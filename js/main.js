@@ -30,15 +30,7 @@ async function loadProducts() {
 // =============================
 // ADD PRODUCT
 // =============================
-async function handleAdd() {
-  const name = document.getElementById("name").value;
-  const price = parseInt(document.getElementById("price").value);
-  const description = document.getElementById("desc").value;
-  const image_url = document.getElementById("image").value;
 
-  await addProduct({ name, price, description, image_url });
-  loadProducts();
-}
 
 // =============================
 // DELETE PRODUCT
@@ -52,16 +44,34 @@ async function removeProduct(id) {
 // EDIT PRODUCT
 // =============================
 async function editProduct(id) {
-  const name = prompt("Tên mới:");
-  const price = prompt("Giá mới:");
 
-  await updateProduct(id, {
-    name,
-    price: parseInt(price)
-  });
+  if (!isAdmin) {
+    alert("Bạn không có quyền sửa sản phẩm");
+    return;
+  }
 
-  loadProducts();
+  const { data, error } = await window.supabaseClient
+    .from("products")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    alert("Không lấy được dữ liệu");
+    return;
+  }
+
+  currentEditId = id;
+
+  document.getElementById("edit-name").value = data.name || "";
+  document.getElementById("edit-price").value = data.price || "";
+  document.getElementById("edit-image").value = data.image || "";
+  document.getElementById("edit-desc").value = data.description || "";
+
+  document.getElementById("edit-modal").classList.remove("hidden");
 }
+
+
 
 // =============================
 // LOGIN
@@ -119,6 +129,43 @@ document.getElementById("logout-btn").classList.add("hidden");
 
   location.reload();
 }
+async function handleUpdate() {
+
+  if (!isAdmin) {
+    alert("Không có quyền cập nhật");
+    return;
+  }
+
+  const name = document.getElementById("edit-name").value;
+  const price = parseInt(document.getElementById("edit-price").value);
+  const image = document.getElementById("edit-image").value;
+  const description = document.getElementById("edit-desc").value;
+
+  const { error } = await window.supabaseClient
+    .from("products")
+    .update({
+      name,
+      price,
+      image,
+      description
+    })
+    .eq("id", currentEditId);
+
+  if (error) {
+    alert("Lỗi cập nhật: " + error.message);
+    return;
+  }
+
+  closeEdit();
+  loadProducts();
+}
+function closeEdit() {
+  document.getElementById("edit-modal").classList.add("hidden");
+}
 
 // RUN
 checkUser();
+
+window.handleUpdate = handleUpdate;
+window.closeEdit = closeEdit;
+window.editProduct = editProduct;

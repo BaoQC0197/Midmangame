@@ -1,0 +1,686 @@
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #a4ef94, #1b641f);
+  min-height: 100vh;
+}
+
+/* CONTAINER */
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 20px;
+}
+
+/* =====================
+   HEADER
+   ===================== */
+.header {
+  background: white;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+
+.header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  gap: 12px;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  color: #4f46e5;
+  white-space: nowrap;
+}
+
+.menu {
+  display: flex;
+  align-items: center;
+}
+
+.menu a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.menu a:hover {
+  color: #4f46e5;
+}
+
+/* Mobile nav overlay */
+.menu.open {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.98);
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  z-index: 300;
+}
+
+.menu.open a {
+  font-size: 22px;
+  margin: 0;
+}
+
+/* Close button inside mobile menu */
+.menu-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #333;
+}
+
+.menu-close-btn:hover {
+  color: #4f46e5;
+  background: none;
+  transform: none;
+}
+
+/* Hamburger button */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #4f46e5;
+  padding: 4px;
+}
+
+.hamburger:hover {
+  background: none;
+  transform: none;
+  color: #4338ca;
+}
+
+.login-area {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.login-area input {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  width: 140px;
+}
+
+.login-area span {
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+}
+
+.login-area button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #4f46e5;
+  color: white;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.login-area button:hover {
+  background: #4338ca;
+  transform: none;
+}
+
+/* =====================
+   CATEGORY BAR
+   ===================== */
+.category-bar {
+  background: #ffffff;
+  border-bottom: 1px solid #eee;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.category-list {
+  display: flex;
+  gap: 24px;
+  padding: 12px 20px;
+  white-space: nowrap;
+  min-width: max-content;
+}
+
+.category-list a {
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
+  font-size: 14px;
+}
+
+.category-list a:hover {
+  color: #15803d;
+}
+
+/* =====================
+   HERO
+   ===================== */
+.hero {
+  text-align: center;
+  padding: 80px 20px;
+  color: white;
+}
+
+.hero h1 {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+/* =====================
+   PRODUCT GRID
+   ===================== */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 30px;
+  margin: 50px 0;
+}
+
+/* =====================
+   CARD
+   ===================== */
+.card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+}
+
+.card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.card-content {
+  padding: 15px;
+}
+
+.card-content h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+.card-content p {
+  font-size: 14px;
+  color: #555;
+  margin: 6px 0;
+}
+
+.price {
+  color: green;
+  font-weight: bold;
+}
+
+/* =====================
+   ADMIN PANEL
+   ===================== */
+.admin-panel {
+  width: 600px;
+  max-width: calc(100% - 40px);
+  margin: 40px auto 20px auto;
+  padding: 25px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #eaffea, #c8f7c5);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+.admin-panel h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #4f46e5;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.admin-panel input,
+.admin-panel textarea,
+.admin-panel select {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border: 1px solid #b2dfdb;
+  border-radius: 10px;
+  outline: none;
+  transition: 0.3s;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+.admin-panel input:focus,
+.admin-panel textarea:focus,
+.admin-panel select:focus {
+  border-color: #66bb6a;
+  box-shadow: 0 0 5px rgba(102, 187, 106, 0.4);
+}
+
+.admin-panel textarea {
+  resize: none;
+  min-height: 80px;
+}
+
+.btn-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-add {
+  padding: 14px 30px;
+  border-radius: 12px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.btn-add:hover {
+  background: #4338ca;
+  transform: translateY(-2px);
+}
+
+.btn-add:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =====================
+   ADMIN ACTIONS
+   ===================== */
+.admin-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.btn-edit {
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid #2e7d32;
+  background: white;
+  color: #2e7d32;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn-edit:hover {
+  background: #e8f5e9;
+  transform: none;
+}
+
+.btn-delete {
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: none;
+  background: linear-gradient(135deg, #fbd786, #f7797d);
+  color: rgb(214, 12, 12);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn-delete:hover {
+  opacity: 0.85;
+  transform: none;
+}
+
+/* =====================
+   FLOAT BUTTONS
+   ===================== */
+.zalo-btn,
+.hotline-btn {
+  position: fixed;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+  transition: transform 0.3s;
+  z-index: 100;
+}
+
+.zalo-btn:hover,
+.hotline-btn:hover {
+  transform: translateY(-3px);
+}
+
+.zalo-btn {
+  bottom: 200px;
+  background: #0ea5e9;
+}
+
+.hotline-btn {
+  bottom: 140px;
+  background: #ef4444;
+}
+
+/* =====================
+   FOOTER
+   ===================== */
+footer {
+  background: white;
+  text-align: center;
+  padding: 20px;
+  font-size: 14px;
+  color: #555;
+}
+
+main {
+  padding-bottom: 100px;
+}
+
+/* =====================
+   EDIT MODAL
+   ===================== */
+#edit-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.modal-content {
+  background: white;
+  padding: 28px;
+  width: 100%;
+  max-width: 380px;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #4f46e5;
+}
+
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  outline: none;
+  box-sizing: border-box;
+  transition: 0.3s;
+  font-size: 14px;
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 5px rgba(79, 70, 229, 0.3);
+}
+
+.modal-content textarea {
+  resize: none;
+  min-height: 80px;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.modal-buttons button {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.modal-buttons button:first-child {
+  background: #4f46e5;
+  color: white;
+}
+
+.modal-buttons button:first-child:hover {
+  background: #4338ca;
+  transform: none;
+}
+
+.modal-buttons button:last-child {
+  background: #f1f5f9;
+  color: #333;
+}
+
+.modal-buttons button:last-child:hover {
+  background: #e2e8f0;
+  transform: none;
+}
+
+.modal-buttons button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =====================
+   TRANSITIONS
+   ===================== */
+button {
+  transition: background 0.2s, transform 0.1s;
+}
+
+/* ==============================================
+   RESPONSIVE — TABLET (max-width: 1024px)
+   ============================================== */
+@media (max-width: 1024px) {
+  .menu a {
+    margin: 0 10px;
+    font-size: 14px;
+  }
+
+  .login-area input {
+    width: 110px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  .admin-panel {
+    width: 90%;
+  }
+}
+
+/* ==============================================
+   RESPONSIVE — MOBILE (max-width: 768px)
+   ============================================== */
+@media (max-width: 768px) {
+
+  /* Header */
+  .header .container {
+    padding: 12px 16px;
+    flex-wrap: nowrap;
+  }
+
+  .menu {
+    display: none;
+    /* ẩn menu desktop, dùng hamburger */
+  }
+
+  .hamburger {
+    display: block;
+  }
+
+  .logo {
+    font-size: 18px;
+  }
+
+  .login-area {
+    flex-wrap: nowrap;
+    gap: 4px;
+  }
+
+  .login-area input {
+    width: 90px;
+    font-size: 12px;
+    padding: 5px 8px;
+  }
+
+  .login-area button {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+
+  /* Hero */
+  .hero {
+    padding: 50px 20px;
+  }
+
+  .hero h1 {
+    font-size: 24px;
+  }
+
+  .hero p {
+    font-size: 15px;
+  }
+
+  /* Products */
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 30px 0;
+  }
+
+  .card img {
+    height: 160px;
+  }
+
+  .card-content {
+    padding: 12px;
+  }
+
+  .card-content h3 {
+    font-size: 14px;
+  }
+
+  /* Admin Panel */
+  .admin-panel {
+    width: calc(100% - 32px);
+    padding: 20px 16px;
+    margin: 20px auto;
+  }
+
+  .admin-panel h2 {
+    font-size: 18px;
+  }
+
+  .btn-add {
+    font-size: 15px;
+    padding: 12px 24px;
+  }
+
+  /* Float buttons */
+  .zalo-btn,
+  .hotline-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+    right: 14px;
+  }
+
+  .zalo-btn {
+    bottom: 170px;
+  }
+
+  .hotline-btn {
+    bottom: 118px;
+  }
+}
+
+/* ==============================================
+   RESPONSIVE — SMALL MOBILE (max-width: 480px)
+   ============================================== */
+@media (max-width: 480px) {
+
+  /* Product grid 1 cột trên màn nhỏ */
+  .product-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .card img {
+    height: 200px;
+  }
+
+  /* Login area - ẩn input khi chưa click (đơn giản hoá) */
+  .login-area input {
+    width: 80px;
+    font-size: 11px;
+  }
+
+  .login-area button {
+    font-size: 11px;
+    padding: 5px 8px;
+  }
+
+  /* Modal full width */
+  .modal-content {
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
+
+  /* Category horizontal scroll */
+  .category-list {
+    gap: 16px;
+    padding: 10px 16px;
+  }
+}

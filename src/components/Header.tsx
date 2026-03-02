@@ -3,15 +3,18 @@ import { useState } from 'react';
 
 interface HeaderProps {
     isAdmin: boolean;
+    cartCount: number;
     onLogin: (email: string, password: string) => Promise<void>;
     onLogout: () => Promise<void>;
+    onCartOpen: () => void;
 }
 
-export default function Header({ isAdmin, onLogin, onLogout }: HeaderProps) {
+export default function Header({ isAdmin, cartCount, onLogin, onLogout, onCartOpen }: HeaderProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [adminOpen, setAdminOpen] = useState(false);
 
     const handleLogin = async () => {
         if (!email || !password) return;
@@ -20,6 +23,7 @@ export default function Header({ isAdmin, onLogin, onLogout }: HeaderProps) {
             await onLogin(email, password);
             setEmail('');
             setPassword('');
+            setAdminOpen(false);
         } finally {
             setLoading(false);
         }
@@ -27,76 +31,86 @@ export default function Header({ isAdmin, onLogin, onLogout }: HeaderProps) {
 
     const navLinks = [
         { label: 'Trang chủ', href: '#' },
-        { label: 'Sản phẩm', href: '#' },
-        { label: 'Giới thiệu', href: '#' },
-        { label: 'Liên hệ', href: '#' },
+        { label: 'Sản phẩm', href: '#product-list' },
+        { label: 'Giới thiệu', href: '#about' },
+        { label: 'Liên hệ', href: '#contact' },
     ];
 
     return (
         <header className="header">
-            <div className="container">
-                <div className="logo">VPP Ti Anh</div>
+            <div className="header-inner container">
+                {/* Logo */}
+                <a href="#" className="logo">
+                    <span className="logo-icon">📚</span>
+                    <span className="logo-text">VPP <span className="logo-accent">Ti Anh</span></span>
+                </a>
 
                 {/* Desktop Nav */}
-                <nav className={`menu${menuOpen ? ' open' : ''}`}>
-                    {/* Nút đóng menu mobile */}
-                    {menuOpen && (
-                        <button
-                            className="menu-close-btn"
-                            onClick={() => setMenuOpen(false)}
-                            aria-label="Đóng menu"
-                        >
-                            ✕
-                        </button>
-                    )}
+                <nav className={`nav-menu${menuOpen ? ' open' : ''}`}>
+                    <button className="nav-close" onClick={() => setMenuOpen(false)}>✕</button>
                     {navLinks.map((link) => (
-                        <a
-                            key={link.label}
-                            href={link.href}
-                            onClick={() => setMenuOpen(false)}
-                        >
+                        <a key={link.label} href={link.href} className="nav-link" onClick={() => setMenuOpen(false)}>
                             {link.label}
                         </a>
                     ))}
                 </nav>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    {/* Login / Admin area */}
-                    <div className="login-area">
+                {/* Right side actions */}
+                <div className="header-actions">
+                    {/* Cart button */}
+                    <button className="cart-btn" onClick={onCartOpen} aria-label="Giỏ hàng">
+                        🛒
+                        {cartCount > 0 && (
+                            <span className="cart-badge">{cartCount > 99 ? '99+' : cartCount}</span>
+                        )}
+                    </button>
+
+                    {/* Admin login area */}
+                    <div className="admin-dropdown-wrapper">
                         {isAdmin ? (
-                            <>
-                                <span id="welcome-text">Chào admin 👋</span>
-                                <button onClick={onLogout} id="logout-btn">Đăng xuất</button>
-                            </>
+                            <div className="admin-info">
+                                <span className="admin-greeting">👋 Admin</span>
+                                <button className="btn-logout" onClick={onLogout}>Đăng xuất</button>
+                            </div>
                         ) : (
                             <>
-                                <input
-                                    id="email"
-                                    type="email"
-                                    placeholder="Email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-                                <input
-                                    id="password"
-                                    type="password"
-                                    placeholder="Password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-                                />
                                 <button
-                                    id="login-btn"
-                                    onClick={handleLogin}
-                                    disabled={loading}
+                                    className="btn-admin-toggle"
+                                    onClick={() => setAdminOpen((v) => !v)}
+                                    title="Đăng nhập Admin"
                                 >
-                                    {loading ? '...' : 'Đăng nhập'}
+                                    🔑
                                 </button>
+                                {adminOpen && (
+                                    <div className="admin-dropdown">
+                                        <p className="admin-dropdown-title">Đăng nhập Admin</p>
+                                        <input
+                                            type="email"
+                                            placeholder="Email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                        />
+                                        <input
+                                            type="password"
+                                            placeholder="Mật khẩu"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+                                        />
+                                        <button
+                                            className="btn-login-submit"
+                                            onClick={handleLogin}
+                                            disabled={loading}
+                                        >
+                                            {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                                        </button>
+                                    </div>
+                                )}
                             </>
                         )}
                     </div>
 
-                    {/* Hamburger button — chỉ hiện trên mobile qua CSS */}
+                    {/* Hamburger */}
                     <button
                         className="hamburger"
                         onClick={() => setMenuOpen(true)}
@@ -106,6 +120,9 @@ export default function Header({ isAdmin, onLogin, onLogout }: HeaderProps) {
                     </button>
                 </div>
             </div>
+
+            {/* Mobile overlay */}
+            {menuOpen && <div className="nav-overlay" onClick={() => setMenuOpen(false)} />}
         </header>
     );
 }

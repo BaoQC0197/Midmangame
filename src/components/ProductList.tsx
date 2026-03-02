@@ -7,13 +7,20 @@ interface ProductListProps {
     isAdmin: boolean;
     onEdit: (id: number) => void;
     onDelete: (id: number) => void;
+    onAddToCart: (product: Product) => void;
+    searchQuery?: string;
 }
 
-export default function ProductList({ products, isAdmin, onEdit, onDelete }: ProductListProps) {
+export default function ProductList({ products, isAdmin, onEdit, onDelete, onAddToCart, searchQuery }: ProductListProps) {
     if (products.length === 0) {
         return (
-            <div id="product-list" className="product-grid" style={{ textAlign: 'center', color: 'white', padding: '40px 0' }}>
-                <p>Không có sản phẩm nào.</p>
+            <div id="product-list" className="empty-state">
+                <span className="empty-icon">🔍</span>
+                {searchQuery?.trim() ? (
+                    <p>Không tìm thấy sản phẩm nào với từ khoá "<strong>{searchQuery}</strong>".</p>
+                ) : (
+                    <p>Không có sản phẩm nào trong danh mục này.</p>
+                )}
             </div>
         );
     }
@@ -27,6 +34,8 @@ export default function ProductList({ products, isAdmin, onEdit, onDelete }: Pro
                     isAdmin={isAdmin}
                     onEdit={onEdit}
                     onDelete={onDelete}
+                    onAddToCart={onAddToCart}
+                    searchQuery={searchQuery}
                 />
             ))}
         </div>

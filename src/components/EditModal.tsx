@@ -1,6 +1,7 @@
 // src/components/EditModal.tsx
 import { useState, useEffect } from 'react';
 import type { Product } from '../types/product';
+import ImageUpload from './ImageUpload';
 
 interface EditModalProps {
     product: Product | null;
@@ -47,6 +48,7 @@ export default function EditModal({ product, onSave, onClose }: EditModalProps) 
         <div id="edit-modal" onClick={(e) => e.target === e.currentTarget && onClose()}>
             <div className="modal-content">
                 <h3>Sửa sản phẩm</h3>
+
                 <input
                     type="text"
                     id="edit-name"
@@ -61,19 +63,21 @@ export default function EditModal({ product, onSave, onClose }: EditModalProps) 
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                 />
-                <input
-                    type="text"
-                    id="edit-image"
-                    placeholder="Link ảnh"
-                    value={image}
-                    onChange={(e) => setImage(e.target.value)}
+
+                {/* --- Upload ảnh --- */}
+                <label className="field-label">Ảnh sản phẩm</label>
+                <ImageUpload
+                    currentImageUrl={image}
+                    onUploaded={(url) => setImage(url)}
                 />
+
                 <textarea
                     id="edit-desc"
                     placeholder="Mô tả"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                 />
+
                 <div className="modal-buttons">
                     <button type="button" onClick={handleSave} disabled={loading}>
                         {loading ? 'Đang lưu...' : 'Lưu'}

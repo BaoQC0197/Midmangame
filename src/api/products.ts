@@ -47,3 +47,21 @@ export async function getProductById(id: number): Promise<Product | null> {
     if (error) return null;
     return data as Product;
 }
+
+export async function uploadImage(file: File): Promise<string> {
+    const ext = file.name.split('.').pop();
+    const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+    const filePath = `products/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+        .from('Images vpp')
+        .upload(filePath, file, { upsert: false });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage
+        .from('Images vpp')
+        .getPublicUrl(filePath);
+
+    return data.publicUrl;
+}

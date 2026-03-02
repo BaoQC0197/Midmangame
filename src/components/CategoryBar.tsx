@@ -1,11 +1,11 @@
 // src/components/CategoryBar.tsx
 
 const CATEGORIES = [
-    { key: 'all', label: 'Tất cả' },
-    { key: 'but', label: 'Bút viết' },
-    { key: 'vo', label: 'Vở' },
-    { key: 'dungcu', label: 'Dụng cụ học tập' },
-    { key: 'mythuat', label: 'Mỹ thuật' },
+    { key: 'all', label: 'Tất cả', icon: '🏪' },
+    { key: 'but', label: 'Bút viết', icon: '✏️' },
+    { key: 'vo', label: 'Vở', icon: '📓' },
+    { key: 'dungcu', label: 'Dụng cụ HT', icon: '📐' },
+    { key: 'mythuat', label: 'Mỹ thuật', icon: '🎨' },
 ] as const;
 
 interface CategoryBarProps {
@@ -18,20 +18,14 @@ export default function CategoryBar({ activeCategory, onFilter }: CategoryBarPro
         <div className="category-bar">
             <div className="container category-list">
                 {CATEGORIES.map((cat) => (
-                    <a
+                    <button
                         key={cat.key}
-                        href="#"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            onFilter(cat.key);
-                        }}
-                        style={{
-                            color: activeCategory === cat.key ? '#15803d' : undefined,
-                            fontWeight: activeCategory === cat.key ? 700 : undefined,
-                        }}
+                        className={`category-pill${activeCategory === cat.key ? ' active' : ''}`}
+                        onClick={() => onFilter(cat.key)}
                     >
+                        <span className="cat-icon">{cat.icon}</span>
                         {cat.label}
-                    </a>
+                    </button>
                 ))}
             </div>
         </div>

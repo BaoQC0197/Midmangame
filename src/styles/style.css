@@ -2752,3 +2752,67 @@ button {
   background: var(--color-danger-bg);
   border-color: var(--color-danger);
 }
+
+/* =====================
+   PRODUCT LIST PAGINATION
+   ===================== */
+.product-list-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 28px 0 16px;
+}
+
+.product-count-label {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.btn-load-more {
+  padding: 12px 32px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-primary);
+  background: transparent;
+  color: var(--color-primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  letter-spacing: 0.3px;
+}
+
+.btn-load-more:hover {
+  background: var(--color-primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.25);
+}
+
+.btn-collapse {
+  padding: 8px 20px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.btn-collapse:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+  .btn-load-more {
+    width: 100%;
+    padding: 14px;
+  }
+
+  .btn-collapse {
+    width: 100%;
+  }
+}

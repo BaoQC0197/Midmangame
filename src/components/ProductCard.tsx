@@ -42,7 +42,7 @@ export default function ProductCard({ product, isAdmin, onEdit, onDelete, onAddT
         setTimeout(() => setAdded(false), 1500);
     };
 
-    const catLabel = CATEGORY_LABELS[product.category] || '';
+    const catLabel = product.category ? CATEGORY_LABELS[product.category] || '' : '';
 
     return (
         <div className="card">

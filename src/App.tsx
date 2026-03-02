@@ -8,7 +8,6 @@ import { useCart } from './hooks/useCart';
 import Header from './components/Header';
 import CategoryBar from './components/CategoryBar';
 import Hero from './components/Hero';
-import SearchBar from './components/SearchBar';
 import ProductList from './components/ProductList';
 import AdminDashboard from './components/AdminDashboard';
 import EditModal from './components/EditModal';

@@ -61,13 +61,15 @@ export default function ProductCard({ product, isAdmin, onEdit, onDelete, onAddT
                 )}
                 <div className="card-footer">
                     <div className="card-price">{product.price.toLocaleString('vi-VN')} đ</div>
-                    <button
-                        className={`btn-add-cart${added ? ' added' : ''}`}
-                        onClick={handleAddToCart}
-                        disabled={added}
-                    >
-                        {added ? '✓ Đã thêm' : '+ Giỏ'}
-                    </button>
+                    {!isAdmin && (
+                        <button
+                            className={`btn-add-cart${added ? ' added' : ''}`}
+                            onClick={handleAddToCart}
+                            disabled={added}
+                        >
+                            {added ? '✓ Đã thêm' : '+ Giỏ'}
+                        </button>
+                    )}
                 </div>
                 {isAdmin && (
                     <div className="admin-actions">

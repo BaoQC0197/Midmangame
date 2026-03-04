@@ -278,9 +278,9 @@
 .navOverlay {
     position: fixed;
     inset: 0;
-    background: rgba(15, 40, 30, 0.55);
+    background: rgba(5, 80, 40, 0.25);
     z-index: 550;
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(3px);
     cursor: pointer;
 }
 
@@ -368,19 +368,49 @@
 
     .mobileNavLink {
         width: 100%;
-        padding: 14px 20px;
+        padding: 15px 20px;
         border-radius: var(--radius-md);
         font-size: 16px;
         font-weight: 600;
         display: flex;
         align-items: center;
+        justify-content: space-between;
         color: var(--color-text);
-        transition: background var(--transition), color var(--transition);
+        border-left: 3px solid transparent;
+        transition:
+            background 0.22s ease,
+            color 0.22s ease,
+            border-color 0.22s ease,
+            padding-left 0.22s ease,
+            box-shadow 0.22s ease;
+        position: relative;
     }
 
-    .mobileNavLink:hover {
-        background: var(--color-primary-light);
+    /* Arrow icon — hidden by default, slides in on hover */
+    .mobileNavLink::after {
+        content: '›';
+        font-size: 20px;
+        font-weight: 400;
+        color: var(--color-primary);
+        opacity: 0;
+        transform: translateX(-6px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        line-height: 1;
+    }
+
+    .mobileNavLink:hover,
+    .mobileNavLink:active {
+        background: linear-gradient(90deg, rgba(22, 163, 74, 0.10) 0%, rgba(22, 163, 74, 0.03) 100%);
         color: var(--color-primary-dark);
+        border-left-color: var(--color-primary);
+        padding-left: 26px;
+        box-shadow: inset 0 0 0 1px rgba(22, 163, 74, 0.08);
+    }
+
+    .mobileNavLink:hover::after,
+    .mobileNavLink:active::after {
+        opacity: 1;
+        transform: translateX(0);
     }
 
     .navFooter {

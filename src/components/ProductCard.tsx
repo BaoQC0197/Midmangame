@@ -3,13 +3,6 @@ import { useState } from 'react';
 import type { Product } from '../types/product';
 import styles from './ProductCard.module.css';
 
-const CATEGORY_LABELS: Record<string, string> = {
-    but: 'Bút viết',
-    vo: 'Vở',
-    dungcu: 'Dụng cụ HT',
-    mythuat: 'Mỹ thuật',
-    all: '',
-};
 
 interface ProductCardProps {
     product: Product;
@@ -43,15 +36,11 @@ export default function ProductCard({ product, isAdmin, onEdit, onDelete, onAddT
         setTimeout(() => setAdded(false), 1500);
     };
 
-    const catLabel = product.category
-        ? (CATEGORY_LABELS[product.category] ?? product.category)
-        : '';
 
     return (
         <div className={styles.card}>
             <div className={styles.cardImgWrapper}>
                 <img src={product.image} alt={product.name} className={styles.cardImg} />
-                {catLabel && <span className={styles.cardBadge}>{catLabel}</span>}
             </div>
             <div className={styles.cardContent}>
                 <h3 className={styles.cardName}>

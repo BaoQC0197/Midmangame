@@ -28,7 +28,12 @@ export default function Hero({ searchQuery, onSearchChange }: HeroProps) {
             <div className={`container ${styles.heroInner}`}>
                 {/* Left: Text */}
                 <div className={styles.heroContent}>
-                    <div className={styles.heroBadge}>🔥 Ưu đãi đặc biệt hôm nay</div>
+                    <button
+                        className={styles.heroBadge}
+                        onClick={() => document.getElementById('product-list')?.scrollIntoView({ behavior: 'smooth' })}
+                    >
+                        ✨ Khám phá ngay
+                    </button>
                     <h1 className={styles.heroTitle}>
                         Văn Phòng Phẩm<br />
                         <span className={styles.heroTitleAccent}>Chất Lượng Cao</span>

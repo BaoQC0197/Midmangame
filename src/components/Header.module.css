@@ -30,8 +30,12 @@
     text-decoration: none;
 }
 
-.logoIcon {
-    font-size: 26px;
+.logoImg {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    object-fit: cover;
+    flex-shrink: 0;
 }
 
 .logoText {
@@ -95,22 +99,26 @@
 /* Cart button */
 .cartBtn {
     position: relative;
-    background: var(--color-primary);
-    color: white;
-    border: none;
+    background: white;
+    color: var(--color-primary-dark);
+    border: 2px solid var(--color-primary);
     border-radius: var(--radius-full);
-    padding: 8px 16px;
+    padding: 7px 16px;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 700;
     display: flex;
     align-items: center;
     gap: 6px;
+    box-shadow: 0 1px 4px rgba(22, 163, 74, 0.15);
+    transition: all var(--transition);
 }
 
 .cartBtn:hover {
-    background: var(--color-primary-dark);
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(22, 163, 74, .35);
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
 }
 
 .cartBadge {
@@ -328,11 +336,14 @@
         display: block;
     }
 
-    .navBannerIcon {
-        font-size: 36px;
+    .navBannerLogo {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        object-fit: cover;
         display: block;
-        margin-bottom: 12px;
-        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+        margin-bottom: 14px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     }
 
     .navBannerText strong {

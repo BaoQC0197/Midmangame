@@ -17,6 +17,7 @@ import CartDrawer from './components/CartDrawer';
 import OrderModal from './components/OrderModal';
 import FloatButtons from './components/FloatButtons';
 import styles from './App.module.css';
+import logoImg from './assets/logo.png';
 
 export default function App() {
     const [isAdmin, setIsAdmin] = useState(false);
@@ -205,7 +206,10 @@ export default function App() {
             <footer className={styles.footer} id="contact">
                 <div className={`container ${styles.footerInner}`}>
                     <div className={styles.footerBrand}>
-                        <div className={styles.footerLogo}>📚 VPP Ti Anh</div>
+                        <div className={styles.footerLogo}>
+                            <img src={logoImg} alt="VPP Ti Anh logo" className={styles.footerLogoImg} />
+                            VPP Ti Anh
+                        </div>
                         <p className={styles.footerTagline}>Đại lý văn phòng phẩm uy tín<br />Chất lượng cao, giá tốt nhất</p>
                     </div>
                     <div className={styles.footerLinks} id="about">

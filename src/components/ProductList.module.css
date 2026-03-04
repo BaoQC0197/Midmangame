@@ -21,10 +21,6 @@
 }
 
 /* Footer: count + pagination */
-.productListFooter {
-    /* wrapper for count + pagination rows */
-}
-
 .productCountLabel {
     text-align: center;
     font-size: 13px;
@@ -106,7 +102,8 @@
 
 @media (max-width: 480px) {
     .productGrid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
     }
 
     .pageBtn {

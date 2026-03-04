@@ -20,7 +20,7 @@ export default function EditModal({ product, onSave, onClose }: EditModalProps) 
     useEffect(() => {
         if (product) {
             setName(product.name || '');
-            setPrice(String(product.price || ''));
+            setPrice(String(product.price || '').replace(/\D/g, '')); // raw digits only
             setImage(product.image || '');
             setDescription(product.description || '');
         }
@@ -29,7 +29,7 @@ export default function EditModal({ product, onSave, onClose }: EditModalProps) 
     if (!product) return null;
 
     const handleSave = async () => {
-        const parsedPrice = parseInt(price);
+        const parsedPrice = parseInt(price.replace(/\./g, ''), 10);
         if (isNaN(parsedPrice)) { alert('Giá không hợp lệ'); return; }
         setLoading(true);
         try {
@@ -47,7 +47,14 @@ export default function EditModal({ product, onSave, onClose }: EditModalProps) 
             <div className={styles.modalContent}>
                 <h3>Sửa sản phẩm</h3>
                 <input type="text" id="edit-name" placeholder="Tên" value={name} onChange={(e) => setName(e.target.value)} />
-                <input type="number" id="edit-price" placeholder="Giá" value={price} onChange={(e) => setPrice(e.target.value)} />
+                <input
+                    type="text"
+                    id="edit-price"
+                    placeholder="Giá"
+                    inputMode="numeric"
+                    value={price ? price.replace(/\B(?=(\d{3})+(?!\d))/g, '.') : ''}
+                    onChange={(e) => setPrice(e.target.value.replace(/\D/g, ''))}
+                />
                 <label className="field-label">Ảnh sản phẩm</label>
                 <ImageUpload currentImageUrl={image} onUploaded={(url) => setImage(url)} />
                 <textarea id="edit-desc" placeholder="Mô tả" value={description} onChange={(e) => setDescription(e.target.value)} />

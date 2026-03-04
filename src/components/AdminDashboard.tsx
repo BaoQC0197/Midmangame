@@ -25,7 +25,7 @@ const CUSTOM_KEY = '__custom__';
 
 function AddProductForm({ onAdd, categories }: { onAdd: (product: ProductInput) => Promise<void>; categories: Category[] }) {
     const [name, setName] = useState('');
-    const [price, setPrice] = useState('');
+    const [price, setPrice] = useState('');   // raw digits, e.g. "2000000"
     const [image, setImage] = useState('');
     const [description, setDescription] = useState('');
     const [selectValue, setSelectValue] = useState('');
@@ -45,7 +45,7 @@ function AddProductForm({ onAdd, categories }: { onAdd: (product: ProductInput) 
         const e: FormErrors = {};
         if (!name.trim()) e.name = 'Vui lòng nhập tên sản phẩm';
         if (!price) e.price = 'Vui lòng nhập giá';
-        else if (isNaN(parseInt(price)) || parseInt(price) <= 0) e.price = 'Giá không hợp lệ';
+        else if (parseInt(price) <= 0) e.price = 'Giá không hợp lệ';
         if (!image) e.image = 'Vui lòng upload ảnh sản phẩm';
         if (selectValue === CUSTOM_KEY && !customCategory.trim()) e.name = (e.name ? e.name + ' | ' : '') + 'Vui lòng nhập tên danh mục mới';
         setErrors(e);
@@ -89,9 +89,18 @@ function AddProductForm({ onAdd, categories }: { onAdd: (product: ProductInput) 
                     className={errors.name ? 'input-error' : ''} />
                 {errors.name && <p className="field-error">{errors.name}</p>}
 
-                <input placeholder="Giá (VNĐ) *" type="number" value={price}
-                    onChange={(e) => { setPrice(e.target.value); setErrors(p => ({ ...p, price: undefined })); }}
-                    className={errors.price ? 'input-error' : ''} />
+                <input
+                    placeholder="Giá (VNĐ) *"
+                    type="text"
+                    inputMode="numeric"
+                    value={price ? price.replace(/\B(?=(\d{3})+(?!\d))/g, '.') : ''}
+                    onChange={(e) => {
+                        const digits = e.target.value.replace(/\D/g, '');
+                        setPrice(digits);
+                        setErrors(p => ({ ...p, price: undefined }));
+                    }}
+                    className={errors.price ? 'input-error' : ''}
+                />
                 {errors.price && <p className="field-error">{errors.price}</p>}
 
                 <label className="field-label">Ảnh sản phẩm *</label>

@@ -1,9 +1,11 @@
 // src/components/CartDrawer.tsx
 import { useState } from 'react';
 import type { CartItem } from '../hooks/useCart';
+import { DEFAULT_PRODUCT_IMAGE } from '../constants/images';
 import styles from './CartDrawer.module.css';
 
 interface CartDrawerProps {
+    // ... lines 7-15 ...
     open: boolean;
     items: CartItem[];
     totalPrice: number;
@@ -59,7 +61,12 @@ export default function CartDrawer({ open, items, totalPrice, onClose, onUpdateQ
                         <ul className={styles.cartItemList}>
                             {items.map(({ product, quantity }) => (
                                 <li key={product.id} className={styles.cartItem}>
-                                    <img src={product.image} alt={product.name} className={styles.cartItemImg} />
+                                    <img
+                                        src={product.image || DEFAULT_PRODUCT_IMAGE}
+                                        alt={product.name}
+                                        className={styles.cartItemImg}
+                                        onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_PRODUCT_IMAGE; }}
+                                    />
                                     <div className={styles.cartItemInfo}>
                                         <p className={styles.cartItemName}>{product.name}</p>
                                         <p className={styles.cartItemPrice}>{(product.price * quantity).toLocaleString('vi-VN')} đ</p>

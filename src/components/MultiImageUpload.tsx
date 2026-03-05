@@ -1,6 +1,7 @@
 // src/components/MultiImageUpload.tsx
 import { useRef, useState, type ChangeEvent, type DragEvent } from 'react';
 import { uploadImage } from '../api/products';
+import { DEFAULT_PRODUCT_IMAGE } from '../constants/images';
 import styles from './MultiImageUpload.module.css';
 
 interface MultiImageUploadProps {
@@ -73,7 +74,12 @@ export default function MultiImageUpload({ urls, onChange, maxImages = 6 }: Mult
                 <div className={styles.grid}>
                     {urls.map((url, idx) => (
                         <div key={url + idx} className={`${styles.thumb}${idx === 0 ? ' ' + styles.primary : ''}`}>
-                            <img src={url} alt={`Ảnh ${idx + 1}`} className={styles.thumbImg} />
+                            <img
+                                src={url || DEFAULT_PRODUCT_IMAGE}
+                                alt={`Ảnh ${idx + 1}`}
+                                className={styles.thumbImg}
+                                onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_PRODUCT_IMAGE; }}
+                            />
                             {idx === 0 && <span className={styles.primaryBadge}>Ảnh chính</span>}
                             <div className={styles.thumbActions}>
                                 <button type="button" onClick={() => handleMoveUp(idx)} disabled={idx === 0} title="Lên trước" className={styles.thumbBtn}>↑</button>

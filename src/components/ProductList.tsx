@@ -18,12 +18,24 @@ interface ProductListProps {
     searchQuery?: string;
     isLoading?: boolean;
     onResetFilter?: () => void;
+    activeCategory?: string;
 }
 
-export default function ProductList({ products, isAdmin, onEdit, onDelete, onAddToCart, onViewDetail, searchQuery, isLoading, onResetFilter }: ProductListProps) {
+export default function ProductList({ products, isAdmin, onEdit, onDelete, onAddToCart, onViewDetail, searchQuery, isLoading, onResetFilter, activeCategory }: ProductListProps) {
     const [page, setPage] = useState(1);
 
-    useEffect(() => { setPage(1); }, [products]);
+    // Reset to page 1 ONLY when filters change (category or search query)
+    useEffect(() => {
+        setPage(1);
+    }, [activeCategory, searchQuery]);
+
+    // Ensure the current page is still valid after products are added/deleted
+    useEffect(() => {
+        const totalPages = Math.ceil(products.length / PAGE_SIZE);
+        if (page > totalPages && totalPages > 0) {
+            setPage(totalPages);
+        }
+    }, [products.length, page]);
 
     // Skeleton loading state
     if (isLoading) {

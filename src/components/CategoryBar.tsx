@@ -14,7 +14,7 @@ export default function CategoryBar({ activeCategory, onFilter, categories }: Ca
     const fullList = [allOption, ...categories];
 
     return (
-        <div className={styles.categoryBar}>
+        <div className={styles.categoryBar} id="category-menu">
             <div className={styles.categoryList}>
                 {fullList.map((cat) => (
                     <button

@@ -205,6 +205,7 @@ export default function App() {
                     searchQuery={searchQuery}
                     isLoading={isLoading}
                     onResetFilter={handleResetFilter}
+                    activeCategory={activeCategory}
                 />
             </main>
 
@@ -299,7 +300,7 @@ export default function App() {
                     <div className={styles.footerLinks} id="about">
                         <h4>Liên kết</h4>
                         <a href="#">Trang chủ</a>
-                        <a href="#product-list">Sản phẩm</a>
+                        <a href="#category-menu">Sản phẩm</a>
                         <a href="#about">Giới thiệu</a>
                     </div>
                     <div className={styles.footerContact}>

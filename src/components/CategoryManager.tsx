@@ -10,7 +10,12 @@ interface Props {
     onRefresh: () => void;
 }
 
-const ICON_PRESETS = ['✏️', '📓', '📐', '🎨', '📦', '🏷️', '📏', '🖊️', '📌', '📎', '🗂️', '📚', '🖍️', '✂️', '🔖'];
+const ICON_PRESETS = [
+    '✏️', '🖊️', '🖋️', '🖌️', '🖍️', '📓', '📒', '📔', '📔', '📕', '📖', '📚',
+    '📐', '📏', '✂️', '🎨', '🧩', '🧸', '🎒', '🎓', '📦', '🏷️', '📌', '📍',
+    '📎', '🖇️', '🗂️', '📁', '📂', '📄', '📃', '📜', '🔖', '📅', '📊', '📈',
+    '💻', '🖥️', '⌨️', '🖱️', '🖨️', '🎁', '🪁', '🏐', '🏸', '🏓'
+];
 
 export default function CategoryManager({ categories, productCategoryCounts, onRefresh }: Props) {
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -137,16 +142,13 @@ export default function CategoryManager({ categories, productCategoryCounts, onR
                                     <span className={styles.catRowIcon}>{cat.icon}</span>
                                     <span className={styles.catRowLabel}>{cat.label}</span>
                                     <span className={styles.catRowKey}>({cat.key})</span>
-                                    {cat.is_fixed && <span className={styles.catBadgeFixed}>Cố định</span>}
                                 </div>
                                 <span className={styles.catColCount}>{productCategoryCounts[cat.key] ?? 0}</span>
                                 <div className={styles.catColActions}>
                                     <button className={styles.btnCatEdit} onClick={() => startEdit(cat)} title="Đổi tên">✏️</button>
-                                    {!cat.is_fixed && (
-                                        <button className={styles.btnCatDel} onClick={() => handleDelete(cat)} disabled={deletingId === cat.id} title="Xoá danh mục">
-                                            {deletingId === cat.id ? '...' : '🗑'}
-                                        </button>
-                                    )}
+                                    <button className={styles.btnCatDel} onClick={() => handleDelete(cat)} disabled={deletingId === cat.id} title="Xoá danh mục">
+                                        {deletingId === cat.id ? '...' : '🗑'}
+                                    </button>
                                 </div>
                             </>
                         )}
@@ -155,8 +157,7 @@ export default function CategoryManager({ categories, productCategoryCounts, onR
             </div>
 
             <p className={styles.catNote}>
-                💡 Danh mục <strong>Cố định</strong> không thể xoá nhưng có thể đổi tên/icon.
-                Khi xoá danh mục custom, sản phẩm sẽ được chuyển sang "Khác".
+                💡 Khi xoá danh mục, các sản phẩm liên quan sẽ được chuyển tự động sang danh mục "Khác" (khac).
             </p>
         </div>
     );

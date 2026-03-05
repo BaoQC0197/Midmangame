@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Product } from '../types/product';
 import type { Category } from '../types/category';
+import { DEFAULT_PRODUCT_IMAGE } from '../constants/images';
 import styles from './ProductDetailModal.module.css';
 
 interface ProductDetailModalProps {
@@ -25,12 +26,20 @@ export default function ProductDetailModal({
 }: ProductDetailModalProps) {
     // Build gallery: combine product.image (always exists) with product.images (from DB)
     const gallery = (() => {
-        const imgs = product.images && product.images.length > 0
+        let imgs = product.images && product.images.length > 0
             ? product.images
             : [product.image];
+
+        // Filter out empty/null images
+        imgs = imgs.filter(img => !!img);
+
+        if (imgs.length === 0) imgs = [DEFAULT_PRODUCT_IMAGE];
+
         // deduplicate while preserving order
         return [...new Set(imgs)];
     })();
+
+    const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
 
     const [activeIdx, setActiveIdx] = useState(0);
     const [qty, setQty] = useState(1);
@@ -86,10 +95,11 @@ export default function ProductDetailModal({
                     <div className={styles.gallery}>
                         <div className={styles.mainImgWrap}>
                             <img
-                                src={gallery[activeIdx]}
+                                src={imgErrors[gallery[activeIdx]] ? DEFAULT_PRODUCT_IMAGE : gallery[activeIdx]}
                                 alt={product.name}
                                 className={styles.mainImg}
                                 key={activeIdx}
+                                onError={() => setImgErrors(prev => ({ ...prev, [gallery[activeIdx]]: true }))}
                             />
                             {gallery.length > 1 && (
                                 <>
@@ -117,7 +127,11 @@ export default function ProductDetailModal({
                                         className={`${styles.thumbBtn}${i === activeIdx ? ' ' + styles.thumbActive : ''}`}
                                         onClick={() => setActiveIdx(i)}
                                     >
-                                        <img src={url} alt={`Ảnh ${i + 1}`} />
+                                        <img
+                                            src={imgErrors[url] ? DEFAULT_PRODUCT_IMAGE : url}
+                                            alt={`Ảnh ${i + 1}`}
+                                            onError={() => setImgErrors(prev => ({ ...prev, [url]: true }))}
+                                        />
                                     </button>
                                 ))}
                             </div>
@@ -198,7 +212,12 @@ export default function ProductDetailModal({
                                     }}
                                     title={p.name}
                                 >
-                                    <img src={p.image} alt={p.name} className={styles.relatedImg} />
+                                    <img
+                                        src={p.image || DEFAULT_PRODUCT_IMAGE}
+                                        alt={p.name}
+                                        className={styles.relatedImg}
+                                        onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_PRODUCT_IMAGE; }}
+                                    />
                                     <span className={styles.relatedName}>{p.name}</span>
                                     <span className={styles.relatedPrice}>{formatPrice(p.price)}</span>
                                 </button>

@@ -1,9 +1,11 @@
 // src/components/ProductCard.tsx
 import { useState } from 'react';
 import type { Product } from '../types/product';
+import { DEFAULT_PRODUCT_IMAGE } from '../constants/images';
 import styles from './ProductCard.module.css';
 
 interface ProductCardProps {
+    // ... items from 7-14 ...
     product: Product;
     isAdmin: boolean;
     onEdit: (id: number) => void;
@@ -29,6 +31,7 @@ function Highlight({ text, query }: { text: string; query?: string }) {
 
 export default function ProductCard({ product, isAdmin, onEdit, onDelete, onAddToCart, onViewDetail, searchQuery }: ProductCardProps) {
     const [added, setAdded] = useState(false);
+    const [imgError, setImgError] = useState(false);
     const promo = product.promotion;
 
     const handleAddToCart = () => {
@@ -39,6 +42,8 @@ export default function ProductCard({ product, isAdmin, onEdit, onDelete, onAddT
 
     const fmt = (n: number) => n.toLocaleString('vi-VN') + ' đ';
 
+    const imgSrc = (!product.image || imgError) ? DEFAULT_PRODUCT_IMAGE : product.image;
+
     return (
         <div className={styles.card}>
             <div
@@ -46,7 +51,12 @@ export default function ProductCard({ product, isAdmin, onEdit, onDelete, onAddT
                 onClick={() => onViewDetail?.(product)}
                 title="Xem chi tiết"
             >
-                <img src={product.image} alt={product.name} className={styles.cardImg} />
+                <img
+                    src={imgSrc}
+                    alt={product.name}
+                    className={styles.cardImg}
+                    onError={() => setImgError(true)}
+                />
                 <div className={styles.imgOverlay}>
                     <span className={styles.imgZoomIcon}>🔍</span>
                 </div>

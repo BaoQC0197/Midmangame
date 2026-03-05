@@ -16,11 +16,10 @@ export async function getCategories(): Promise<Category[]> {
     return data as Category[];
 }
 
-/** Thêm danh mục mới (is_fixed = false) */
-export async function addCategory(input: Omit<CategoryInput, 'is_fixed' | 'sort_order'>): Promise<void> {
+/** Thêm danh mục mới */
+export async function addCategory(input: Omit<CategoryInput, 'sort_order'>): Promise<void> {
     const { error } = await supabase.from('categories').insert([{
         ...input,
-        is_fixed: false,
         sort_order: 50,
     }]);
     if (error) throw error;
@@ -36,7 +35,7 @@ export async function updateCategory(id: number, data: Partial<Pick<Category, 'l
 }
 
 /**
- * Xoá danh mục custom (is_fixed = false).
+ * Xoá danh mục.
  * Tất cả sản phẩm có category = key sẽ được chuyển sang 'khac'.
  */
 export async function deleteCategory(id: number, key: string): Promise<void> {

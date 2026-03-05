@@ -5,7 +5,6 @@ export interface Category {
     key: string;
     label: string;
     icon: string;
-    is_fixed: boolean;
     sort_order: number;
 }
 

@@ -1,5 +1,6 @@
 // src/components/SaleSection.tsx
 import type { Product } from '../types/product';
+import { DEFAULT_PRODUCT_IMAGE } from '../constants/images';
 import styles from './SaleSection.module.css';
 
 interface Props {
@@ -40,7 +41,13 @@ export default function SaleSection({ products, onViewDetail }: Props) {
                             >
                                 <span className={styles.saleBadge}>{promo.label}</span>
                                 <div className={styles.imgWrap}>
-                                    <img src={p.image} alt={p.name} className={styles.img} loading="lazy" />
+                                    <img
+                                        src={p.image || DEFAULT_PRODUCT_IMAGE}
+                                        alt={p.name}
+                                        className={styles.img}
+                                        loading="lazy"
+                                        onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_PRODUCT_IMAGE; }}
+                                    />
                                 </div>
                                 <div className={styles.cardBody}>
                                     <p className={styles.cardName}>{p.name}</p>

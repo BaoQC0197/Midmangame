@@ -5,6 +5,7 @@
     width: 100%;
     margin: 0 auto;
     padding: 0 clamp(20px, 2.5%, 60px);
+    scroll-margin-top: 80px;
 }
 
 .categoryList {

@@ -24,7 +24,7 @@ export default function Hero({ searchQuery, onSearchChange }: HeroProps) {
     }, []);
 
     const scrollToResults = () => {
-        document.getElementById('product-list')?.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('category-menu')?.scrollIntoView({ behavior: 'smooth' });
     };
 
     return (
@@ -38,7 +38,7 @@ export default function Hero({ searchQuery, onSearchChange }: HeroProps) {
                         onClick={scrollToResults}
                     >
                         ✨ Mua ở đây thì ngon luôn!
-                        <span className={styles.handPointer}>👆</span>
+                        <span className={styles.handPointer}>👆🏼</span>
                     </button>
                     <h1 className={styles.heroTitle}>
                         Học hành thiếu đồ<br />

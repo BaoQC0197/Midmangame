@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import type { CartItem } from '../hooks/useCart';
 import { createOrder, sendEmailNotification } from '../api/orders';
+import { DEFAULT_PRODUCT_IMAGE } from '../constants/images';
 import styles from './OrderModal.module.css';
 
 interface OrderModalProps {
@@ -92,7 +93,12 @@ export default function OrderModal({ items, totalPrice, onClose, onConfirm }: Or
                             {items.map(({ product, quantity }) => (
                                 <li key={product.id} className={styles.orderSummaryItem}>
                                     <div className={styles.orderSummaryItemLeft}>
-                                        <img src={product.image} alt={product.name} className={styles.orderSummaryImg} />
+                                        <img
+                                            src={product.image || DEFAULT_PRODUCT_IMAGE}
+                                            alt={product.name}
+                                            className={styles.orderSummaryImg}
+                                            onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_PRODUCT_IMAGE; }}
+                                        />
                                         <span className={styles.orderSummaryName}>{product.name} × {quantity}</span>
                                     </div>
                                     <span className={styles.orderSummaryPrice}>{(product.price * quantity).toLocaleString('vi-VN')} đ</span>

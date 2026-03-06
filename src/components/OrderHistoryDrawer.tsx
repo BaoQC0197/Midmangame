@@ -45,7 +45,15 @@ export default function OrderHistoryDrawer({ open, onClose }: Props) {
             <aside className={`${styles.drawer} ${open ? styles.drawerOpen : ''}`}>
                 <div className={styles.header}>
                     <div className={styles.headerLeft}>
-                        <span className={styles.headerIcon}>📋</span>
+                        <span className={styles.headerIcon}>
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                                <polyline points="10 9 9 9 8 9" />
+                            </svg>
+                        </span>
                         <h2 className={styles.headerTitle}>Đơn hàng của tôi</h2>
                     </div>
                     <button className={styles.closeBtn} onClick={onClose} aria-label="Đóng">✕</button>
@@ -75,15 +83,29 @@ export default function OrderHistoryDrawer({ open, onClose }: Props) {
                 <div className={styles.body}>
                     {!searched && !loading && (
                         <div className={styles.emptyState}>
-                            <span>🛍️</span>
-                            <p>Nhập SĐT để xem lịch sử đơn hàng</p>
+                            <div className={styles.emptyIconWrapper}>
+                                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={styles.emptyIconSvg}>
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    <path d="M11 8v6M8 11h6" strokeDasharray="2 2" />
+                                </svg>
+                            </div>
+                            <p>Nhập số điện thoại để tra cứu đơn hàng</p>
                         </div>
                     )}
 
                     {searched && orders.length === 0 && (
                         <div className={styles.emptyState}>
-                            <span>📭</span>
-                            <p>Không tìm thấy đơn hàng nào với SĐT này</p>
+                            <div className={styles.emptyIconWrapper}>
+                                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={styles.emptyIconSvg}>
+                                    <path d="M21 8v13H3V8" />
+                                    <path d="M1 3h22v5H1z" />
+                                    <path d="M10 12h4" />
+                                    <line x1="8" y1="6" x2="16" y2="14" stroke="var(--color-danger)" strokeWidth="2" opacity="0.4" />
+                                    <line x1="16" y1="6" x2="8" y2="14" stroke="var(--color-danger)" strokeWidth="2" opacity="0.4" />
+                                </svg>
+                            </div>
+                            <p>Chưa xếp đơn nào với số điện thoại này</p>
                         </div>
                     )}
 

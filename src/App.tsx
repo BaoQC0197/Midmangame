@@ -1,12 +1,16 @@
-// src/App.tsx
-import { useState, useEffect, useCallback } from 'react';
-import { supabase, ADMIN_EMAIL } from './lib/supabase';
-import { getProducts, addProduct, deleteProduct, updateProduct, getProductById, replaceProductImages } from './api/products';
-import { getCategories } from './api/categories';
-import type { Product, ProductInput } from './types/product';
-import type { Category } from './types/category';
-import { useCart } from './hooks/useCart';
+/**
+ * src/App.tsx
+ * 
+ * ĐÂY LÀ "BỘ KHUNG" GIAO DIỆN CHÍNH CỦA WEBSITE
+ * --------------------------------------------
+ * File này đóng vai trò như người điều phối: lấy dữ liệu từ Bím (useVppData) 
+ * rồi chia cho các Component con (Header, Hero, ProductList, v.v.) hiển thị.
+ */
+import { useState } from 'react';
+import { useVppData } from './hooks/useVppData';
+import type { Product } from './types/product';
 
+// Nhập các thành phần giao diện (UI Components)
 import Header from './components/Header';
 import CategoryBar from './components/CategoryBar';
 import Hero from './components/Hero';
@@ -20,9 +24,11 @@ import ConfirmModal from './components/ConfirmModal';
 import ProductDetailModal from './components/ProductDetailModal';
 import OrderHistoryDrawer from './components/OrderHistoryDrawer';
 import SaleSection from './components/SaleSection';
+import Toast, { type ToastType } from './components/Toast';
 import styles from './App.module.css';
 import logoImg from './assets/logo.png';
 
+// Định nghĩa kiểu dữ liệu cho Modal xác nhận
 interface ConfirmState {
     open: boolean;
     title: string;
@@ -31,20 +37,42 @@ interface ConfirmState {
     variant?: 'danger' | 'warning' | 'info';
 }
 
-export default function App() {
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [products, setProducts] = useState<Product[]>([]);
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [activeCategory, setActiveCategory] = useState('all');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-    const [detailProduct, setDetailProduct] = useState<Product | null>(null);
-    const [cartOpen, setCartOpen] = useState(false);
-    const [orderOpen, setOrderOpen] = useState(false);
-    const [orderSuccess, setOrderSuccess] = useState(false);
-    const [orderHistoryOpen, setOrderHistoryOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
+// Định nghĩa kiểu dữ liệu cho thông báo Toast
+interface ToastState {
+    show: boolean;
+    message: string;
+    type: ToastType;
+}
 
+export default function App() {
+    // 1. LẤY "BỘ NÃO" XỬ LÝ DỮ LIỆU TỪ HOOK
+    const {
+        isAdmin,
+        products,
+        categories,
+        isLoading,
+        cart,
+        handleLogin: login,
+        handleLogout,
+        handleAddProduct,
+        handleDeleteProduct,
+        handleUpdateProduct,
+        handleRefreshCategories,
+        getFullProduct,
+    } = useVppData();
+
+    // 2. CÁC TRẠNG THÁI GIAO DIỆN (UI STATE)
+    const [activeCategory, setActiveCategory] = useState('all'); // Danh mục đang chọn để lọc
+    const [searchQuery, setSearchQuery] = useState(''); // Từ khóa tìm kiếm
+    const [editingProduct, setEditingProduct] = useState<Product | null>(null); // SP đang được Admin sửa
+    const [detailProduct, setDetailProduct] = useState<Product | null>(null); // SP đang xem chi tiết (Modal)
+    const [cartOpen, setCartOpen] = useState(false); // Trạng thái đóng/mở Giỏ hàng
+    const [orderOpen, setOrderOpen] = useState(false); // Trạng thái đóng/mở Form đặt hàng
+    const [orderHistoryOpen, setOrderHistoryOpen] = useState(false); // Trạng thái xem Lịch sử đơn hàng
+    const [adminPanelOpen, setAdminPanelOpen] = useState(false); // Trạng thái đóng/mở Bảng quản trị (Sidebar)
+
+    // Quản lý thông báo và xác nhận
+    const [toast, setToast] = useState<ToastState>({ show: false, message: '', type: 'success' });
     const [confirm, setConfirm] = useState<ConfirmState>({
         open: false,
         title: '',
@@ -52,51 +80,31 @@ export default function App() {
         onConfirm: () => { },
     });
 
-    const { items, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice } = useCart();
+    // Hàm tiện ích để hiện thông báo nhanh
+    const showToast = (message: string, type: ToastType = 'success') => {
+        setToast({ show: true, message, type });
+    };
 
-    // Load products
-    const loadProducts = useCallback(async () => {
-        setIsLoading(true);
-        const data = await getProducts();
-        setProducts(data);
-        setIsLoading(false);
-    }, []);
+    // 3. CÁC HÀM ĐIỀU KHIỂN (HANDLERS) - Kết nối UI với logic của Bím
 
-    // Load categories from DB
-    const loadCategories = useCallback(async () => {
-        const data = await getCategories();
-        setCategories(data);
-    }, []);
-
-    useEffect(() => {
-        const checkUser = async () => {
-            const { data } = await supabase.auth.getUser();
-            const user = data?.user;
-            if (user && user.email === ADMIN_EMAIL) setIsAdmin(true);
-            loadProducts();
-            loadCategories();
-        };
-        checkUser();
-    }, [loadProducts, loadCategories]);
-
-    // Auth
+    // Xử lý đăng nhập
     const handleLogin = async (email: string, password: string) => {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) { alert('Sai email hoặc mật khẩu'); return; }
-        if (data.user?.email === ADMIN_EMAIL) setIsAdmin(true);
-        await loadProducts();
+        try {
+            await login(email, password);
+            showToast('Đăng nhập thành công');
+        } catch (error: any) {
+            showToast(error.message || 'Lỗi đăng nhập', 'error');
+        }
     };
 
-    const handleLogout = async () => {
-        await supabase.auth.signOut();
-        setIsAdmin(false);
-        await loadProducts();
+    const handleLogoutWithToast = async () => {
+        await handleLogout();
+        showToast('Đã đăng xuất');
     };
 
-    // CRUD Products
-    const handleAdd = async (product: ProductInput): Promise<number> => {
-        const id = await addProduct(product);
-        await loadProducts();
+    const handleAdd = async (product: any) => {
+        const id = await handleAddProduct(product);
+        showToast('Đã thêm sản phẩm mới');
         return id;
     };
 
@@ -108,37 +116,34 @@ export default function App() {
             variant: 'danger',
             onConfirm: async () => {
                 setConfirm(c => ({ ...c, open: false }));
-                await deleteProduct(id);
-                await loadProducts();
+                await handleDeleteProduct(id);
+                showToast('Đã xoá sản phẩm');
             },
         });
     };
 
     const handleEdit = async (id: number) => {
-        const product = await getProductById(id);
-        if (!product) { alert('Không lấy được dữ liệu sản phẩm'); return; }
+        const product = await getFullProduct(id);
+        if (!product) {
+            showToast('Không lấy được dữ liệu sản phẩm', 'error');
+            return;
+        }
         setEditingProduct(product);
     };
 
     const handleUpdate = async (id: number, data: Partial<Product>, imageUrls: string[]) => {
-        await updateProduct(id, data);
-        await replaceProductImages(id, imageUrls);
-        await loadProducts();
+        await handleUpdateProduct(id, data, imageUrls);
+        showToast('Cập nhật sản phẩm thành công');
     };
-
-    // Refresh both products and categories (called after category changes)
-    const handleRefreshCategories = useCallback(async () => {
-        await Promise.all([loadProducts(), loadCategories()]);
-    }, [loadProducts, loadCategories]);
 
     // Cart
     const handleAddToCart = (product: Product, qty = 1) => {
-        for (let i = 0; i < qty; i++) addToCart(product);
+        for (let i = 0; i < qty; i++) cart.addToCart(product);
         setCartOpen(true);
     };
 
     const handleBuyNow = (product: Product, qty = 1) => {
-        for (let i = 0; i < qty; i++) addToCart(product);
+        for (let i = 0; i < qty; i++) cart.addToCart(product);
         setDetailProduct(null);
         setCartOpen(false);
         setOrderOpen(true);
@@ -150,10 +155,9 @@ export default function App() {
     };
 
     const handleOrderConfirm = () => {
-        clearCart();
+        cart.clearCart();
         setOrderOpen(false);
-        setOrderSuccess(true);
-        setTimeout(() => setOrderSuccess(false), 4000);
+        showToast('Đặt hàng thành công! Chúng tôi sẽ liên hệ sớm.');
     };
 
     // Reset filters
@@ -170,7 +174,7 @@ export default function App() {
         return matchCategory && matchSearch;
     });
 
-    // Product count per category (for CategoryManager)
+    // Product count per category
     const productCategoryCounts = products.reduce<Record<string, number>>((acc, p) => {
         const key = p.category ?? 'khac';
         acc[key] = (acc[key] ?? 0) + 1;
@@ -181,10 +185,9 @@ export default function App() {
         <>
             <Header
                 isAdmin={isAdmin}
-                cartCount={totalItems}
                 onLogin={handleLogin}
-                onLogout={handleLogout}
-                onCartOpen={() => setCartOpen(true)}
+                onLogout={handleLogoutWithToast}
+                onAdminPanelOpen={() => setAdminPanelOpen(true)} // Mở trung tâm điều khiển
             />
             <Hero searchQuery={searchQuery} onSearchChange={setSearchQuery} />
             <SaleSection products={products} onViewDetail={(p) => setDetailProduct(p)} />
@@ -211,6 +214,8 @@ export default function App() {
 
             {isAdmin && (
                 <AdminDashboard
+                    open={adminPanelOpen}
+                    onClose={() => setAdminPanelOpen(false)}
                     onAdd={handleAdd}
                     categories={categories}
                     onRefreshCategories={handleRefreshCategories}
@@ -230,33 +235,25 @@ export default function App() {
 
             <CartDrawer
                 open={cartOpen}
-                items={items}
-                totalPrice={totalPrice}
+                items={cart.items}
+                totalPrice={cart.totalPrice}
                 onClose={() => setCartOpen(false)}
-                onUpdateQuantity={updateQuantity}
-                onRemove={removeFromCart}
+                onUpdateQuantity={cart.updateQuantity}
+                onRemove={cart.removeFromCart}
                 onCheckout={handleCheckout}
-                onClearCart={clearCart}
+                onClearCart={cart.clearCart}
             />
 
             {orderOpen && (
                 <OrderModal
-                    items={items}
-                    totalPrice={totalPrice}
+                    items={cart.items}
+                    totalPrice={cart.totalPrice}
                     onClose={() => setOrderOpen(false)}
                     onConfirm={handleOrderConfirm}
                 />
             )}
 
-            {/* Order success toast */}
-            {orderSuccess && (
-                <div className={styles.orderToast}>
-                    <span className={styles.orderToastIcon}>✅</span>
-                    Đặt hàng thành công! Chúng tôi sẽ liên hệ sớm.
-                </div>
-            )}
-
-            {/* Confirm modal (replaces window.confirm) */}
+            {/* Confirm modal */}
             {confirm.open && (
                 <ConfirmModal
                     title={confirm.title}
@@ -280,12 +277,28 @@ export default function App() {
                 />
             )}
 
-            <FloatButtons onOrderHistory={() => setOrderHistoryOpen(true)} />
+            {/* Ẩn các nút trôi (FloatButtons) khi đang mở các Sidebar/Modal để tránh bị che khuất và rối mắt */}
+            {!(cartOpen || orderHistoryOpen || orderOpen || adminPanelOpen) && (
+                <FloatButtons
+                    onOrderHistory={() => setOrderHistoryOpen(true)}
+                    cartCount={cart.totalItems}
+                    onCartOpen={() => setCartOpen(true)}
+                />
+            )}
 
             <OrderHistoryDrawer
                 open={orderHistoryOpen}
                 onClose={() => setOrderHistoryOpen(false)}
             />
+
+            {/* Toast system */}
+            {toast.show && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(t => ({ ...t, show: false }))}
+                />
+            )}
 
             {/* Footer */}
             <footer className={styles.footer} id="contact">

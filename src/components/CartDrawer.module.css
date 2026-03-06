@@ -4,7 +4,7 @@
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, .45);
-    z-index: 800;
+    z-index: 1000;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
@@ -23,7 +23,7 @@
     max-width: 100vw;
     height: 100dvh;
     background: var(--color-surface);
-    z-index: 900;
+    z-index: 1001;
     display: flex;
     flex-direction: column;
     transform: translateX(100%);
@@ -129,8 +129,27 @@
     padding: 40px 0;
 }
 
-.cartEmptyIcon {
-    font-size: 56px;
+.titleIcon {
+    margin-right: 8px;
+    vertical-align: text-bottom;
+    color: var(--color-primary);
+}
+
+.cartEmptyIconWrapper {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(22, 163, 74, 0.1), rgba(5, 150, 105, 0.05));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    box-shadow: inset 0 4px 20px rgba(22, 163, 74, 0.05);
+}
+
+.cartEmptyIconSvg {
+    color: var(--color-primary);
+    opacity: 0.8;
 }
 
 .cartEmpty p {

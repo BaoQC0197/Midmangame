@@ -1,37 +1,57 @@
-/* =============================================
-   VPP TI ANH — Global Styles
-   (Variables, Reset, Base, Container)
-   ============================================= */
+/* ============================================================
+   VPP TI ANH — GLOBAL STYLES (FILE PHONG CÁCH CHUNG)
+   ------------------------------------------------------------
+   Bím giải thích: File này giống như "quy định trang phục" chung 
+   cho cả công ty. Những gì viết ở đây sẽ ảnh hưởng đến TOÀN BỘ 
+   các trang và thành phần (Component) của website.
+   ============================================================ */
+
+/* Nhập font chữ từ Google Fonts (Inter cho chữ thường, Pattaya/Itim cho nghệ thuật) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Pattaya&family=Itim&display=swap');
 
-/* ---- CSS Custom Properties ---- */
+/* ---- BIẾN CSS (Dùng để quản lý màu sắc, bo góc tập trung) ---- */
 :root {
+    /* Màu sắc chủ đạo (Xanh lá - đặc trưng của VPP Ti Anh) */
     --color-primary: #10b981;
     --color-primary-dark: #059669;
     --color-primary-light: #a7f3d0;
     --color-accent: #f59e0b;
+    /* Màu cam nhấn mạnh (ví dụ: nút Sale) */
+
+    /* Màu nền và chữ */
     --color-surface: #ffffff;
     --color-bg: #f8fafc;
     --color-text: #1e293b;
     --color-text-muted: #64748b;
+    /* Chữ màu xám, dùng cho phần mô tả phụ */
     --color-border: #e2e8f0;
+
+    /* Màu cảnh báo lỗi */
     --color-danger: #ef4444;
     --color-danger-bg: #fef2f2;
+
+    /* Bo góc (Radius) - Càng lớn thì trông càng mềm mại */
     --radius-sm: 8px;
     --radius-md: 12px;
     --radius-lg: 20px;
     --radius-full: 9999px;
+    /* Dùng để tạo hình tròn hoặc nút bo tròn hẳn */
+
+    /* Đổ bóng (Shadow) - Tạo chiều sâu cho các bảng/form */
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, .08);
     --shadow-md: 0 4px 16px rgba(0, 0, 0, .1);
     --shadow-lg: 0 12px 40px rgba(0, 0, 0, .14);
+
+    /* Thời gian chuyển động (Animation) */
     --transition: 0.2s ease;
 }
 
-/* ---- Reset & Base ---- */
+/* ---- RESET & BASE (Xóa các định dạng mặc định của trình duyệt) ---- */
 *,
 *::before,
 *::after {
     box-sizing: border-box;
+    /* Giúp việc tính toán kích thước padding/border không làm phình to phần tử */
     margin: 0;
     padding: 0;
 }
@@ -39,6 +59,7 @@
 html,
 body {
     overflow-x: hidden;
+    /* Ngăn chặn cuộn ngang nếu có phần tử nào lỡ tràn ra ngoài */
     width: 100%;
     position: relative;
 }
@@ -49,11 +70,13 @@ body {
     color: var(--color-text);
     min-height: 100vh;
     line-height: 1.6;
+    /* Khoảng cách dòng giúp chữ dễ đọc hơn */
 }
 
 a {
     color: inherit;
     text-decoration: none;
+    /* Bỏ gạch chân mặc định của liên kết */
 }
 
 button {
@@ -65,12 +88,14 @@ button {
 img {
     display: block;
     max-width: 100%;
+    /* Đảm bảo hình ảnh không bao giờ to quá khung chứa nó */
 }
 
 main {
     padding-bottom: 40px;
 }
 
+/* Khung chứa nội dung chính, giới hạn chiều ngang tối đa để màn hình to không bị loãng */
 .container {
     max-width: 1800px;
     width: 100%;
@@ -78,12 +103,15 @@ main {
     padding: 0 clamp(20px, 2.5%, 60px);
 }
 
-/* ---- Shared utility classes (used across multiple components) ---- */
+/* ---- LỚP TIỆN ÍCH DÙNG CHUNG (Shared Utility Classes) ---- */
+
+/* Style cho các ô nhập liệu bị lỗi */
 .input-error {
     border-color: var(--color-danger) !important;
     box-shadow: 0 0 0 3px rgba(239, 68, 68, .12) !important;
 }
 
+/* Thông báo lỗi bên dưới ô nhập liệu */
 .field-error {
     color: var(--color-danger);
     font-size: 12px;
@@ -98,6 +126,7 @@ main {
     font-size: 11px;
 }
 
+/* Tên nhãn của các ô nhập liệu */
 .field-label {
     display: block;
     font-size: 13px;
@@ -107,7 +136,9 @@ main {
     margin-top: 8px;
 }
 
-/* ---- Popup (success overlay — shared) ---- */
+/* ---- POPUP/MODAL DÙNG CHUNG (Hiệu ứng và khung nền) ---- */
+
+/* Hiệu ứng mờ dần */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -118,6 +149,7 @@ main {
     }
 }
 
+/* Hiệu ứng nảy lên */
 @keyframes popIn {
     from {
         transform: scale(0.7);
@@ -130,6 +162,7 @@ main {
     }
 }
 
+/* Lớp phủ nền mờ phía sau Modal */
 .popup-overlay {
     position: fixed;
     inset: 0;
@@ -142,6 +175,7 @@ main {
     animation: fadeIn 0.2s ease;
 }
 
+/* Thẻ Modal trắng chính giữa */
 .popup-card {
     background: white;
     border-radius: var(--radius-lg);
@@ -171,6 +205,7 @@ main {
     margin-bottom: 24px;
 }
 
+/* Nút bấm trong Popup */
 .popup-btn {
     padding: 11px 36px;
     border: none;

@@ -1,4 +1,12 @@
-// src/components/ProductDetailModal.tsx
+/**
+ * src/components/ProductDetailModal.tsx
+ * 
+ * MODAL CHI TIẾT SẢN PHẨM (Product Detail Modal)
+ * -----------------------------------------------
+ * Bím ví file này như một cái "Kính lúp". Khi bro bấm vào một sản phẩm, 
+ * nó sẽ hiện lên to rõ, cho phép xem nhiều ảnh, đọc mô tả kỹ hơn 
+ * và xem cả những món đồ tương tự.
+ */
 import { useState, useEffect, useCallback } from 'react';
 import type { Product } from '../types/product';
 import type { Category } from '../types/category';
@@ -24,41 +32,41 @@ export default function ProductDetailModal({
     onBuyNow,
     onViewDetail,
 }: ProductDetailModalProps) {
-    // Build gallery: combine product.image (always exists) with product.images (from DB)
+    // TẠO BỘ SƯU TẬP ẢNH: Kết hợp ảnh chính và các ảnh phụ từ Database
     const gallery = (() => {
         let imgs = product.images && product.images.length > 0
             ? product.images
             : [product.image];
 
-        // Filter out empty/null images
+        // Loại bỏ các đường dẫn ảnh bị trống hoặc lỗi
         imgs = imgs.filter(img => !!img);
 
         if (imgs.length === 0) imgs = [DEFAULT_PRODUCT_IMAGE];
 
-        // deduplicate while preserving order
+        // Lọc bỏ các ảnh trùng lặp để tiết kiệm bộ nhớ
         return [...new Set(imgs)];
     })();
 
-    const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
-
-    const [activeIdx, setActiveIdx] = useState(0);
-    const [qty, setQty] = useState(1);
-    const [added, setAdded] = useState(false);
+    const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({}); // Theo dõi các ảnh bị lỗi để thay bằng ảnh mặc định
+    const [activeIdx, setActiveIdx] = useState(0); // Chỉ số của ảnh đang hiển thị
+    const [qty, setQty] = useState(1); // Số lượng khách muốn mua
+    const [added, setAdded] = useState(false); // Hiệu ứng "Đã thêm" khi bấm nút giỏ hàng
 
     const categoryLabel = categories.find(c => c.key === product.category);
 
+    // LẤY SẢN PHẨM LIÊN QUAN: Tìm các món cùng danh mục nhưng khác cái đang xem
     const related = allProducts.filter(
         p => p.id !== product.id && p.category === product.category
     ).slice(0, 6);
 
-    // Close on ESC
+    // LOGIC ĐÓNG MODAL: Nhấn phím 'ESC' để thoát nhanh
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
         if (e.key === 'Escape') onClose();
     }, [onClose]);
 
     useEffect(() => {
         document.addEventListener('keydown', handleKeyDown);
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden'; // Khóa cuộn trang phía sau khi đang xem modal
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
             document.body.style.overflow = '';
@@ -87,11 +95,11 @@ export default function ProductDetailModal({
     return (
         <div className={styles.overlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
             <div className={styles.modal}>
-                {/* Close */}
+                {/* Nút đóng hình chữ X */}
                 <button className={styles.closeBtn} onClick={onClose} aria-label="Đóng">✕</button>
 
                 <div className={styles.body}>
-                    {/* ── Left: Image Gallery ── */}
+                    {/* ── BÊN TRÁI: BỘ SƯU TẬP ẢNH ── */}
                     <div className={styles.gallery}>
                         <div className={styles.mainImgWrap}>
                             <img
@@ -101,6 +109,7 @@ export default function ProductDetailModal({
                                 key={activeIdx}
                                 onError={() => setImgErrors(prev => ({ ...prev, [gallery[activeIdx]]: true }))}
                             />
+                            {/* Nút chuyển ảnh qua lại (nếu có nhiều hơn 1 ảnh) */}
                             {gallery.length > 1 && (
                                 <>
                                     <button
@@ -118,7 +127,7 @@ export default function ProductDetailModal({
                             )}
                         </div>
 
-                        {/* Thumbnails */}
+                        {/* Các ảnh nhỏ (Thumbnails) bên dưới ảnh chính */}
                         {gallery.length > 1 && (
                             <div className={styles.thumbStrip}>
                                 {gallery.map((url, i) => (
@@ -138,7 +147,7 @@ export default function ProductDetailModal({
                         )}
                     </div>
 
-                    {/* ── Right: Info ── */}
+                    {/* ── BÊN PHẢI: THÔNG TIN SẢN PHẨM ── */}
                     <div className={styles.info}>
                         {categoryLabel && (
                             <span className={styles.categoryBadge}>
@@ -147,6 +156,8 @@ export default function ProductDetailModal({
                         )}
 
                         <h2 className={styles.productName}>{product.name}</h2>
+
+                        {/* Hiển thị giá (có tính đến khuyến mãi nếu có) */}
                         {promo ? (
                             <div className={styles.priceBlock}>
                                 <span className={styles.originalPrice}>{formatPrice(product.price)}</span>
@@ -164,7 +175,7 @@ export default function ProductDetailModal({
                             </div>
                         )}
 
-                        {/* Quantity */}
+                        {/* Chọn số lượng sản phẩm muốn mua */}
                         <div className={styles.qtySection}>
                             <span className={styles.qtyLabel}>Số lượng</span>
                             <div className={styles.qtyControl}>
@@ -181,7 +192,7 @@ export default function ProductDetailModal({
                             </div>
                         </div>
 
-                        {/* CTA buttons */}
+                        {/* Nút hành động chính (CTA) */}
                         <div className={styles.ctaRow}>
                             <button
                                 className={`${styles.btnCart}${added ? ' ' + styles.btnAdded : ''}`}
@@ -196,7 +207,7 @@ export default function ProductDetailModal({
                     </div>
                 </div>
 
-                {/* ── Related products ── */}
+                {/* ── DANH SÁCH SẢN PHẨM LIÊN QUAN ── */}
                 {related.length > 0 && (
                     <div className={styles.related}>
                         <h4 className={styles.relatedTitle}>Sản phẩm liên quan</h4>
@@ -206,7 +217,7 @@ export default function ProductDetailModal({
                                     key={p.id}
                                     className={styles.relatedCard}
                                     onClick={() => {
-                                        // Navigate to the related product's detail modal
+                                        // Khi bấm vào SP liên quan -> Đóng cái cũ, mở cái mới sau một lát
                                         onClose();
                                         setTimeout(() => onViewDetail(p), 50);
                                     }}

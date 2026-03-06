@@ -1,25 +1,31 @@
-// src/components/Header.tsx
+/**
+ * src/components/Header.tsx
+ * 
+ * THANH TIÊU ĐỀ (Navigation Bar)
+ * ------------------------------
+ * Bím ví file này như "Bảng chỉ dẫn" của cửa hàng. Nó giúp khách 
+ * tìm đường, xem giỏ hàng và giúp Admin đăng nhập vào hệ thống.
+ */
 import { useState, useEffect } from 'react';
 import styles from './Header.module.css';
 import logoImg from '../assets/logo.png';
 
 interface HeaderProps {
     isAdmin: boolean;
-    cartCount: number;
     onLogin: (email: string, password: string) => Promise<void>;
     onLogout: () => Promise<void>;
-    onCartOpen: () => void;
+    onAdminPanelOpen: () => void;
 }
 
-export default function Header({ isAdmin, cartCount, onLogin, onLogout, onCartOpen }: HeaderProps) {
+export default function Header({ isAdmin, onLogin, onLogout, onAdminPanelOpen }: HeaderProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    const [menuOpen, setMenuOpen] = useState(false);
-    const [adminOpen, setAdminOpen] = useState(false);
-    const [scrolled, setScrolled] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false); // Trạng thái đóng/mở menu trên điện thoại
+    const [adminOpen, setAdminOpen] = useState(false); // Trạng thái đóng/mở ô đăng nhập Admin
+    const [scrolled, setScrolled] = useState(false); // Theo dõi xem người dùng có đang cuộn trang không
 
-    // Scroll-aware shadow
+    // HIỆU ỨNG: Khi cuộn chuột xuống thì Header sẽ đổi kiểu (thêm đổ bóng)
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
         window.addEventListener('scroll', handleScroll, { passive: true });
@@ -37,6 +43,7 @@ export default function Header({ isAdmin, cartCount, onLogin, onLogout, onCartOp
         }
     };
 
+    // Danh sách các mục menu
     const navLinks = [
         { label: 'Trang chủ', href: '#' },
         { label: 'Sản phẩm', href: '#product-list' },
@@ -48,16 +55,16 @@ export default function Header({ isAdmin, cartCount, onLogin, onLogout, onCartOp
 
     return (
         <>
-            {/* ── Header bar ────────────────────────────────────────── */}
+            {/* ── THANH HEADER CHÍNH ────────────────────────────────────────── */}
             <header className={`${styles.header}${scrolled ? ' ' + styles.scrolled : ''}`}>
                 <div className={styles.headerInner}>
-                    {/* Logo */}
+                    {/* Logo dự án */}
                     <a href="#" className={styles.logo}>
                         <img src={logoImg} alt="VPP Ti Anh logo" className={styles.logoImg} />
                         <span className={styles.logoText}>VPP <span className={styles.logoAccent}>Ti Anh</span></span>
                     </a>
 
-                    {/* Desktop nav links (hidden on mobile) */}
+                    {/* Menu cho máy tính (ẩn trên điện thoại) */}
                     <nav className={styles.desktopNav}>
                         {navLinks.map((link) => (
                             <a key={link.label} href={link.href} className={styles.navLink}>
@@ -66,25 +73,27 @@ export default function Header({ isAdmin, cartCount, onLogin, onLogout, onCartOp
                         ))}
                     </nav>
 
-                    {/* Right actions */}
+                    {/* Các nút hành động bên phải (Admin, Menu mobile) */}
                     <div className={styles.headerActions}>
-                        <button className={styles.cartBtn} onClick={onCartOpen} aria-label="Giỏ hàng">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="9" cy="21" r="1" />
-                                <circle cx="20" cy="21" r="1" />
-                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-                            </svg>
-                            <span>Giỏ</span>
-                            {cartCount > 0 && (
-                                <span className={styles.cartBadge}>{cartCount > 99 ? '99+' : cartCount}</span>
-                            )}
-                        </button>
 
+                        {/* Khu vực đăng nhập cho Admin */}
                         <div className={styles.adminDropdownWrapper}>
                             {isAdmin ? (
                                 <div className={styles.adminInfo}>
-                                    <span className={styles.adminGreeting}>👋 Admin</span>
-                                    <button className={styles.btnLogout} onClick={onLogout}>Đăng xuất</button>
+                                    <button className={styles.btnAdminPortal} onClick={onAdminPanelOpen} title="Bảng quản trị chuyên nghiệp">
+                                        <span className={styles.btnIcon}>⚙️</span>
+                                        <span className={styles.btnText}>Quản trị</span>
+                                    </button>
+                                    <button className={styles.btnLogout} onClick={onLogout} title="Đăng xuất">
+                                        <span className={styles.btnIcon}>
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                                <polyline points="16 17 21 12 16 7"></polyline>
+                                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                                            </svg>
+                                        </span>
+                                        <span className={styles.btnText}>Đăng xuất</span>
+                                    </button>
                                 </div>
                             ) : (
                                 <>
@@ -103,12 +112,13 @@ export default function Header({ isAdmin, cartCount, onLogin, onLogout, onCartOp
                             )}
                         </div>
 
+                        {/* Nút ba gạch để mở menu trên điện thoại */}
                         <button className={styles.hamburger} onClick={() => setMenuOpen(true)} aria-label="Mở menu">☰</button>
                     </div>
                 </div>
             </header>
 
-            {/* ── Mobile slide-out nav — NGOÀI header để tránh stacking context ── */}
+            {/* ── MENU TRƯỢT TRÊN MOBILE ── */}
             <nav className={`${styles.mobileNav}${menuOpen ? ' ' + styles.open : ''}`} aria-hidden={!menuOpen}>
                 <button className={styles.navClose} onClick={closeMenu}>✕</button>
 
@@ -135,7 +145,7 @@ export default function Header({ isAdmin, cartCount, onLogin, onLogout, onCartOp
                 </div>
             </nav>
 
-            {/* Overlay — NGOÀI header, click để đóng menu */}
+            {/* Lớp nền mờ khi mở menu mobile, bấm vào đây cũng đóng được menu */}
             {menuOpen && <div className={styles.navOverlay} onClick={closeMenu} aria-hidden="true" />}
         </>
     );

@@ -1,6 +1,10 @@
 /* App.module.css */
 
-/* Footer */
+/* PHẦN CHÂN TRANG (Footer STYLE) 
+   ---------------------------
+   Bím thiết kế Footer với màu xanh đầm (Emerald 900) 
+   và một lớp ảnh nền mờ ảo fix cứng để tạo cảm giác sang trọng.
+*/
 .footer {
     position: relative;
     background: #064e3b;
@@ -8,6 +12,7 @@
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
+    /* Ảnh nền đứng yên khi cuộn trang */
     color: white;
     margin-top: 60px;
     overflow: hidden;

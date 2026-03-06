@@ -98,7 +98,8 @@
 .dropZone {
     border: 2px dashed var(--color-border);
     border-radius: var(--radius-md);
-    padding: 20px;
+    padding: 12px;
+    /* Giảm từ 20px xuống 12px để ép mỏng */
     text-align: center;
     cursor: pointer;
     transition: all 0.2s;
@@ -112,9 +113,11 @@
 }
 
 .dropIcon {
-    font-size: 28px;
+    font-size: 24px;
+    /* Thu nhỏ icon ảnh */
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
+    /* Giảm margin dưới icon */
 }
 
 .dropZone p {

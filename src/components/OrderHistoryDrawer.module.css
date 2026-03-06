@@ -4,7 +4,8 @@
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0);
-    z-index: 199;
+    z-index: 1000;
+    /* Nâng lên rất cao để vượt qua Header và FloatButtons */
     pointer-events: none;
     transition: background 0.3s ease;
 }
@@ -23,7 +24,8 @@
     max-width: 100vw;
     background: white;
     box-shadow: -8px 0 40px rgba(0, 0, 0, 0.15);
-    z-index: 200;
+    z-index: 1001;
+    /* Phải cao hơn backdrop */
     display: flex;
     flex-direction: column;
     transform: translateX(100%);
@@ -153,10 +155,21 @@
     color: #94a3b8;
 }
 
-.emptyState span {
-    font-size: 48px;
-    display: block;
-    margin-bottom: 12px;
+.emptyIconWrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(5, 150, 105, 0.1), rgba(16, 185, 129, 0.05));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    box-shadow: inset 0 4px 20px rgba(5, 150, 105, 0.05);
+}
+
+.emptyIconSvg {
+    color: var(--color-primary);
+    opacity: 0.8;
 }
 
 .emptyState p {

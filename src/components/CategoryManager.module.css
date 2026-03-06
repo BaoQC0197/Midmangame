@@ -160,7 +160,8 @@
 
 .catTableHead {
     display: grid;
-    grid-template-columns: 1fr 90px 140px;
+    grid-template-columns: 1fr 80px 120px;
+    /* Thu nhỏ cột số lượng và hành động */
     padding: 10px 16px;
     background: #f1f5f9;
     font-size: 12px;
@@ -173,7 +174,7 @@
 
 .catRow {
     display: grid;
-    grid-template-columns: 1fr 90px 140px;
+    grid-template-columns: 1fr 80px 120px;
     align-items: center;
     padding: 12px 16px;
     border-bottom: 1px solid #f1f5f9;
@@ -376,18 +377,51 @@
 }
 
 @media (max-width: 768px) {
+    .catTableHead {
+        display: none;
+        /* Ẩn header bảng trên mobile để tiết kiệm diện tích */
+    }
 
-    .catTableHead,
     .catRow {
-        grid-template-columns: 1fr 60px 110px;
-        padding: 10px 12px;
+        grid-template-columns: 1fr;
+        /* Chuyển sang 1 cột duy nhất */
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .catColCount {
+        text-align: left;
+        font-size: 13px;
+        color: var(--color-primary);
+        font-weight: 600;
+    }
+
+    .catColCount::before {
+        content: "Số lượng sản phẩm: ";
+        color: var(--color-text-muted);
+        font-weight: 400;
+    }
+
+    .catColActions {
+        justify-content: flex-start;
+        border-top: 1px dashed var(--color-border);
+        padding-top: 12px;
+        margin-top: 4px;
     }
 
     .catAddRow {
         flex-direction: column;
     }
+}
 
-    .catManagerHeader {
-        flex-wrap: wrap;
+@media (max-width: 480px) {
+    .catAddForm {
+        padding: 12px;
+    }
+
+    .catIconOpt {
+        width: 38px;
+        /* Tăng kích thước nút bấm icon trên mobile cho dễ bấm */
+        height: 38px;
     }
 }

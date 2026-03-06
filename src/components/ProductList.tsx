@@ -1,14 +1,21 @@
-// src/components/ProductList.tsx
+/**
+ * src/components/ProductList.tsx
+ * 
+ * DANH SÁCH SẢN PHẨM (Product Grid & Pagination)
+ * ----------------------------------------------
+ * Bím ví file này như "Diện mạo chính" của cửa hàng. Nó sắp xếp 
+ * các thẻ sản phẩm thành dạng lưới và quản lý việc lật trang 
+ * khi có quá nhiều món hàng.
+ */
 import { useState, useEffect } from 'react';
 import type { Product } from '../types/product';
 import ProductCard from './ProductCard';
 import SkeletonCard from './SkeletonCard';
 import styles from './ProductList.module.css';
 
-const SKELETON_COUNT = 8;
+const SKELETON_COUNT = 8; // Số lượng khung xám hiện lên khi đang tải dữ liệu
 
 interface ProductListProps {
-    // ... items from 12-21 ...
     products: Product[];
     isAdmin: boolean;
     onEdit: (id: number) => void;
@@ -22,9 +29,11 @@ interface ProductListProps {
 }
 
 export default function ProductList({ products, isAdmin, onEdit, onDelete, onAddToCart, onViewDetail, searchQuery, isLoading, onResetFilter, activeCategory }: ProductListProps) {
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(1); // Trang hiện tại
+    // Số lượng SP trên mỗi trang: Máy tính hiện 12, điện thoại hiện 8 cho đỡ rối
     const [pageSize, setPageSize] = useState(window.innerWidth > 768 ? 12 : 8);
 
+    // Tự động điều chỉnh số lượng SP khi bro xoay điện thoại hoặc đổi kích thước cửa sổ
     useEffect(() => {
         const handleResize = () => {
             setPageSize(window.innerWidth > 768 ? 12 : 8);
@@ -33,12 +42,12 @@ export default function ProductList({ products, isAdmin, onEdit, onDelete, onAdd
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // Reset to page 1 ONLY when filters or pageSize change
+    // QUY TẮC: Khi bro đổi danh mục hoặc tìm kiếm -> Bắt buộc quay về trang 1
     useEffect(() => {
         setPage(1);
     }, [activeCategory, searchQuery, pageSize]);
 
-    // Ensure the current page is still valid after products change or pageSize changes
+    // Đảm bảo không bị ở "trang trống" khi xóa sản phẩm
     useEffect(() => {
         const totalPages = Math.ceil(products.length / pageSize);
         if (page > totalPages && totalPages > 0) {
@@ -46,7 +55,7 @@ export default function ProductList({ products, isAdmin, onEdit, onDelete, onAdd
         }
     }, [products.length, page, pageSize]);
 
-    // Skeleton loading state
+    // TRẠNG THÁI LOADING: Hiện khung xám mờ mờ cho "sang"
     if (isLoading) {
         return (
             <div id="product-list">
@@ -59,6 +68,7 @@ export default function ProductList({ products, isAdmin, onEdit, onDelete, onAdd
         );
     }
 
+    // TRẠNG THÁI TRỐNG: Khi không tìm thấy món nào
     if (products.length === 0) {
         return (
             <div id="product-list" className={styles.emptyState}>
@@ -84,14 +94,17 @@ export default function ProductList({ products, isAdmin, onEdit, onDelete, onAdd
         );
     }
 
+    // TÍNH TOÁN PHÂN TRANG
     const totalPages = Math.ceil(products.length / pageSize);
-    const shown = products.slice((page - 1) * pageSize, page * pageSize);
+    const shown = products.slice((page - 1) * pageSize, page * pageSize); // Cắt mảng để lấy đúng SP của trang đó
 
+    // Hàm chuyển trang và cuộn lên đầu danh sách cho dễ nhìn
     const goTo = (p: number) => {
         setPage(p);
         document.getElementById('product-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
+    // Hàm tạo dãy số trang (1, 2, 3... 10)
     const getPageNumbers = (): (number | '...')[] => {
         if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
         const pages: (number | '...')[] = [1];
@@ -104,6 +117,7 @@ export default function ProductList({ products, isAdmin, onEdit, onDelete, onAdd
 
     return (
         <div id="product-list">
+            {/* LƯỚI SẢN PHẨM CHÍNH */}
             <div className={styles.productGrid}>
                 {shown.map((product) => (
                     <ProductCard
@@ -119,6 +133,7 @@ export default function ProductList({ products, isAdmin, onEdit, onDelete, onAdd
                 ))}
             </div>
 
+            {/* PHẦN CHÂN: Thông tin số lượng và nút chuyển trang */}
             <div className={styles.productListFooter}>
                 <p className={styles.productCountLabel}>
                     Hiển thị <strong>{(page - 1) * pageSize + 1}–{Math.min(page * pageSize, products.length)}</strong> / <strong>{products.length}</strong> sản phẩm

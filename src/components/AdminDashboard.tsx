@@ -1,4 +1,11 @@
-// src/components/AdminDashboard.tsx
+/**
+ * src/components/AdminDashboard.tsx
+ * 
+ * BẢNG ĐIỀU KHIỂN QUẢN TRỊ (Admin Dashboard)
+ * ------------------------------------------
+ * Bím ví file này như "Phòng điều hành" của chủ shop. Tại đây, bro 
+ * có thể thêm hàng mới, xem ai vừa đặt hàng, và quản lý khuyến mãi.
+ */
 import { useState, useEffect, useCallback } from 'react';
 import type { Product, ProductInput } from '../types/product';
 import type { Order, OrderStatus } from '../types/order';
@@ -12,8 +19,10 @@ import PromotionManager from './PromotionManager';
 import styles from './AdminDashboard.module.css';
 
 interface AdminDashboardProps {
-    onAdd: (product: ProductInput) => Promise<number>;
-    categories: Category[];
+    open: boolean; // Trạng thái đóng/mở Sidebar
+    onClose: () => void; // Hàm để đóng Sidebar
+    onAdd: (product: ProductInput) => Promise<number>; // Hàm thêm SP
+    categories: Category[]; // Danh sách các ngăn kệ (danh mục)
     onRefreshCategories: () => void;
     productCategoryCounts: Record<string, number>;
     products: Product[];
@@ -23,19 +32,19 @@ const ALL_STATUSES: OrderStatus[] = ['pending', 'confirmed', 'delivering', 'deli
 
 interface FormErrors { name?: string; price?: string; image?: string; }
 
-// ===================== ADD PRODUCT FORM =====================
+// ===================== BIỂU MẪU THÊM SẢN PHẨM =====================
 const CUSTOM_KEY = '__custom__';
 
 function AddProductForm({ onAdd, categories }: { onAdd: (product: ProductInput) => Promise<number>; categories: Category[] }) {
     const [name, setName] = useState('');
-    const [price, setPrice] = useState('');   // raw digits, e.g. "2000000"
+    const [price, setPrice] = useState('');   // Giá dạng chuỗi để dễ nhập liệu
     const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [description, setDescription] = useState('');
     const [selectValue, setSelectValue] = useState('');
     const [customCategory, setCustomCategory] = useState('');
     const [loading, setLoading] = useState(false);
-    const [errors, setErrors] = useState<FormErrors>({});
-    const [showSuccess, setShowSuccess] = useState(false);
+    const [errors, setErrors] = useState<FormErrors>({}); // Chứa các thông báo lỗi khi nhập sai
+    const [showSuccess, setShowSuccess] = useState(false); // Hiện thông báo khi thêm thành công
 
     useEffect(() => {
         if (categories.length > 0 && !selectValue) setSelectValue(categories[0].key);
@@ -43,6 +52,7 @@ function AddProductForm({ onAdd, categories }: { onAdd: (product: ProductInput) 
 
     const effectiveCategory = selectValue === CUSTOM_KEY ? customCategory.trim() : selectValue;
 
+    // Hàm kiểm tra xem Admin đã nhập đủ thông tin chưa
     const validate = (): boolean => {
         const e: FormErrors = {};
         if (!name.trim()) e.name = 'Vui lòng nhập tên sản phẩm';
@@ -65,8 +75,9 @@ function AddProductForm({ onAdd, categories }: { onAdd: (product: ProductInput) 
         setLoading(true);
         try {
             const primaryImage = imageUrls[0];
+            // 1. Lưu thông tin cơ bản của SP
             const newId = await onAdd({ name: name.trim(), price: parseInt(price), image: primaryImage, description, category: effectiveCategory });
-            // Save gallery images (position 0..n)
+            // 2. Lưu bộ sưu tập ảnh (nếu có nhiều ảnh)
             await addProductImages(newId, imageUrls);
             resetForm(); setShowSuccess(true);
         } catch {
@@ -78,6 +89,7 @@ function AddProductForm({ onAdd, categories }: { onAdd: (product: ProductInput) 
 
     return (
         <>
+            {/* Thông báo THÊM THÀNH CÔNG */}
             {showSuccess && (
                 <div className="popup-overlay" onClick={() => setShowSuccess(false)}>
                     <div className="popup-card" onClick={(e) => e.stopPropagation()}>
@@ -88,6 +100,7 @@ function AddProductForm({ onAdd, categories }: { onAdd: (product: ProductInput) 
                     </div>
                 </div>
             )}
+            {/* Form nhập liệu */}
             <div className={styles.addProductForm}>
                 <input placeholder="Tên sản phẩm *" value={name}
                     onChange={(e) => { setName(e.target.value); setErrors(p => ({ ...p, name: undefined })); }}
@@ -134,19 +147,20 @@ function AddProductForm({ onAdd, categories }: { onAdd: (product: ProductInput) 
     );
 }
 
-// ===================== ORDER HISTORY =====================
+// ===================== QUẢN LÝ ĐƠN HÀNG =====================
 const PAGE_SIZE = 10;
 
 function OrderHistory() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
-    const [expandedId, setExpandedId] = useState<number | null>(null);
-    const [updatingId, setUpdatingId] = useState<number | null>(null);
+    const [expandedId, setExpandedId] = useState<number | null>(null); // Mở rộng xem chi tiết đơn nào
+    const [updatingId, setUpdatingId] = useState<number | null>(null); // Đang cập nhật trạng thái đơn nào
     const [deletingId, setDeletingId] = useState<number | null>(null);
-    const [filterStatus, setFilterStatus] = useState<OrderStatus | 'all'>('all');
-    const [phoneFilter, setPhoneFilter] = useState('');
+    const [filterStatus, setFilterStatus] = useState<OrderStatus | 'all'>('all'); // Lọc theo trạng thái
+    const [phoneFilter, setPhoneFilter] = useState(''); // Tìm theo SĐT
     const [currentPage, setCurrentPage] = useState(1);
 
+    // Tải danh sách đơn hàng từ Database
     const loadOrders = useCallback(async () => {
         setLoading(true);
         const data = await getOrders();
@@ -156,16 +170,17 @@ function OrderHistory() {
 
     useEffect(() => { loadOrders(); }, [loadOrders]);
 
+    // Bấm vào đơn hàng để xem chi tiết
     const handleExpandToggle = async (order: Order) => {
         if (expandedId !== order.id) {
             setExpandedId(order.id);
-            // Mark as read if it's unread
+            // Nếu đơn này chưa đọc -> Đánh dấu là đã xem trong Database
             if (!order.is_read) {
                 try {
                     await markOrderAsRead(order.id);
                     setOrders(prev => prev.map(o => o.id === order.id ? { ...o, is_read: true } : o));
                 } catch (err) {
-                    console.error('Failed to mark order as read:', err);
+                    console.error('Lỗi đánh dấu đã đọc:', err);
                 }
             }
         } else {
@@ -173,6 +188,7 @@ function OrderHistory() {
         }
     };
 
+    // Đổi trạng thái đơn hàng (Xác nhận, Đang giao...)
     const handleStatusChange = async (orderId: number, newStatus: OrderStatus) => {
         setUpdatingId(orderId);
         try {
@@ -189,13 +205,11 @@ function OrderHistory() {
         try {
             await deleteOrder(orderId);
             setOrders(prev => prev.filter(o => o.id !== orderId));
-            const newFiltered = orders.filter(o => o.id !== orderId && (filterStatus === 'all' || o.status === filterStatus));
-            const maxPage = Math.max(1, Math.ceil(newFiltered.length / PAGE_SIZE));
-            if (currentPage > maxPage) setCurrentPage(maxPage);
         } catch { alert('Xoá thất bại, thử lại nhé!'); }
         finally { setDeletingId(null); }
     };
 
+    // LOGIC LỌC VÀ TÌM KIẾM
     const filteredOrders = orders
         .filter(o => filterStatus === 'all' || o.status === filterStatus)
         .filter(o => {
@@ -210,18 +224,13 @@ function OrderHistory() {
         setCurrentPage(1);
         setExpandedId(null);
     };
-    const handlePhoneFilter = (value: string) => {
-        setPhoneFilter(value);
-        setCurrentPage(1);
-        setExpandedId(null);
-    };
     const formatDate = (iso: string) => new Date(iso).toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' });
 
     if (loading) return <div className={styles.orderLoading}>⏳ Đang tải đơn hàng...</div>;
 
     return (
         <div className={styles.orderHistory}>
-            {/* Phone search */}
+            {/* Thanh tìm kiếm theo SĐT */}
             <div className={styles.phoneSearchRow}>
                 <span className={styles.phoneSearchIcon}>🔍</span>
                 <input
@@ -229,13 +238,11 @@ function OrderHistory() {
                     className={styles.phoneSearchInput}
                     placeholder="Tìm theo số điện thoại..."
                     value={phoneFilter}
-                    onChange={e => handlePhoneFilter(e.target.value)}
+                    onChange={e => setPhoneFilter(e.target.value)}
                 />
-                {phoneFilter && (
-                    <button className={styles.phoneSearchClear} onClick={() => handlePhoneFilter('')}>✕</button>
-                )}
             </div>
 
+            {/* Bộ lọc trạng thái đơn hàng */}
             <div className={styles.orderFilterBar}>
                 <button className={`${styles.orderFilterBtn}${filterStatus === 'all' ? ' ' + styles.active : ''}`} onClick={() => handleFilterChange('all')}>
                     Tất cả ({orders.length})
@@ -251,12 +258,9 @@ function OrderHistory() {
                 <div className={styles.orderEmptyState}><span>📭</span><p>Không có đơn hàng nào.</p></div>
             ) : (
                 <>
-                    <p className={styles.orderListSummary}>
-                        Hiển thị {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, filteredOrders.length)} / {filteredOrders.length} đơn hàng
-                    </p>
-
                     <div className={styles.orderTableWrapper}>
                         {pagedOrders.map(order => (
+                            /* Một 'Card' đơn hàng */
                             <div key={order.id} className={`${styles.orderCard}${order.status === 'cancelled' ? ' ' + styles.cancelled : ''}${!order.is_read ? ' ' + styles.unread : ''}`}>
                                 <div className={styles.orderCardHeader} onClick={() => handleExpandToggle(order)}>
                                     <div className={styles.orderCardLeft}>
@@ -274,8 +278,14 @@ function OrderHistory() {
                                         <span className={styles.orderTotal}>{order.total_price.toLocaleString('vi-VN')} đ</span>
                                         <span className={styles.orderDate}>{formatDate(order.created_at)}</span>
 
+                                        {/* Nút xóa đơn đã hủy */}
                                         {order.status === 'cancelled' && (
-                                            <button className={styles.orderDeleteBtn} onClick={(e) => { e.stopPropagation(); handleDelete(order.id); }} disabled={deletingId === order.id} title="Xoá đơn đã huỷ">
+                                            <button
+                                                className={styles.orderDeleteBtn}
+                                                onClick={(e) => { e.stopPropagation(); handleDelete(order.id); }}
+                                                disabled={deletingId === order.id}
+                                                title="Xoá đơn đã huỷ"
+                                            >
                                                 {deletingId === order.id ? '...' : '🗑'}
                                             </button>
                                         )}
@@ -283,15 +293,15 @@ function OrderHistory() {
                                     </div>
                                 </div>
 
+                                {/* PHẦN CHI TIẾT (Chỉ hiện khi bấm vào) */}
                                 {expandedId === order.id && (
                                     <div className={styles.orderCardDetail}>
                                         <div className={styles.orderDetailInfo}>
                                             <p><strong>📍 Địa chỉ:</strong> {order.address}</p>
                                             {order.note && <p><strong>📝 Ghi chú:</strong> {order.note}</p>}
                                         </div>
-
                                         <table className={styles.orderItemsTable}>
-                                            <thead><tr><th>Sản phẩm</th><th>Đơn giá</th><th>SL</th><th>Thành tiền</th></tr></thead>
+                                            <thead><tr><th>Sản phẩm</th><th>Giá</th><th>SL</th><th>Tổng</th></tr></thead>
                                             <tbody>
                                                 {order.order_items?.map((item, i) => (
                                                     <tr key={i}>
@@ -303,68 +313,58 @@ function OrderHistory() {
                                                 ))}
                                             </tbody>
                                         </table>
-
-                                        {order.status !== 'cancelled' && (
-                                            <div className={styles.orderStatusChanger}>
-                                                <span>Đổi trạng thái:</span>
-                                                <div className={styles.orderStatusBtns}>
-                                                    {ALL_STATUSES.filter(s => s !== 'cancelled').map(s => (
-                                                        <button key={s}
-                                                            className={`${styles.orderStatusBtn}${order.status === s ? ' ' + styles.current : ''}`}
-                                                            style={order.status === s ? { backgroundColor: ORDER_STATUS_COLORS[s], color: 'white', borderColor: ORDER_STATUS_COLORS[s] } : {}}
-                                                            onClick={() => handleStatusChange(order.id, s)}
-                                                            disabled={order.status === s || updatingId === order.id}
-                                                        >
-                                                            {updatingId === order.id && order.status !== s ? '...' : ORDER_STATUS_LABELS[s]}
-                                                        </button>
-                                                    ))}
-                                                    <button className={`${styles.orderStatusBtn} ${styles.cancelBtn}`} onClick={() => handleStatusChange(order.id, 'cancelled')} disabled={updatingId === order.id}>
-                                                        Huỷ đơn
+                                        {/* Nút đổi trạng thái đơn */}
+                                        <div className={styles.orderStatusChanger}>
+                                            <span>Đổi trạng thái:</span>
+                                            <div className={styles.orderStatusBtns}>
+                                                {ALL_STATUSES.filter(s => s !== 'cancelled').map(s => (
+                                                    <button key={s}
+                                                        className={`${styles.orderStatusBtn}${order.status === s ? ' ' + styles.current : ''}`}
+                                                        style={order.status === s ? { backgroundColor: ORDER_STATUS_COLORS[s], color: 'white', borderColor: ORDER_STATUS_COLORS[s] } : {}}
+                                                        onClick={() => handleStatusChange(order.id, s)}
+                                                        disabled={order.status === s || updatingId === order.id}
+                                                    >
+                                                        {updatingId === order.id && order.status !== s ? '...' : ORDER_STATUS_LABELS[s]}
                                                     </button>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {order.status === 'cancelled' && (
-                                            <div className={styles.orderCancelledActions}>
-                                                <p className={styles.orderCancelledNote}>⚠️ Đơn đã huỷ — không thể thay đổi trạng thái</p>
-                                                <button className={styles.orderDeleteFullBtn} onClick={() => handleDelete(order.id)} disabled={deletingId === order.id}>
-                                                    {deletingId === order.id ? 'Đang xoá...' : '🗑 Xoá đơn hàng này'}
+                                                ))}
+                                                <button
+                                                    className={`${styles.orderStatusBtn} ${styles.cancelBtn}`}
+                                                    onClick={() => handleStatusChange(order.id, 'cancelled')}
+                                                    disabled={updatingId === order.id}
+                                                >
+                                                    Huỷ đơn
                                                 </button>
                                             </div>
-                                        )}
+                                        </div>
                                     </div>
                                 )}
                             </div>
                         ))}
                     </div>
 
+                    {/* Phân trang của Đơn hàng */}
                     {totalPages > 1 && (
                         <div className={styles.pagination}>
-                            <button className={styles.pageBtn} onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>← Trước</button>
                             {Array.from({ length: totalPages }, (_, i) => i + 1).map(pg => (
                                 <button key={pg} className={`${styles.pageBtn}${currentPage === pg ? ' ' + styles.pageBtnActive : ''}`} onClick={() => setCurrentPage(pg)}>{pg}</button>
                             ))}
-                            <button className={styles.pageBtn} onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Sau →</button>
                         </div>
                     )}
                 </>
             )}
-
             <button className={styles.orderRefreshBtn} onClick={loadOrders}>🔄 Làm mới</button>
         </div>
     );
 }
 
-// ===================== ADMIN DASHBOARD (Main) =====================
+// ===================== DASHBOARD CHÍNH (Gồm các Tab) =====================
 type Tab = 'products' | 'orders' | 'categories' | 'promotions';
 
-export default function AdminDashboard({ onAdd, categories, onRefreshCategories, productCategoryCounts, products }: AdminDashboardProps) {
+export default function AdminDashboard({ open, onClose, onAdd, categories, onRefreshCategories, productCategoryCounts, products }: AdminDashboardProps) {
     const [activeTab, setActiveTab] = useState<Tab>('products');
     const [unreadCount, setUnreadCount] = useState(0);
 
-    // Sync unread count from OrderHistory or Poll roughly
-    // For simplicity, we can just load orders here or pass a callback
+    // KIỂM TRA ĐƠN HÀNG MỚI: Cứ 30 giây Bím sẽ đi kiểm tra xem có đơn mới nào khách vừa đặt không
     useEffect(() => {
         const fetchUnread = async () => {
             const orders = await getOrders();
@@ -372,34 +372,80 @@ export default function AdminDashboard({ onAdd, categories, onRefreshCategories,
             setUnreadCount(unread);
         };
         fetchUnread();
-        // Poll every 30s for new orders
         const timer = setInterval(fetchUnread, 30000);
         return () => clearInterval(timer);
     }, []);
 
-    // Also update unread count if we're in 'orders' tab and things change
-    // This is a bit decoupled but polling + initial load should work.
+    // Nếu sidebar đang đóng thì không render gì cả (phần Backdrop xử lý hiệu ứng sau)
+    // if (!open) return null; // Ta sẽ xử lý hiệu ứng CSS nên vẫn trả về JSX
 
     return (
-        <div className={styles.adminDashboard} id="admin-dashboard">
-            <div className={styles.dashboardTabs}>
-                <button className={`${styles.dashboardTab}${activeTab === 'products' ? ' ' + styles.active : ''}`} onClick={() => setActiveTab('products')}>📦 Quản lý sản phẩm</button>
-                <button className={`${styles.dashboardTab}${activeTab === 'categories' ? ' ' + styles.active : ''}`} onClick={() => setActiveTab('categories')}>🏷️ Danh mục</button>
-                <button className={`${styles.dashboardTab}${activeTab === 'promotions' ? ' ' + styles.active : ''}`} onClick={() => setActiveTab('promotions')}>🔥 Khuyến mãi</button>
-                <button className={`${styles.dashboardTab}${activeTab === 'orders' ? ' ' + styles.active : ''}`} onClick={() => setActiveTab('orders')}>
-                    📋 Đơn hàng
-                    {unreadCount > 0 && <span className={styles.unreadBadge}>{unreadCount}</span>}
-                </button>
-            </div>
+        <>
+            {/* Lớp nền mờ (Backdrop) */}
+            <div className={`${styles.adminOverlay}${open ? ' ' + styles.open : ''}`} onClick={onClose} />
 
-            <div className={styles.dashboardContent}>
-                {activeTab === 'products' && <AddProductForm onAdd={onAdd} categories={categories} />}
-                {activeTab === 'categories' && (
-                    <CategoryManager categories={categories} productCategoryCounts={productCategoryCounts} onRefresh={onRefreshCategories} />
-                )}
-                {activeTab === 'promotions' && <PromotionManager products={products} />}
-                {activeTab === 'orders' && <OrderHistory />}
+            {/* Thanh Sidebar quản trị */}
+            <div className={`${styles.adminSidebar}${open ? ' ' + styles.open : ''}`}>
+                <div className={styles.sidebarHeader}>
+                    <div className={styles.sidebarTitle}>
+                        <span className={styles.sidebarIcon}>⚙️</span>
+                        <div>
+                            <h3>Trung tâm quản trị</h3>
+                        </div>
+                    </div>
+                    <button className={styles.btnCloseSidebar} onClick={onClose} title="Đóng bảng điều khiển">✕</button>
+                </div>
+
+                {/* Thanh chuyển đổi giữa các tab công việc (Dạng dọc trên Desktop) */}
+                <div className={styles.dashboardTabs}>
+                    <button className={`${styles.dashboardTab}${activeTab === 'products' ? ' ' + styles.active : ''}`} onClick={() => setActiveTab('products')}>
+                        <div className={styles.tabIconWrapper}><span className={styles.tabIcon}>📦</span></div>
+                        <span>Quản lý sản phẩm</span>
+                    </button>
+                    <button className={`${styles.dashboardTab}${activeTab === 'categories' ? ' ' + styles.active : ''}`} onClick={() => setActiveTab('categories')}>
+                        <div className={styles.tabIconWrapper}><span className={styles.tabIcon}>🏷️</span></div>
+                        <span>Quản lý danh mục</span>
+                    </button>
+                    <button className={`${styles.dashboardTab}${activeTab === 'promotions' ? ' ' + styles.active : ''}`} onClick={() => setActiveTab('promotions')}>
+                        <div className={styles.tabIconWrapper}><span className={styles.tabIcon}>🔥</span></div>
+                        <span>Quản lý khuyến mãi</span>
+                    </button>
+                    <button className={`${styles.dashboardTab}${activeTab === 'orders' ? ' ' + styles.active : ''}`} onClick={() => setActiveTab('orders')}>
+                        <div className={styles.tabIconWrapper}>
+                            <span className={styles.tabIcon}>📋</span>
+                            {unreadCount > 0 && <span className={styles.unreadBadge}>{unreadCount}</span>}
+                        </div>
+                        <span>Quản lý đơn hàng</span>
+                    </button>
+                </div>
+
+                {/* Nội dung tương ứng với mỗi tab */}
+                <div className={styles.dashboardContent}>
+                    {activeTab === 'products' && (
+                        <div className={styles.tabSection}>
+                            <h4>+ Thêm sản phẩm mới</h4>
+                            <AddProductForm onAdd={onAdd} categories={categories} />
+                        </div>
+                    )}
+                    {activeTab === 'categories' && (
+                        <div className={styles.tabSection}>
+                            <CategoryManager categories={categories} productCategoryCounts={productCategoryCounts} onRefresh={onRefreshCategories} />
+                        </div>
+                    )}
+                    {activeTab === 'promotions' && (
+                        <div className={styles.tabSection}>
+                            <h4>🔥 Chương trình khuyến mãi</h4>
+                            <PromotionManager products={products} />
+                        </div>
+                    )}
+                    {activeTab === 'orders' && (
+                        <div className={styles.tabSection}>
+                            <h4>📋 Lịch sử đơn hàng</h4>
+                            <OrderHistory />
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+        </>
     );
 }

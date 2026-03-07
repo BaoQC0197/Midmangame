@@ -94,8 +94,9 @@
 }
 
 .zaloIconImg {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    /* Giảm khoảng 80% so với 32px ban đầu */
+    height: 22px;
     object-fit: contain;
     border-radius: 6px;
     /* Bo nhẹ góc ảnh cho mượt */

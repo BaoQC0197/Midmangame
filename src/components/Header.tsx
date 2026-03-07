@@ -6,7 +6,7 @@
  * Bím ví file này như "Bảng chỉ dẫn" của cửa hàng. Nó giúp khách 
  * tìm đường, xem giỏ hàng và giúp Admin đăng nhập vào hệ thống.
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from './Header.module.css';
 import logoImg from '../assets/logo.png';
 
@@ -24,6 +24,19 @@ export default function Header({ isAdmin, onLogin, onLogout, onAdminPanelOpen }:
     const [menuOpen, setMenuOpen] = useState(false); // Trạng thái đóng/mở menu trên điện thoại
     const [adminOpen, setAdminOpen] = useState(false); // Trạng thái đóng/mở ô đăng nhập Admin
     const [scrolled, setScrolled] = useState(false); // Theo dõi xem người dùng có đang cuộn trang không
+
+    const adminWrapperRef = useRef<HTMLDivElement>(null);
+
+    // Kích ra ngoài để đóng adminOpen
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (adminOpen && adminWrapperRef.current && !adminWrapperRef.current.contains(event.target as Node)) {
+                setAdminOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [adminOpen]);
 
     // HIỆU ỨNG: Khi cuộn chuột xuống thì Header sẽ đổi kiểu (thêm đổ bóng)
     useEffect(() => {
@@ -77,7 +90,7 @@ export default function Header({ isAdmin, onLogin, onLogout, onAdminPanelOpen }:
                     <div className={styles.headerActions}>
 
                         {/* Khu vực đăng nhập cho Admin */}
-                        <div className={styles.adminDropdownWrapper}>
+                        <div className={styles.adminDropdownWrapper} ref={adminWrapperRef}>
                             {isAdmin ? (
                                 <div className={styles.adminInfo}>
                                     <button className={styles.btnAdminPortal} onClick={onAdminPanelOpen} title="Bảng quản trị chuyên nghiệp">

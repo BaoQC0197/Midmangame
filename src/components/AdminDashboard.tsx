@@ -376,6 +376,20 @@ export default function AdminDashboard({ open, onClose, onAdd, categories, onRef
         return () => clearInterval(timer);
     }, []);
 
+    // NGĂN SCROLL NỀN: Khi mở Admin Dashboard, vô hiệu hóa scroll của body
+    useEffect(() => {
+        if (open) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+
+        // Cleanup function phòng trường hợp component bị unmount đột ngột
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [open]);
+
     // Nếu sidebar đang đóng thì không render gì cả (phần Backdrop xử lý hiệu ứng sau)
     // if (!open) return null; // Ta sẽ xử lý hiệu ứng CSS nên vẫn trả về JSX
 

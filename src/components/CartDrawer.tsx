@@ -6,7 +6,7 @@
  * Bím ví file này như một cái "Giỏ xách ảo". Nó hiện ra từ bên phải 
  * màn hình để bro kiểm tra lại những thứ mình đã chọn trước khi thanh toán.
  */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { CartItem } from '../hooks/useCart';
 import { DEFAULT_PRODUCT_IMAGE } from '../constants/images';
 import styles from './CartDrawer.module.css';
@@ -24,6 +24,18 @@ interface CartDrawerProps {
 
 export default function CartDrawer({ open, items, totalPrice, onClose, onUpdateQuantity, onRemove, onCheckout, onClearCart }: CartDrawerProps) {
     const [confirmClear, setConfirmClear] = useState(false); // Trạng thái xác nhận trước khi xóa sạch giỏ
+
+    // NGĂN SCROLL NỀN: Vô hiệu hóa cuộn trang khi Giỏ hàng đang mở
+    useEffect(() => {
+        if (open) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [open]);
 
     // Hàm xử lý xóa sạch giỏ (bấm 2 lần mới xóa để tránh lỡ tay)
     const handleClearCart = () => {

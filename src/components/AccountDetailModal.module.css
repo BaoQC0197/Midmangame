@@ -1,0 +1,313 @@
+/* AccountDetailModal.module.css */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(3, 7, 18, 0.85);
+    backdrop-filter: blur(12px);
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    background: linear-gradient(145deg, rgba(17, 24, 39, 0.98), rgba(9, 14, 28, 0.99));
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-radius: 28px;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    height: 85vh;
+    max-height: 800px;
+    overflow: hidden;
+    box-shadow: 
+        0 0 80px -20px rgba(168, 85, 247, 0.2),
+        0 50px 100px -20px rgba(0, 0, 0, 0.9);
+}
+
+.closeBtn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.closeBtn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    transform: rotate(90deg);
+}
+
+/* LEFT: Gallery Section */
+.gallerySection {
+    background: #000;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.mainImageContainer {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mainImage {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.navBtn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.gallerySection:hover .navBtn {
+    opacity: 1;
+}
+
+.navPrev { left: 20px; }
+.navNext { right: 20px; }
+
+.navBtn:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.thumbnails {
+    display: flex;
+    gap: 10px;
+    padding: 20px;
+    overflow-x: auto;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.thumb {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    opacity: 0.6;
+}
+
+.thumb:hover {
+    opacity: 1;
+}
+
+.thumbActive {
+    border-color: var(--color-primary);
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+/* RIGHT: Info Section */
+.infoSection {
+    padding: 40px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.header h2 {
+    font-size: 28px;
+    font-family: var(--font-heading);
+    color: white;
+    margin-bottom: 12px;
+}
+
+.badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.badge {
+    padding: 6px 12px;
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.priceBox {
+    background: rgba(16, 185, 129, 0.05);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.priceLabel {
+    display: block;
+    font-size: 14px;
+    color: var(--color-text-dim);
+    margin-bottom: 8px;
+}
+
+.priceValue {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--color-accent);
+    font-family: var(--font-heading);
+}
+
+.detailsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.detailItem {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.detailLabel {
+    display: block;
+    font-size: 12px;
+    color: var(--color-text-dim);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.detailValue {
+    font-weight: 700;
+    color: white;
+    font-size: 14px;
+}
+
+.description h4 {
+    margin-bottom: 10px;
+    color: var(--color-text-dim);
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.description p {
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    font-size: 15px;
+    white-space: pre-line;
+}
+
+/* Fee Transparency Table */
+.feeTransparency {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 25px;
+}
+
+.feeTable {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.feeRow {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--color-text-dim);
+}
+
+.feeRow.total {
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    color: white;
+    font-weight: 800;
+}
+
+.feePayerBadge {
+    font-size: 10px;
+    padding: 2px 8px;
+    background: var(--color-primary);
+    border-radius: 4px;
+    margin-left: 8px;
+}
+
+.footer {
+    position: sticky;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(17, 24, 39, 1), rgba(17, 24, 39, 0));
+    padding-top: 20px;
+}
+
+.buyBtn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+@media (max-width: 900px) {
+    .modal {
+        grid-template-columns: 1fr;
+        height: 95vh;
+        max-height: none;
+        overflow-y: auto;
+    }
+
+    .gallerySection {
+        height: 400px;
+    }
+
+    .infoSection {
+        border-left: none;
+        padding: 24px;
+    }
+}

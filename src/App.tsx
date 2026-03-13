@@ -1,323 +1,418 @@
-/**
- * src/App.tsx
- * 
- * ĐÂY LÀ "BỘ KHUNG" GIAO DIỆN CHÍNH CỦA WEBSITE
- * --------------------------------------------
- * File này đóng vai trò như người điều phối: lấy dữ liệu từ Bím (useVppData) 
- * rồi chia cho các Component con (Header, Hero, ProductList, v.v.) hiển thị.
- */
-import { useState } from 'react';
-import { useVppData } from './hooks/useVppData';
-import type { Product } from './types/product';
+import { useState, useMemo, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { AnimatePresence, motion } from 'framer-motion';
 
-// Nhập các thành phần giao diện (UI Components)
-import Header from './components/Header';
-import CategoryBar from './components/CategoryBar';
-import Hero from './components/Hero';
-import ProductList from './components/ProductList';
-import AdminDashboard from './components/AdminDashboard';
-import EditModal from './components/EditModal';
-import CartDrawer from './components/CartDrawer';
-import OrderModal from './components/OrderModal';
-import FloatButtons from './components/FloatButtons';
-import ConfirmModal from './components/ConfirmModal';
-import ProductDetailModal from './components/ProductDetailModal';
-import OrderHistoryDrawer from './components/OrderHistoryDrawer';
-// import SaleSection from './components/SaleSection';
+import { getAccounts, addAccount } from './api/accounts';
+import { uploadImages } from './api/storage';
+import { supabase, ADMIN_EMAIL } from './lib/supabase';
+
+// UI Components
+import MarketHeader from './components/MarketHeader';
+import MarketHero from './components/MarketHero';
+import MarketAccountCard from './components/MarketAccountCard';
+import FilterHub from './components/FilterHub';
+import MiddlemanHub from './components/MiddlemanHub';
+import SellAccountModal from './components/SellAccountModal';
+import WelcomePopup from './components/WelcomePopup';
+import BuyRequestModal from './components/BuyRequestModal';
+import AccountDetailModal from './components/AccountDetailModal';
+import TradeRoomBanner from './components/TradeRoomBanner';
+import TradeRoomView from './components/TradeRoomView';
 import Toast, { type ToastType } from './components/Toast';
+import UserHub from './components/UserHub';
+import Logo from './components/Logo';
 import styles from './App.module.css';
-import logoImg from './assets/logo.png';
 
-// Định nghĩa kiểu dữ liệu cho Modal xác nhận
-interface ConfirmState {
-    open: boolean;
-    title: string;
-    message: string;
-    onConfirm: () => void;
-    variant?: 'danger' | 'warning' | 'info';
-}
-
-// Định nghĩa kiểu dữ liệu cho thông báo Toast
-interface ToastState {
-    show: boolean;
-    message: string;
-    type: ToastType;
-}
+// Types
+import { CATEGORY_STRUCTURE, CategoryKey } from './types/account';
 
 export default function App() {
-    // 1. LẤY "BỘ NÃO" XỬ LÝ DỮ LIỆU TỪ HOOK
-    const {
-        isAdmin,
-        products,
-        categories,
-        isLoading,
-        cart,
-        handleLogin: login,
-        handleLogout,
-        handleAddProduct,
-        handleDeleteProduct,
-        handleUpdateProduct,
-        handleUpdateProductOrders,
-        handleUpdateGlobalProductOrders,
-        handleRefreshCategories,
-        getFullProduct,
-    } = useVppData();
+    const queryClient = useQueryClient();
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [adminPanelOpen, setAdminPanelOpen] = useState(false);
+    const [sellModalOpen, setSellModalOpen] = useState(false);
+    const [isSubmittingTicket, setIsSubmittingTicket] = useState(false);
+    const [selectedGame, setSelectedGame] = useState<string>('All');
+    const [sortBy, setSortBy] = useState<string>('newest');
+    const [feePayerFilter, setFeePayerFilter] = useState<string>('All');
+    const [accTypeFilter, setAccTypeFilter] = useState<string>('All');
+    const [minPrice, setMinPrice] = useState<string>('');
+    const [maxPrice, setMaxPrice] = useState<string>('');
+    const [user, setUser] = useState<any>(null);
+    const [buyModalAccount, setBuyModalAccount] = useState<any>(null);
+    const [detailModalAccount, setDetailModalAccount] = useState<any>(null);
+    const [showTradeRoom, setShowTradeRoom] = useState(false);
+    const [activeTradeTicket, setActiveTradeTicket] = useState<any>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6;
+    const [userHubOpen, setUserHubOpen] = useState(false);
+    const [toast, setToast] = useState({ show: false, message: '', type: 'success' as ToastType });
 
-    // 2. CÁC TRẠNG THÁI GIAO DIỆN (UI STATE)
-    const [activeCategory, setActiveCategory] = useState('all'); // Danh mục đang chọn để lọc
-    const [searchQuery, setSearchQuery] = useState(''); // Từ khóa tìm kiếm
-    const [editingProduct, setEditingProduct] = useState<Product | null>(null); // SP đang được Admin sửa
-    const [detailProduct, setDetailProduct] = useState<Product | null>(null); // SP đang xem chi tiết (Modal)
-    const [cartOpen, setCartOpen] = useState(false); // Trạng thái đóng/mở Giỏ hàng
-    const [orderOpen, setOrderOpen] = useState(false); // Trạng thái đóng/mở Form đặt hàng
-    const [orderHistoryOpen, setOrderHistoryOpen] = useState(false); // Trạng thái xem Lịch sử đơn hàng
-    const [adminPanelOpen, setAdminPanelOpen] = useState(false); // Trạng thái đóng/mở Bảng quản trị (Sidebar)
-
-    // Quản lý thông báo và xác nhận
-    const [toast, setToast] = useState<ToastState>({ show: false, message: '', type: 'success' });
-    const [confirm, setConfirm] = useState<ConfirmState>({
-        open: false,
-        title: '',
-        message: '',
-        onConfirm: () => { },
+    // --- DATA FETCHING ---
+    const { data: accounts = [], isLoading } = useQuery({
+        queryKey: ['accounts'],
+        queryFn: getAccounts,
     });
 
-    // Hàm tiện ích để hiện thông báo nhanh
     const showToast = (message: string, type: ToastType = 'success') => {
         setToast({ show: true, message, type });
     };
 
-    // 3. CÁC HÀM ĐIỀU KHIỂN (HANDLERS) - Kết nối UI với logic của Bím
+    // Auth Effect
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setUser(session?.user ?? null);
+            if (session?.user?.email === ADMIN_EMAIL) setIsAdmin(true);
+        });
 
-    // Xử lý đăng nhập
-    const handleLogin = async (email: string, password: string) => {
-        try {
-            await login(email, password);
-            showToast('Đăng nhập thành công');
-        } catch (error: any) {
-            showToast(error.message || 'Lỗi đăng nhập', 'error');
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+            setIsAdmin(session?.user?.email === ADMIN_EMAIL);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
+
+    // Load active ticket khi user đăng nhập
+    useEffect(() => {
+        const loadActive = () => {
+            if (user && !isAdmin) {
+                import('./api/tickets').then(({ getMyActiveTicket }) => {
+                    getMyActiveTicket(user.id).then(setActiveTradeTicket).catch(() => setActiveTradeTicket(null));
+                });
+            } else {
+                setActiveTradeTicket(null);
+            }
+        };
+
+        loadActive();
+
+        // Real-time subscription để hiện banner ngay khi admin chuyển status sang 'trading'
+        if (user && !isAdmin) {
+            const channel = supabase
+                .channel('trading_notifications')
+                .on(
+                    'postgres_changes',
+                    { event: 'UPDATE', schema: 'public', table: 'transaction_tickets' },
+                    (payload: any) => {
+                        // Nếu ticket này liên quan đến user và status mới là trading hoặc vừa kết thúc
+                        const t = payload.new;
+                        if (t.buyer_user_id === user.id || t.seller_user_id === user.id) {
+                            loadActive();
+                        }
+                    }
+                )
+                .subscribe();
+
+            return () => { supabase.removeChannel(channel); };
         }
+    }, [user, isAdmin]);
+
+    const currentUserPhone = useMemo(() => {
+        if (!user || !user.email) return null;
+        const DOMAINS = ['@easytrade.com'];
+        const match = DOMAINS.find(d => user.email.endsWith(d));
+        if (match && user.email !== ADMIN_EMAIL) {
+            return user.email.replace(match, '');
+        }
+        return null;
+    }, [user]);
+
+    // --- AUTH LOGIC ---
+    const handleLogin = async (rawInput: string, password: string) => {
+        const email = rawInput.includes('@') ? rawInput : `${rawInput}@easytrade.com`;
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw new Error('Sai thông tin đăng nhập');
+        showToast(email === ADMIN_EMAIL ? 'Chào mừng trở lại, Admin!' : 'Đăng nhập thành công!');
+        queryClient.invalidateQueries({ queryKey: ['accounts'] });
     };
 
-    const handleLogoutWithToast = async () => {
-        await handleLogout();
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        setIsAdmin(false);
+        localStorage.clear();
+        sessionStorage.clear();
         showToast('Đã đăng xuất');
     };
 
-    const handleAdd = async (product: any) => {
-        const id = await handleAddProduct(product);
-        showToast('Đã thêm sản phẩm mới');
-        return id;
-    };
+    const handleSellSubmit = async (formData: any) => {
+        setIsSubmittingTicket(true);
+        showToast('Hệ thống đang xử lý và tải hình ảnh lên...', 'info');
+        try {
+            // Xử lý tạo tài khoản hoặc đăng nhập ngầm qua SĐT
+            let currentUserId = user?.id;
 
-    const handleDelete = async (id: number) => {
-        setConfirm({
-            open: true,
-            title: 'Xoá sản phẩm',
-            message: 'Bạn có chắc muốn xoá sản phẩm này? Hành động này không thể hoàn tác.',
-            variant: 'danger',
-            onConfirm: async () => {
-                setConfirm(c => ({ ...c, open: false }));
-                await handleDeleteProduct(id);
-                showToast('Đã xoá sản phẩm');
-            },
-        });
-    };
+            if (!user) {
+                if (!formData.phone) throw new Error("Vui lòng nhập số điện thoại.");
+                const email = `${formData.phone}@easytrade.com`;
+                const password = formData.password || formData.phone;
 
-    const handleEdit = async (id: number) => {
-        const product = await getFullProduct(id);
-        if (!product) {
-            showToast('Không lấy được dữ liệu sản phẩm', 'error');
-            return;
-        }
-        setEditingProduct(product);
-    };
+                // Thử đăng ký trước
+                const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
 
-    const handleUpdate = async (id: number, data: Partial<Product>, imageUrls: string[]) => {
-        await handleUpdateProduct(id, data, imageUrls);
-        showToast('Cập nhật sản phẩm thành công');
-    };
-
-    // Cart
-    const handleAddToCart = (product: Product, qty = 1) => {
-        for (let i = 0; i < qty; i++) cart.addToCart(product);
-        setCartOpen(true);
-    };
-
-    const handleBuyNow = (product: Product, qty = 1) => {
-        for (let i = 0; i < qty; i++) cart.addToCart(product);
-        setDetailProduct(null);
-        setCartOpen(false);
-        setOrderOpen(true);
-    };
-
-    const handleCheckout = () => {
-        setCartOpen(false);
-        setOrderOpen(true);
-    };
-
-    const handleOrderConfirm = () => {
-        cart.clearCart();
-        setOrderOpen(false);
-        showToast('Đặt hàng thành công! Chúng tôi sẽ liên hệ sớm.');
-    };
-
-    // Reset filters
-    const handleResetFilter = () => {
-        setActiveCategory('all');
-        setSearchQuery('');
-    };
-
-    // Filter và Sắp xếp
-    const filteredProducts = products.filter((p) => {
-        const matchCategory = activeCategory === 'all' || p.category === activeCategory;
-        const q = searchQuery.trim().toLowerCase();
-        const matchSearch = !q || p.name.toLowerCase().includes(q);
-        return matchCategory && matchSearch;
-    }).sort((a, b) => {
-        // Nếu đang ở trang chủ (Tất cả), sử dụng global_sort_order để ưu tiên ghim
-        if (activeCategory === 'all') {
-            const globalA = a.global_sort_order;
-            const globalB = b.global_sort_order;
-
-            // Cả 2 đều được ghim -> So sánh vị trí ghim
-            if (globalA !== null && globalA !== undefined && globalB !== null && globalB !== undefined) {
-                return globalA - globalB;
+                if (signUpError) {
+                    if (signUpError.message?.toLowerCase().includes('already registered')) {
+                        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+                        if (signInError) throw new Error("Mật khẩu không đúng cho tài khoản này.");
+                        currentUserId = signInData.user?.id;
+                    } else {
+                        throw new Error("Lỗi xác thực: " + signUpError.message);
+                    }
+                } else {
+                    currentUserId = signUpData.user?.id;
+                }
             }
-            // Chỉ A được ghim -> A lên trước
-            if (globalA !== null && globalA !== undefined) return -1;
-            // Chỉ B được ghim -> B lên trước
-            if (globalB !== null && globalB !== undefined) return 1;
 
-            // Nếu không ai được ghim, hiển thị mới nhất giảm dần
-            return b.id - a.id;
+            const finalDesc = `[${formData.accountType}] - Server: ${formData.server}\nBind: ${formData.bindStatus}\nLiên hệ: ${formData.phone || currentUserPhone}\n\n${formData.description}`;
+
+            // Upload mảng Files vật lý lên Supabase Storage
+            const imageUrls = await uploadImages(formData.images);
+            if (imageUrls.length === 0) throw new Error('Vui lòng tải lên ít nhất 1 ảnh');
+
+            await addAccount({
+                title: formData.title,
+                thumbnail: imageUrls[0], // Ảnh đầu tiên làm Thumbnail
+                images: imageUrls,       // Lưu danh sách đường dẫn URL
+                price: parseFloat(formData.price),
+                description: finalDesc,
+                game: formData.game,
+                server: formData.server,
+                account_type: formData.accountType,
+                is_sold: false,
+                seller_id: currentUserId,
+                seller_phone: formData.phone || currentUserPhone,
+                fee_payer: formData.feePayer
+            } as any);
+            showToast('Tạo ticket ký gửi thành công! Admin sẽ duyệt sớm nhất.', 'success');
+            setSellModalOpen(false);
+            queryClient.invalidateQueries({ queryKey: ['accounts'] });
+        } catch (error: any) {
+            console.error('Lỗi khi tạo ticket ký gửi:', error);
+            showToast(error.message || 'Lỗi gửi ticket. Vui lòng thử lại sau!', 'error');
+        } finally {
+            setIsSubmittingTicket(false);
         }
+    };
 
-        // Nếu ở trong danh mục cụ thể, backend đã sort theo sort_order và id rồi nên giữ nguyên thứ tự ban đầu của API
-        return 0;
-    });
+    // --- FILTER LOGIC ---
+    /* const games = useMemo(() => {
+        const uniqueGames = Array.from(new Set(accounts.map(acc => acc.game)));
+        return ['All', ...uniqueGames];
+    }, [accounts]); */
 
-    // Product count per category
-    const productCategoryCounts = products.reduce<Record<string, number>>((acc, p) => {
-        const key = p.category ?? 'khac';
-        acc[key] = (acc[key] ?? 0) + 1;
-        return acc;
-    }, {});
+    const filteredAccounts = useMemo(() => {
+        let base = accounts.filter(acc => {
+            const matchesSearch = !searchQuery ||
+                acc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                acc.game.toLowerCase().includes(searchQuery.toLowerCase());
+
+            const matchesGame = selectedGame === 'All' ||
+                acc.game === selectedGame ||
+                (CATEGORY_STRUCTURE.find(g => g.id === selectedGame)?.items.includes(acc.game as CategoryKey));
+
+            // Fee Payer Filter
+            const matchesFee = feePayerFilter === 'All' || acc.fee_payer === feePayerFilter;
+
+            // Account Type Filter
+            const matchesType = accTypeFilter === 'All' ||
+                (acc.account_type && acc.account_type.toLowerCase().includes(accTypeFilter.toLowerCase())) ||
+                (acc.description && acc.description.toLowerCase().includes(accTypeFilter.toLowerCase()));
+
+            // Price Range Filter
+            const min = minPrice ? parseFloat(minPrice) : 0;
+            const max = maxPrice ? parseFloat(maxPrice) : Infinity;
+            const matchesPrice = acc.price >= min && acc.price <= max;
+
+            const isApproved = acc.status === 'approved';
+
+            return matchesSearch && matchesGame && matchesFee && matchesType && matchesPrice && isApproved;
+        });
+
+        // Sắp xếp
+        return [...base].sort((a, b) => {
+            // Luôn ưu tiên hàng chưa bán
+            if (a.is_sold !== b.is_sold) return a.is_sold ? 1 : -1;
+
+            if (sortBy === 'price_asc') return a.price - b.price;
+            if (sortBy === 'price_desc') return b.price - a.price;
+            if (sortBy === 'newest') return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+
+            if (a.has_active_ticket !== b.has_active_ticket) return a.has_active_ticket ? 1 : -1;
+            return 0;
+        });
+    }, [accounts, searchQuery, selectedGame, sortBy, feePayerFilter, accTypeFilter, minPrice, maxPrice]);
+
+    // Reset trang khi bộ lọc thay đổi
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, selectedGame, feePayerFilter, accTypeFilter, minPrice, maxPrice, sortBy]);
+
+    const totalPages = Math.ceil(filteredAccounts.length / itemsPerPage);
+    const paginatedAccounts = useMemo(() => {
+        const start = (currentPage - 1) * itemsPerPage;
+        return filteredAccounts.slice(start, start + itemsPerPage);
+    }, [filteredAccounts, currentPage, itemsPerPage]);
 
     return (
-        <>
-            <Header
+        <div className={styles.app}>
+            <MarketHeader
                 isAdmin={isAdmin}
+                isLoggedIn={!!user}
+                currentUserPhone={currentUserPhone}
                 onLogin={handleLogin}
-                onLogout={handleLogoutWithToast}
-                onAdminPanelOpen={() => setAdminPanelOpen(true)} // Mở trung tâm điều khiển
-            />
-            <Hero searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-            {/* <SaleSection products={products} onViewDetail={(p) => setDetailProduct(p)} /> */}
-            <CategoryBar
-                activeCategory={activeCategory}
-                onFilter={(cat) => { setActiveCategory(cat); setSearchQuery(''); }}
-                categories={categories}
+                onLogout={handleLogout}
+                onAdminPanelOpen={() => setAdminPanelOpen(true)}
+                activeTicket={activeTradeTicket}
+                onUserHubOpen={() => setUserHubOpen(true)}
             />
 
-            <main className="container" id="product-list">
-                <ProductList
-                    products={filteredProducts}
-                    isAdmin={isAdmin}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    onAddToCart={handleAddToCart}
-                    onViewDetail={(p) => setDetailProduct(p)}
+            <MarketHero
+                onOpenSellModal={() => setSellModalOpen(true)}
+                onBuyRequest={(acc) => setBuyModalAccount(acc)}
+                accounts={accounts}
+            />
+
+            <main id="product-list" className="container">
+                <FilterHub
+                    selectedGame={selectedGame}
+                    onSelectedGameChange={setSelectedGame}
                     searchQuery={searchQuery}
-                    isLoading={isLoading}
-                    onResetFilter={handleResetFilter}
-                    activeCategory={activeCategory}
+                    onSearchChange={setSearchQuery}
+                    sortBy={sortBy}
+                    onSortChange={setSortBy}
+                    feePayer={feePayerFilter}
+                    onFeePayerChange={setFeePayerFilter}
+                    accType={accTypeFilter}
+                    onAccTypeChange={setAccTypeFilter}
+                    minPrice={minPrice}
+                    onMinPriceChange={setMinPrice}
+                    maxPrice={maxPrice}
+                    onMaxPriceChange={setMaxPrice}
                 />
+
+                {isLoading ? (
+                    <div className={styles.loadingState}>
+                        <div className="spinner" />
+                        <p>Đang quét dữ liệu sàn giao dịch...</p>
+                    </div>
+                ) : (
+                    <div className={styles.accountGrid}>
+                        <AnimatePresence mode="popLayout">
+                            {paginatedAccounts.map((account) => (
+                                <MarketAccountCard
+                                    key={account.id}
+                                    account={account}
+                                    onClick={(acc) => setDetailModalAccount(acc)}
+                                    onBuyRequest={(acc) => setBuyModalAccount(acc)}
+                                />
+                            ))}
+                        </AnimatePresence>
+                        {filteredAccounts.length === 0 && (
+                            <div className={styles.emptyState}>
+                                <p>Không tìm thấy tài khoản nào phù hợp với yêu cầu của bạn.</p>
+                                <button onClick={() => { setSearchQuery(''); setSelectedGame('All'); }}>Đặt lại bộ lọc</button>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Floating Trade Banner */}
+                {activeTradeTicket && !showTradeRoom && (
+                    <div onClick={() => setShowTradeRoom(true)} style={{ cursor: 'pointer' }}>
+                        <TradeRoomBanner ticket={activeTradeTicket} />
+                    </div>
+                )}
+
+                <AnimatePresence>
+                    {showTradeRoom && activeTradeTicket && (
+                        <TradeRoomView 
+                            ticket={activeTradeTicket} 
+                            onClose={() => setShowTradeRoom(false)} 
+                        />
+                    )}
+                </AnimatePresence>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className={styles.pagination}>
+                        <button
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            className={styles.pageBtn}
+                        >
+                            Trước
+                        </button>
+
+                        <div className={styles.pageNumbers}>
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                <button
+                                    key={page}
+                                    onClick={() => setCurrentPage(page)}
+                                    className={`${styles.pageNumber} ${currentPage === page ? styles.activePage : ''}`}
+                                >
+                                    {page}
+                                </button>
+                            ))}
+                        </div>
+
+                        <button
+                            disabled={currentPage === totalPages}
+                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                            className={styles.pageBtn}
+                        >
+                            Sau
+                        </button>
+                    </div>
+                )}
             </main>
 
             {isAdmin && (
-                <AdminDashboard
+                <MiddlemanHub
                     open={adminPanelOpen}
                     onClose={() => setAdminPanelOpen(false)}
-                    onAdd={handleAdd}
-                    categories={categories}
-                    onRefreshCategories={handleRefreshCategories}
-                    productCategoryCounts={productCategoryCounts}
-                    products={products}
-                    onUpdateProductOrders={handleUpdateProductOrders}
-                    onUpdateGlobalProductOrders={handleUpdateGlobalProductOrders}
+                    accounts={accounts}
                     showToast={showToast}
                 />
             )}
 
-            {editingProduct && (
-                <EditModal
-                    product={editingProduct}
-                    categories={categories}
-                    onSave={handleUpdate}
-                    onClose={() => setEditingProduct(null)}
-                />
-            )}
-
-            <CartDrawer
-                open={cartOpen}
-                items={cart.items}
-                totalPrice={cart.totalPrice}
-                onClose={() => setCartOpen(false)}
-                onUpdateQuantity={cart.updateQuantity}
-                onRemove={cart.removeFromCart}
-                onCheckout={handleCheckout}
-                onClearCart={cart.clearCart}
+            <SellAccountModal
+                open={sellModalOpen}
+                onClose={() => setSellModalOpen(false)}
+                onSubmit={handleSellSubmit}
+                isSubmitting={isSubmittingTicket}
+                currentUserPhone={currentUserPhone}
+                isLoggedIn={!!user}
             />
 
-            {orderOpen && (
-                <OrderModal
-                    items={cart.items}
-                    totalPrice={cart.totalPrice}
-                    onClose={() => setOrderOpen(false)}
-                    onConfirm={handleOrderConfirm}
-                />
-            )}
-
-            {/* Confirm modal */}
-            {confirm.open && (
-                <ConfirmModal
-                    title={confirm.title}
-                    message={confirm.message}
-                    variant={confirm.variant}
-                    onConfirm={confirm.onConfirm}
-                    onCancel={() => setConfirm(c => ({ ...c, open: false }))}
-                />
-            )}
-
-            {/* Product detail modal */}
-            {detailProduct && (
-                <ProductDetailModal
-                    product={detailProduct}
-                    allProducts={products}
-                    categories={categories}
-                    onClose={() => setDetailProduct(null)}
-                    onAddToCart={handleAddToCart}
-                    onBuyNow={handleBuyNow}
-                    onViewDetail={(p) => setDetailProduct(p)}
-                />
-            )}
-
-            {/* Ẩn các nút trôi (FloatButtons) khi đang mở các Sidebar/Modal để tránh bị che khuất và rối mắt */}
-            {!(cartOpen || orderHistoryOpen || orderOpen || adminPanelOpen) && (
-                <FloatButtons
-                    onOrderHistory={() => setOrderHistoryOpen(true)}
-                    cartCount={cart.totalItems}
-                    onCartOpen={() => setCartOpen(true)}
-                />
-            )}
-
-            <OrderHistoryDrawer
-                open={orderHistoryOpen}
-                onClose={() => setOrderHistoryOpen(false)}
+            <BuyRequestModal
+                account={buyModalAccount}
+                onClose={() => setBuyModalAccount(null)}
+                isLoggedIn={!!user}
             />
 
-            {/* Toast system */}
+            <AccountDetailModal
+                account={detailModalAccount}
+                onClose={() => setDetailModalAccount(null)}
+                onBuy={(acc) => {
+                    setDetailModalAccount(null);
+                    setBuyModalAccount(acc);
+                }}
+            />
+
+            {user && (
+                <UserHub 
+                    open={userHubOpen}
+                    onClose={() => setUserHubOpen(false)}
+                    userId={user.id}
+                />
+            )}
+
+            {/* Modal Tham gia nhanh qua Link (Xử lý /trade/[ID]) */}
+            <QuickJoinModal />
+
+            <WelcomePopup onOpenSellModal={() => setSellModalOpen(true)} />
+
             {toast.show && (
                 <Toast
                     message={toast.message}
@@ -326,33 +421,110 @@ export default function App() {
                 />
             )}
 
-            {/* Footer */}
-            <footer className={styles.footer} id="contact">
-                <div className={`container ${styles.footerInner}`}>
-                    <div className={styles.footerBrand}>
-                        <div className={styles.footerLogo}>
-                            <img src={logoImg} alt="VPP Ti Anh logo" className={styles.footerLogoImg} />
-                            VPP Ti Anh
+            <footer className={styles.footer}>
+                <div className="container">
+                    <div className={styles.footerContent}>
+                        <div className={styles.footerBrand}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                                <Logo size={32} style={{ color: 'var(--color-primary)' }} />
+                                <h3 className="text-gradient" style={{ margin: 0 }}>EasyTrade</h3>
+                            </div>
+                            <p>Hệ thống trung gian tài khoản chuyên nghiệp, bảo mật tuyệt đối.</p>
                         </div>
-                        <p className={styles.footerTagline}>Đại lý văn phòng phẩm uy tín<br />Chất lượng cao, giá tốt nhất</p>
+                        <div className={styles.footerLinks}>
+                            <div className={styles.footerCol}>
+                                <h4>Khám phá</h4>
+                                <a href="#">Mua tài khoản</a>
+                                <a href="#">Ký gửi trung gian</a>
+                                <a href="#">Bảng giá dịch vụ</a>
+                            </div>
+                            <div className={styles.footerCol}>
+                                <h4>Hệ thống</h4>
+                                <a href="#">Điều khoản sử dụng</a>
+                                <a href="#">Chính sách bảo mật</a>
+                                <a href="#">Liên hệ hỗ trợ</a>
+                            </div>
+                        </div>
                     </div>
-                    <div className={styles.footerLinks} id="about">
-                        <h4>Liên kết</h4>
-                        <a href="#">Trang chủ</a>
-                        <a href="#category-menu">Sản phẩm</a>
-                        <a href="#about">Giới thiệu</a>
+                    <div className={styles.footerBottom}>
+                        <p>© 2024 EasyTrade Middleman Service. All rights reserved.</p>
                     </div>
-                    <div className={styles.footerContact}>
-                        <h4>Liên hệ</h4>
-                        <p>📞 <a href="tel:0981063381">0981 063 381</a></p>
-                        <p>💬 <a href="https://zalo.me/0981063381" target="_blank" rel="noreferrer">Zalo: 0981 063 381</a></p>
-                        <p>📍 TP. Hồ Chí Minh</p>
-                    </div>
-                </div>
-                <div className={styles.footerBottom}>
-                    <p>© 2026 VPP Ti Anh. All rights reserved.</p>
                 </div>
             </footer>
-        </>
+        </div>
+    );
+}
+
+// --- UTILITY COMPONENTS ---
+function QuickJoinModal() {
+    const [ticket, setTicket] = useState<any>(null);
+    const [show, setShow] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const path = window.location.pathname;
+        if (path.startsWith('/trade/')) {
+            const id = path.split('/trade/')[1];
+            if (id) {
+                setLoading(true);
+                setShow(true);
+                // Fetch ticket info công khai
+                supabase
+                    .from('transaction_tickets')
+                    .select(`*, trade_accounts(name, price)`)
+                    .eq('id', id)
+                    .single()
+                    .then(({ data }) => {
+                        if (data && data.status === 'trading') {
+                            setTicket(data);
+                        }
+                        setLoading(false);
+                    });
+            }
+        }
+    }, []);
+
+    if (!show) return null;
+
+    return (
+        <div className={styles.modalOverlay} style={{ zIndex: 2000 }}>
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className={`${styles.modalContent} glass-panel`}
+                style={{ maxWidth: 400, textAlign: 'center', padding: 40 }}
+            >
+                <div style={{ width: 8, height: 8, background: '#ef4444', borderRadius: '50%', boxShadow: '0 0 8px #ef4444', margin: '0 auto 20px' }} />
+                <h2 style={{ marginBottom: 10 }}>Tham gia giao dịch</h2>
+                {loading ? (
+                    <p>Đang tìm kiếm thông tin phòng...</p>
+                ) : ticket ? (
+                    <>
+                        <p style={{ color: 'var(--color-text-dim)', marginBottom: 24 }}>
+                            Bạn đang được mời tham gia phòng giao dịch trung gian cho tài khoản:
+                            <br /><b style={{ color: 'white' }}>{ticket.trade_accounts?.name}</b>
+                        </p>
+                        <a
+                            href={ticket.room_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="btn-premium"
+                            style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: 8, alignItems: 'center' }}
+                            onClick={() => setShow(false)}
+                        >
+                            Vào phòng ngay
+                        </a>
+                    </>
+                ) : (
+                    <p style={{ color: '#ef4444' }}>Phòng giao dịch này không tồn tại hoặc đã kết thúc.</p>
+                )}
+                <button
+                    onClick={() => { setShow(false); window.history.pushState({}, '', '/'); }}
+                    style={{ marginTop: 20, background: 'none', border: 'none', color: 'var(--color-text-dim)', cursor: 'pointer', fontSize: 13 }}
+                >
+                    Đóng và quay về trang chủ
+                </button>
+            </motion.div>
+        </div>
     );
 }

@@ -1,72 +1,66 @@
-/* src/components/Toast.module.css 
-   Bím giải thích: Đây là cái "Bánh mì nướng" (Thông báo nhỏ xíu nảy lên từ dưới đáy màn hình)
-*/
-.toast {
+.toastContainer {
     position: fixed;
-    bottom: 32px;
-    /* Thả neo cách đáy màn hình 32px */
+    bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
-    /* Bí kíp kéo bảng vào chính giữa màn hình (lệnh left 50% chỉ đẩy mép trái bảng vào giữa thôi) */
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.toast {
+    pointer-events: auto;
+    background: rgba(18, 18, 23, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 12px 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 24px;
-    background: #1e293b;
-    color: white;
-    border-radius: 9999px;
-    /* Bo tròn tuyệt đối thành hình hạt đậu */
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-    z-index: 9999;
-    /* Cao nhất vũ trụ (Để không bị bất cứ cái gì đè lên) */
-    cursor: pointer;
-
-    /* Chạy kịch bản animation slideUp, sau 2.7 giây thì chạy kịch bản fadeOut */
-    animation: slideUp 0.3s ease-out, fadeOut 0.3s ease-in 2.7s forwards;
-    white-space: nowrap;
-    /* Không rớt dòng */
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.success {
-    border-left: 4px solid #10b981;
-}
-
-.error {
-    border-left: 4px solid #ef4444;
-}
-
-.info {
-    border-left: 4px solid #3b82f6;
+    min-width: 280px;
+    max-width: 90vw;
 }
 
 .icon {
-    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+}
+
+.success .icon {
+    color: #10b981;
+}
+
+.error .icon {
+    color: #ef4444;
+}
+
+.info .icon {
+    color: #3b82f6;
 }
 
 .message {
+    color: #ffffff;
     font-size: 14px;
     font-weight: 500;
 }
 
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translate(-50%, 20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translate(-50%, 0);
-    }
+.close {
+    margin-left: auto;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 4px;
 }
 
-@keyframes fadeOut {
-    from {
-        opacity: 1;
-    }
-
-    to {
-        opacity: 0;
-    }
+.close:hover {
+    color: #ffffff;
 }

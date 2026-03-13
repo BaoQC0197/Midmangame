@@ -1,0 +1,571 @@
+/* MarketHero.module.css */
+.hero {
+    position: relative;
+    padding: 160px 0 100px;
+    overflow: hidden;
+    background: var(--color-bg);
+}
+
+.heroGlow {
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 60%;
+    height: 100%;
+    background: radial-gradient(circle, var(--color-primary-glow) 0%, transparent 70%);
+    filter: blur(100px);
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.heroInner {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 80px;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-radius: var(--radius-xl);
+    font-size: 14px;
+    font-weight: 700;
+    width: fit-content;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.badgeIcon {
+    color: var(--color-accent);
+}
+
+.title {
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-weight: var(--fw-extrabold);
+    font-family: var(--font-heading);
+}
+
+.title span {
+    display: inline-block;
+}
+
+.subtitle {
+    font-size: 18px;
+    color: var(--color-text-dim);
+    line-height: 1.7;
+    max-width: 580px;
+    font-weight: var(--fw-regular);
+    letter-spacing: 0.01em;
+}
+
+.heroActions {
+    margin-top: 35px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.btnExplore {
+    padding: 12px 24px;
+    height: 100%;
+}
+
+.btnCoffee {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 28px;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 14px;
+    color: #f59e0b;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.1);
+}
+
+.btnCoffee:hover {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: #f59e0b;
+    box-shadow: 0 15px 25px -5px rgba(245, 158, 11, 0.2);
+    transform: translateY(-2px);
+}
+
+.btnCoffee svg {
+    filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.4));
+}
+
+.stats {
+    display: flex;
+    gap: 48px;
+    margin-top: 20px;
+}
+
+.statItem {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.statIcon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface-2);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    color: var(--color-secondary);
+}
+
+.statText {
+    display: flex;
+    flex-direction: column;
+}
+
+.statText strong {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+}
+
+.statText span {
+    font-size: 13px;
+    color: var(--color-text-dim);
+}
+
+/* Hero secondary glow */
+.heroCyan {
+    position: absolute;
+    bottom: -10%;
+    left: -5%;
+    width: 40%;
+    height: 80%;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, transparent 70%);
+    filter: blur(80px);
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.visual {
+    perspective: 1000px;
+}
+
+.visualContainer {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-end;
+    min-height: 520px; /* Fixed height to prevent layout shift during slider transitions */
+}
+
+/* ── Main floating card ── */
+.floatingCard {
+    width: 100%;
+    max-width: 380px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-xl);
+    padding: 20px;
+    box-shadow:
+        0 40px 80px -20px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    z-index: 5;
+}
+
+.cardTopBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.cardTag {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(185, 28, 28, 0.15));
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cardVerified {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-secondary);
+}
+
+/* Game banner inside card */
+.cardGameBanner {
+    position: relative;
+    height: 80px;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(153, 27, 27, 0.2));
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    margin-bottom: 16px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+}
+
+.bannerGlow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 80% 50%, rgba(239, 68, 68, 0.3) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.bannerContent {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    z-index: 1;
+}
+
+.bannerAvatar {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(153, 27, 27, 0.3));
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.hotThumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.bannerTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    font-family: var(--font-heading);
+}
+
+.bannerGame {
+    font-size: 12px;
+    color: var(--color-text-dim);
+    margin-top: 2px;
+}
+
+/* Card stats row */
+.cardStats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.cardStatItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cardStatLabel {
+    font-size: 10px;
+    color: var(--color-text-dim);
+    text-align: center;
+    line-height: 1.3;
+}
+
+.cardStatVal {
+    font-size: 16px;
+    font-weight: 800;
+    color: white;
+    font-family: var(--font-heading);
+}
+
+/* Card footer */
+.cardFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.priceArea {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.priceLabel {
+    font-size: 11px;
+    color: var(--color-text-dim);
+}
+
+.priceVal {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-accent);
+    font-family: var(--font-heading);
+}
+
+.cardShield {
+    width: 36px;
+    height: 36px;
+    background: rgba(6, 182, 212, 0.1);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btnBuyAction {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--color-primary);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btnBuyAction:hover {
+    background: var(--color-primary-light);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+}
+
+.btnBuyAction:disabled {
+    background: var(--color-surface-2);
+    color: var(--color-text-dim);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ── Mini listing panel ── */
+.miniList {
+    width: 100%;
+    max-width: 380px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.miniItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    transition: all 0.3s ease;
+}
+
+.miniItem.active {
+    background: rgba(168, 85, 247, 0.1);
+    border-color: rgba(168, 85, 247, 0.3);
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.1);
+}
+
+.miniDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.miniInfo {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 2px;
+}
+
+.miniLabel {
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+}
+
+.miniRank {
+    font-size: 11px;
+    color: var(--color-text-dim);
+}
+
+.miniPrice {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-accent);
+    white-space: nowrap;
+    font-family: var(--font-heading);
+}
+
+.miniFooter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--color-text-dim);
+    padding-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 1024px) {
+    .heroInner {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 48px;
+    }
+
+    .content {
+        align-items: center;
+    }
+
+    .subtitle {
+        margin: 0 auto;
+    }
+
+    .searchContainer {
+        margin: 0 auto;
+    }
+
+    .stats {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 640px) {
+    .hero {
+        padding: 100px 0 40px;
+        min-height: auto;
+    }
+
+    .title {
+        font-size: 32px;
+        line-height: 1.2;
+        margin-bottom: 20px;
+    }
+
+    .subtitle {
+        font-size: 15px;
+        line-height: 1.6;
+        padding: 0 16px;
+        margin-bottom: 30px;
+    }
+
+    .heroActions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        max-width: 100%;
+        padding: 0 20px;
+        margin: 0;
+    }
+
+    .btnExplore, .btnCoffee {
+        justify-content: center;
+        width: 100%;
+        padding: 16px;
+        font-size: 15px;
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        width: 100%;
+        padding: 0 20px;
+        margin: 40px 0 0;
+    }
+
+    .statItem {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 16px;
+        width: 100%;
+        justify-content: flex-start;
+        gap: 16px;
+    }
+
+    .statIcon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+    }
+
+    .searchBox {
+        padding: 5px 5px 5px 16px;
+        gap: 10px;
+    }
+
+    .searchBox input {
+        font-size: 14px;
+    }
+
+    .searchBox button {
+        padding: 10px 20px;
+        font-size: 13px;
+    }
+
+    .visualContainer {
+        height: 0;
+        display: none;
+    }
+}

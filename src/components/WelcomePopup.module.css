@@ -1,0 +1,243 @@
+/* WelcomePopup.module.css */
+
+/* ── Overlay ── */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(3, 7, 18, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* ── Modal ── */
+.modal {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    background: linear-gradient(145deg, rgba(17, 24, 39, 0.98) 0%, rgba(9, 14, 28, 0.99) 100%);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 28px;
+    padding: 48px 44px;
+    box-shadow:
+        0 0 0 1px rgba(168, 85, 247, 0.1),
+        0 40px 80px -20px rgba(0, 0, 0, 0.8),
+        0 0 80px -20px rgba(168, 85, 247, 0.2);
+    overflow: hidden;
+}
+
+/* Decorative glow blobs inside modal */
+.modal::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -40px;
+    width: 260px;
+    height: 260px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.18) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.modal::after {
+    content: '';
+    position: absolute;
+    bottom: -80px;
+    left: -40px;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ── Header Badge ── */
+.headerBadge {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    background: rgba(168, 85, 247, 0.12);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 24px;
+}
+
+.gemIcon {
+    color: var(--color-accent);
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ── Title ── */
+.title {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-heading);
+    font-size: clamp(26px, 5vw, 34px);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    margin-bottom: 20px;
+}
+
+/* ── Letter content ── */
+.letter {
+    position: relative;
+    z-index: 1;
+    font-size: 15px;
+    color: rgba(249, 250, 251, 0.75);
+    line-height: 1.8;
+    margin-bottom: 36px;
+    padding: 20px 22px;
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid rgba(168, 85, 247, 0.4);
+    border-radius: 0 12px 12px 0;
+}
+
+.letter strong {
+    color: white;
+    font-weight: 700;
+}
+
+/* ── Question prompt ── */
+.question {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* ── CTA Buttons ── */
+.ctaGroup {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.btnBuy {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px 16px;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(124, 58, 237, 0.25) 100%);
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    border-radius: 18px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    font-family: var(--font-body);
+    text-align: center;
+}
+
+.btnBuy:hover {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.35) 0%, rgba(124, 58, 237, 0.4) 100%);
+    border-color: var(--color-primary);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px -8px rgba(168, 85, 247, 0.5);
+}
+
+.btnSell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px 16px;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(8, 145, 178, 0.2) 100%);
+    border: 1px solid rgba(6, 182, 212, 0.35);
+    border-radius: 18px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    font-family: var(--font-body);
+    text-align: center;
+}
+
+.btnSell:hover {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.28) 0%, rgba(8, 145, 178, 0.35) 100%);
+    border-color: var(--color-secondary);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px -8px rgba(6, 182, 212, 0.4);
+}
+
+.btnIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+}
+
+.btnBuy .btnIcon {
+    background: rgba(168, 85, 247, 0.2);
+    color: var(--color-primary);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.btnSell .btnIcon {
+    background: rgba(6, 182, 212, 0.2);
+    color: var(--color-secondary);
+    border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.btnLabel {
+    font-size: 15px;
+    font-weight: 700;
+    font-family: var(--font-heading);
+}
+
+.btnSub {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+/* ── Footer note ── */
+.footerNote {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.3);
+    margin-top: 20px;
+}
+
+/* ── Mobile ── */
+@media (max-width: 480px) {
+    .modal {
+        padding: 36px 24px;
+        border-radius: 20px;
+    }
+
+    .ctaGroup {
+        grid-template-columns: 1fr;
+    }
+
+    .letter {
+        font-size: 14px;
+    }
+
+    .title {
+        font-size: 24px;
+    }
+}

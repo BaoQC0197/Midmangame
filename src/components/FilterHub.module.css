@@ -1,0 +1,344 @@
+/* FilterHub.module.css */
+.filterHub {
+    margin: 40px 0;
+    padding: 24px;
+    background: var(--color-surface-1);
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    position: relative;
+}
+
+.filterRow {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.filterLabel {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text-dim);
+    min-width: 120px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.filterGroups {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.gameSelector {
+    position: relative;
+    width: 320px;
+    z-index: 100;
+}
+
+.searchWrapper {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 2px 12px;
+    transition: var(--transition-smooth);
+}
+
+.searchWrapper:focus-within {
+    border-color: var(--color-primary);
+    background: rgba(168, 85, 247, 0.05);
+}
+
+.searchIconSide {
+    color: var(--color-primary);
+    filter: drop-shadow(0 0 5px var(--color-primary-glow));
+}
+
+.searchInput {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 10px 8px;
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+}
+
+.searchInput::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.clearSearch {
+    background: transparent;
+    border: none;
+    color: var(--color-text-dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 50%;
+}
+
+.clearSearch:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.chevron {
+    color: var(--color-text-dim);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.gameDropdown {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    width: 600px; /* Wider to accommodate both levels */
+    background: #1a1a2e;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    z-index: 1000;
+    display: flex; /* Flex to show side-by-side */
+    gap: 8px;
+}
+
+.level1Menu {
+    flex: 0 0 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-right: 8px;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.level2Menu {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.categoryGroupLabel {
+    padding: 10px 12px;
+    font-size: 11px;
+    font-weight: var(--fw-extrabold);
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.7;
+}
+
+.gameOption {
+    width: 100%;
+    padding: 10px 12px;
+    text-align: left;
+    background: transparent;
+    border: none;
+    color: var(--color-text-dim);
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 13px;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.gameOption:hover, .gameOption.hovered {
+    background: rgba(168, 85, 247, 0.1);
+    color: white;
+}
+
+.gameOption.active {
+    background: rgba(168, 85, 247, 0.2);
+    color: var(--color-primary);
+}
+
+.noResults {
+    padding: 15px;
+    text-align: center;
+    color: var(--color-text-dim);
+    font-size: 13px;
+}
+
+.dividerVertical {
+    width: 1px;
+    height: 30px;
+    background: var(--color-border);
+}
+
+.sortWrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.filterLabelSmall {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.sortSelect {
+    background: #1a1a2e; /* Fix white background issue */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 12px;
+    outline: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+    transition: var(--transition-smooth);
+}
+
+.sortSelect:focus {
+    border-color: var(--color-primary);
+}
+
+/* Price Inputs */
+.priceInputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.priceInputWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 5px 12px;
+    color: var(--color-text-dim);
+}
+
+.priceInputWrapper input {
+    background: transparent;
+    border: none;
+    color: white;
+    width: 100px;
+    font-size: 14px;
+    outline: none;
+}
+
+.priceInputWrapper input::-webkit-outer-spin-button,
+.priceInputWrapper input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.priceTo {
+    color: var(--color-text-dim);
+    font-weight: 700;
+}
+
+.feeWrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.feeGroup {
+    display: flex;
+    gap: 8px;
+}
+
+.filterChip {
+    padding: 8px 18px;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--color-text-dim);
+    font-size: 13px;
+    font-weight: var(--fw-semibold);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filterChip:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+}
+
+.filterChip.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+    box-shadow: 0 5px 15px var(--color-primary-glow);
+}
+
+.divider {
+    height: 1px;
+    background: var(--color-border);
+    width: 100%;
+}
+
+@media (max-width: 992px) {
+    .gameSelector {
+        width: 100%;
+    }
+    .gameDropdown {
+        width: 100%;
+        flex-direction: column;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    .level1Menu {
+        flex: none;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding-bottom: 8px;
+    }
+}
+
+@media (max-width: 768px) {
+    .filterHub {
+        padding: 20px;
+        gap: 20px;
+    }
+    
+    .filterLabel {
+        width: 100%;
+        margin-bottom: -10px;
+    }
+
+    .dividerVertical {
+        display: none;
+    }
+
+    .priceInputs {
+        width: 100%;
+    }
+
+    .priceInputWrapper {
+        flex: 1;
+    }
+
+    .priceInputWrapper input {
+        width: 100%;
+    }
+}

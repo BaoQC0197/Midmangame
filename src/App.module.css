@@ -1,192 +1,290 @@
 /* App.module.css */
-
-/* =========================================================
-   PHẦN CHÂN TRANG (FOOTER STYLE)
-   ---------------------------------------------------------
-   Bím giải thích: Footer là phần nằm ở dưới cùng của mọi trang web.
-   Ở đây, ta dùng một hình ảnh làm nền (`background-image`) và cố 
-   định nó lại (`background-attachment: fixed`) để tạo hiệu ứng
-   hình ảnh đứng yên khi người dùng cuộn xem nội dung.
-   ========================================================= */
-.footer {
-    position: relative;
-    background: #064e3b;
-    /* Màu xanh thẫm phòng khi ảnh lỗi */
-    background-image: url('/hero-bg-4k.png');
-    background-size: cover;
-    /* Phóng to ảnh vừa khít khung */
-    background-position: center;
-    /* Căn giữa ảnh */
-    background-attachment: fixed;
-    /* Ảnh nền đứng yên khi cuộn trang */
-    color: white;
-    margin-top: 60px;
-    /* Cách nội dung phía trên một khoảng */
-    overflow: hidden;
-    /* Cắt bỏ những phần tử con nếu nó tràn ra ngoài */
+.app {
+    min-height: 100vh;
+    background: var(--color-bg);
+    display: flex;
+    flex-direction: column;
 }
 
-/* 
-   Lớp phủ màu (Overlay): Dùng pseudo-element ::before để tạo 
-   một màng màu tối dần (gradient) đè lên bức ảnh nền, giúp cho 
-   các chữ màu trắng viết ở trên không bị chìm vào ảnh.
-*/
-.footer::before {
-    content: '';
-    /* Bắt buộc phải có để ::before hoạt động */
-    position: absolute;
-    inset: 0;
-    /* Cách viết tắt của top:0; right:0; bottom:0; left:0; -> Phủ kín thẻ cha */
-    background: linear-gradient(180deg, rgba(6, 78, 59, 0.95) 0%, rgba(6, 78, 59, 0.85) 100%);
-    pointer-events: none;
-    /* Bấm xuyên qua lớp màu này */
-    z-index: 1;
-    /* Nằm ngay trên bức ảnh nền */
+.filterSection {
+    margin: 40px 0;
+    padding: 28px;
+    background: var(--color-surface-1);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
 }
 
-/* 
-   Khung chứa nội dung bên trong Footer.
-   Dùng CSS Grid để chia cột (1 cột logo to, 1 cột menu, 1 cột liên hệ)
-*/
-.footerInner {
-    position: relative;
-    z-index: 2;
-    /* Nằm trên lớp phủ màu ở trên (z-index: 1) */
-    display: grid;
-    grid-template-columns: 2fr 1fr 1.5fr;
-    /* Cột 1 to nhất(2 phần), cột 2 nhỏ nhất(1 phần), cột 3 vừa vừa */
-    gap: 48px;
-    /* Khoảng cách giữa các cột */
-    padding: 52px clamp(20px, 2.5%, 60px) 44px;
-    /* Padding tự co giãn theo tỷ lệ màn hình */
-    max-width: 1800px;
-    margin: 0 auto;
-    /* Căn giữa khung nội dung */
-}
-
-.footerLogo {
-    font-size: 22px;
-    font-weight: 800;
-    color: white;
-    margin-bottom: 10px;
+.filterHeader {
     display: flex;
     align-items: center;
-    gap: 10px;
-}
-
-.footerLogoImg {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.footerTagline {
-    font-size: 14px;
-    line-height: 1.8;
-    color: rgba(255, 255, 255, 0.8);
-    margin: 0;
-}
-
-.footerBrand {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-}
-
-.footerLinks,
-.footerContact {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-}
-
-.footerLinks h4,
-.footerContact h4 {
-    font-size: 11px;
+    gap: 12px;
+    margin-bottom: 24px;
     font-weight: 700;
     color: white;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    margin: 0 0 16px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.footerLinks a {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.8);
-    transition: color var(--transition), padding-left var(--transition);
-    padding: 5px 0;
-    display: block;
+.filterHeader span {
+    font-family: var(--font-heading);
+    letter-spacing: 0.02em;
 }
 
-.footerLinks a:hover {
-    color: white;
-    padding-left: 4px;
-}
-
-.footerContact p {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.8);
-    margin: 0;
-    padding: 5px 0;
+.gameFilters {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    line-height: 1.5;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
-.footerContact a {
-    color: rgba(255, 255, 255, 0.8);
-    transition: color var(--transition);
+.filterBtn {
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--color-text-dim);
+    font-weight: var(--fw-bold);
+    font-size: 14px;
+    transition: var(--transition-smooth);
+    cursor: pointer;
 }
 
-.footerContact a:hover {
+.filterBtn:hover {
+    background: rgba(255, 255, 255, 0.08);
     color: white;
+    border-color: rgba(255, 255, 255, 0.1);
 }
 
-/* 
-   Phần chót cùng của Footer (Ghi bản quyền)
-*/
-.footerBottom {
-    position: relative;
-    z-index: 2;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 18px 24px;
+.filterBtn.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 20px var(--color-primary-glow);
+}
+
+.accountGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 32px;
+    margin-bottom: 80px;
+}
+
+.loadingState,
+.emptyState {
+    padding: 120px 0;
     text-align: center;
-    /* Chữ ra giữa */
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    background: var(--color-surface-1);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
 }
 
-/* =========================================================
-   Responsive (Giao diện trên điện thoại & Máy tính bảng)
-   ---------------------------------------------------------
-   Sử dụng @media query để thay đổi CSS khi màn hình bị hẹp lại.
-   ========================================================= */
-@media (max-width: 1024px) {
-    .footerInner {
-        grid-template-columns: 1fr 1fr;
-        gap: 32px;
-    }
+.loadingState p,
+.emptyState p {
+    color: var(--color-text-dim);
+    font-size: 18px;
+    max-width: 400px;
+}
 
-    .footerBrand {
-        grid-column: 1 / -1;
+.emptyState button {
+    background: var(--color-surface-2);
+    color: white;
+    padding: 12px 32px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.emptyState button:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 15px var(--color-primary-glow);
+}
+
+/* Footer Improvements */
+.footer {
+    background: var(--color-surface-1);
+    border-top: 1px solid var(--color-border);
+    padding: 100px 0 40px;
+    margin-top: auto;
+}
+
+.footerContent {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 80px;
+    margin-bottom: 80px;
+}
+
+.footerBrand h3 {
+    font-size: 32px;
+    font-weight: var(--fw-extrabold);
+    margin-bottom: 20px;
+    font-family: var(--font-heading);
+}
+
+.footerBrand p {
+    color: var(--color-text-dim);
+    line-height: 1.6;
+    max-width: 400px;
+}
+
+.footerLinks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+.footerCol h4 {
+    font-size: 16px;
+    font-weight: var(--fw-extrabold);
+    margin-bottom: 24px;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.footerCol {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footerCol a {
+    color: var(--color-text-dim);
+    font-size: 14px;
+    transition: var(--transition-smooth);
+    text-decoration: none;
+}
+
+.footerCol a:hover {
+    color: var(--color-primary);
+    transform: translateX(4px);
+}
+
+.footerBottom {
+    border-top: 1px solid var(--color-border);
+    padding-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--color-text-dim);
+    font-size: 14px;
+}
+
+@media (max-width: 1024px) {
+    .footerContent {
+        grid-template-columns: 1fr;
+        gap: 40px;
     }
 }
 
 @media (max-width: 768px) {
-    .footerInner {
-        grid-template-columns: 1fr;
-        gap: 32px;
-        padding: 40px 20px 32px;
+    .filterSection {
+        margin: 20px 0;
+        padding: 16px;
+        border-radius: var(--radius-lg);
     }
 
-    .footerLinks h4,
-    .footerContact h4 {
-        margin-bottom: 12px;
-        padding-bottom: 8px;
+    .accountGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        margin-bottom: 40px;
+    }
+
+    .footerLinks {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .footerBottom {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+
+    .footer {
+        padding: 40px 0 24px;
+    }
+}
+
+/* Pagination Styles */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 40px;
+    margin-bottom: 80px;
+}
+
+.pageNumbers {
+    display: flex;
+    gap: 8px;
+}
+
+.pageBtn {
+    padding: 8px 20px;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pageBtn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.pageBtn:not(:disabled):hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.pageNumber {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface-1);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-dim);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pageNumber:hover {
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.pageNumber.activePage {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 15px var(--color-primary-glow);
+}
+
+@media (max-width: 480px) {
+    .accountGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .pagination {
+        gap: 10px;
+    }
+
+    .pageBtn {
+        padding: 8px 12px;
+        font-size: 13px;
     }
 }

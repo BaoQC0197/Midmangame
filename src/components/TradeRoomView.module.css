@@ -1,0 +1,161 @@
+.roomWrapper {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: #0f172a;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.header {
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.roomContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.titleArea {
+    text-align: center;
+}
+
+.roomTitle {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.roomSub {
+    color: var(--color-text-dim);
+    font-size: 14px;
+}
+
+.gridContent {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 30px;
+    width: 100%;
+}
+
+@media (max-width: 1000px) {
+    .gridContent {
+        grid-template-columns: 1fr;
+    }
+}
+
+.infoSidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.card {
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.cardTitle {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--color-accent);
+}
+
+.checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.checkItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--color-text-dim);
+    transition: all 0.3s ease;
+}
+
+.checkItem.done {
+    color: #fff;
+}
+
+.checkIcon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #334155;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkItem.done .checkIcon {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #000;
+}
+
+.joinBtn {
+    width: 100%;
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.joinBtn:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+}
+
+.backBtn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.backBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}

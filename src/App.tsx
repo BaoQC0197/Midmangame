@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
+import { ShieldCheck, Zap, TrendingUp } from 'lucide-react';
 
 import { getAccounts, addAccount } from './api/accounts';
 import { uploadImages } from './api/storage';
@@ -326,9 +327,9 @@ export default function App() {
 
                 <AnimatePresence>
                     {showTradeRoom && activeTradeTicket && (
-                        <TradeRoomView 
-                            ticket={activeTradeTicket} 
-                            onClose={() => setShowTradeRoom(false)} 
+                        <TradeRoomView
+                            ticket={activeTradeTicket}
+                            onClose={() => setShowTradeRoom(false)}
                         />
                     )}
                 </AnimatePresence>
@@ -401,7 +402,7 @@ export default function App() {
             />
 
             {user && (
-                <UserHub 
+                <UserHub
                     open={userHubOpen}
                     onClose={() => setUserHubOpen(false)}
                     userId={user.id}
@@ -415,7 +416,6 @@ export default function App() {
 
             {toast.show && (
                 <Toast
-                    show={toast.show}
                     message={toast.message}
                     type={toast.type}
                     onClose={() => setToast(t => ({ ...t, show: false }))}
@@ -424,6 +424,30 @@ export default function App() {
 
             <footer className={styles.footer}>
                 <div className="container">
+                    <div className={styles.safetyBanner}>
+                        <div className={styles.safetyItem}>
+                            <div className={styles.safetyIcon}><ShieldCheck size={24} /></div>
+                            <div className={styles.safetyText}>
+                                <strong>An toàn</strong>
+                                <span>Giao dịch bảo mật 100%</span>
+                            </div>
+                        </div>
+                        <div className={styles.safetyItem}>
+                            <div className={styles.safetyIcon}><Zap size={24} /></div>
+                            <div className={styles.safetyText}>
+                                <strong>Linh hoạt</strong>
+                                <span>Hỗ trợ 24/7 siêu tốc</span>
+                            </div>
+                        </div>
+                        <div className={styles.safetyItem}>
+                            <div className={styles.safetyIcon}><TrendingUp size={24} /></div>
+                            <div className={styles.safetyText}>
+                                <strong>Tiết kiệm</strong>
+                                <span>Phí trung gian thấp nhất</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <div className={styles.footerContent}>
                         <div className={styles.footerBrand}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>

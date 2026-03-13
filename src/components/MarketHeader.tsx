@@ -274,8 +274,37 @@ export default function MarketHeader({ isAdmin, isLoggedIn, currentUserPhone, ac
                                 </button>
                             </div>
                             <div className={styles.mobileLinks}>
+                                {isLoggedIn && currentUserPhone && (
+                                    <div className={styles.mobileUserPhone}>
+                                        <User size={16} />
+                                        <span>{currentUserPhone}</span>
+                                    </div>
+                                )}
+                                {isLoggedIn && (
+                                    <button 
+                                        className={styles.mobileLinkBtn} 
+                                        onClick={() => {
+                                            onUserHubOpen();
+                                            setMenuOpen(false);
+                                        }}
+                                    >
+                                        <ShoppingBag size={20} />
+                                        <span>Trung tâm của tôi</span>
+                                    </button>
+                                )}
                                 {navLinks.map((link) => (
-                                    <a key={link.label} href={link.href} className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
+                                    <a 
+                                        key={link.label} 
+                                        href={link.href} 
+                                        className={styles.mobileLink} 
+                                        onClick={(e) => {
+                                            if (link.onClick) {
+                                                e.preventDefault();
+                                                link.onClick();
+                                            }
+                                            setMenuOpen(false);
+                                        }}
+                                    >
                                         {link.label}
                                     </a>
                                 ))}

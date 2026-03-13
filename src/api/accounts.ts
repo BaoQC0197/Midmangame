@@ -155,3 +155,12 @@ export async function approveAccount(id: string) {
 
     if (error) throw error;
 }
+
+export async function rejectAccount(id: string) {
+    const { error } = await supabase
+        .from('trade_accounts')
+        .update({ status: 'rejected' })
+        .eq('id', id);
+
+    if (error) throw error;
+}

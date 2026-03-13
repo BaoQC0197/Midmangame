@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, Zap, TrendingUp, Sparkles, Star, BadgeCheck, Coffee, Handshake } from 'lucide-react';
+import { ShieldCheck, Sparkles, Star, BadgeCheck, Coffee, Handshake, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './MarketHero.module.css';
 import CoffeeDonateModal from './CoffeeDonateModal';
 import { TradeAccount, CATEGORY_LABELS, CategoryKey } from '../types/account';
@@ -30,11 +30,6 @@ export default function MarketHero({ onOpenSellModal, onBuyRequest, accounts = [
     const [currentPage, setCurrentPage] = useState(0);
     const ITEMS_PER_PAGE = 3;
 
-    const stats = [
-        { icon: <ShieldCheck size={20} />, label: 'An toàn', sub: 'Giao dịch an toàn' },
-        { icon: <Zap size={20} />, label: 'Linh hoạt', sub: 'Đội ngũ túc trực 24/7' },
-        { icon: <TrendingUp size={20} />, label: 'Tiết kiệm', sub: 'Phí giao dịch thấp' },
-    ];
 
     // Filter hot accounts (limit to 6 for the slider/carousel)
     const hotAccounts = useMemo(() => {
@@ -74,17 +69,10 @@ export default function MarketHero({ onOpenSellModal, onBuyRequest, accounts = [
                     transition={{ duration: 0.8, ease: "easeOut" }}
                     className={styles.content}
                 >
-                    <motion.div
-                        className={styles.badge}
-                        whileHover={{ scale: 1.05 }}
-                    >
-                        <Sparkles size={14} className={styles.badgeIcon} />
-                        <span>Có Easytrade, Không lo Scam </span>
-                    </motion.div>
 
                     <h1 className={`${styles.title} text-gradient`}>
-                        <span className="text-gold">Sàn Trung Gian</span> <br />
-                        Tài Khoản & Dịch Vụ
+                        <span className="text-gold">Trung Gian</span> <br />
+                        Tài Khoản
                     </h1>
 
                     <p className={styles.subtitle}>
@@ -94,28 +82,13 @@ export default function MarketHero({ onOpenSellModal, onBuyRequest, accounts = [
 
                     <div className={styles.heroActions}>
                         <motion.button
-                            className="btn-premium"
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
+                            className={`btn-premium ${styles.btnExplore}`}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={onOpenSellModal}
-                            style={{ padding: '14px 28px', borderRadius: '14px' }}
                         >
-                            <Sparkles size={18} />
+                            <Sparkles size={20} className={styles.btnIcon} />
                             <span>Đăng ký bán</span>
-                            <motion.span
-                                animate={{
-                                    y: [0, -4, 0],
-                                    scale: [1, 1.1, 1]
-                                }}
-                                transition={{
-                                    duration: 1.5,
-                                    repeat: Infinity,
-                                    ease: "easeInOut"
-                                }}
-                                style={{ marginLeft: '8px', display: 'inline-block', fontSize: '18px' }}
-                            >
-                                👆
-                            </motion.span>
                         </motion.button>
 
                         <motion.button
@@ -124,28 +97,11 @@ export default function MarketHero({ onOpenSellModal, onBuyRequest, accounts = [
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setCoffeeModalOpen(true)}
                         >
-                            <Coffee size={18} />
-                            <span>Mời Admin coffee, cơ hội nhận vòng quay hot account</span>
+                            <Coffee size={20} className={styles.btnIcon} />
+                            <span>Mời Coffee</span>
                         </motion.button>
                     </div>
 
-                    <div className={styles.stats}>
-                        {stats.map((stat, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.4 + i * 0.1 }}
-                                className={styles.statItem}
-                            >
-                                <div className={styles.statIcon}>{stat.icon}</div>
-                                <div className={styles.statText}>
-                                    <strong>{stat.label}</strong>
-                                    <span>{stat.sub}</span>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
                 </motion.div>
 
                 <motion.div
@@ -159,11 +115,14 @@ export default function MarketHero({ onOpenSellModal, onBuyRequest, accounts = [
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={activeIndex}
-                                initial={{ opacity: 0, x: 20, scale: 0.95 }}
-                                animate={{ opacity: 1, x: 0, scale: 1 }}
-                                exit={{ opacity: 0, x: -20, scale: 0.95 }}
-                                transition={{ duration: 0.5, ease: "easeInOut" }}
-                                className={`${styles.floatingCard} animate-float`}
+                                initial={{ opacity: 0, x: 40, scale: 0.95, filter: "blur(8px)" }}
+                                animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)" }}
+                                exit={{ opacity: 0, x: -40, scale: 1.05, filter: "blur(8px)" }}
+                                transition={{ 
+                                    duration: 1.2,
+                                    ease: [0.22, 1, 0.36, 1] 
+                                }}
+                                className={styles.floatingCard}
                             >
                                 <div className={styles.cardTopBar}>
                                     <div className={styles.cardTag}>
@@ -281,25 +240,25 @@ export default function MarketHero({ onOpenSellModal, onBuyRequest, accounts = [
                                     </motion.div>
                                 );
                             })}
-                            
+
                             {displayItems.length > ITEMS_PER_PAGE && (
                                 <div className={styles.miniPagination}>
-                                    <button 
+                                    <button
                                         onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
                                         disabled={currentPage === 0}
                                         className={styles.pageBtn}
                                     >
-                                        ←
+                                        <ChevronLeft size={16} />
                                     </button>
                                     <span className={styles.pageInfo}>
                                         Trang {currentPage + 1} / {Math.ceil(displayItems.length / ITEMS_PER_PAGE)}
                                     </span>
-                                    <button 
+                                    <button
                                         onClick={() => setCurrentPage(p => Math.min(Math.ceil(displayItems.length / ITEMS_PER_PAGE) - 1, p + 1))}
                                         disabled={currentPage >= Math.ceil(displayItems.length / ITEMS_PER_PAGE) - 1}
                                         className={styles.pageBtn}
                                     >
-                                        →
+                                        <ChevronRight size={16} />
                                     </button>
                                 </div>
                             )}

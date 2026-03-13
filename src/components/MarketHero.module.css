@@ -1,29 +1,25 @@
 /* MarketHero.module.css */
 .hero {
     position: relative;
-    padding: 160px 0 100px;
+    padding: 120px 0 120px;
     overflow: hidden;
     background: var(--color-bg);
 }
 
 .heroGlow {
     position: absolute;
-    top: -20%;
-    right: -10%;
-    width: 60%;
-    height: 100%;
-    background: radial-gradient(circle, var(--color-primary-glow) 0%, transparent 70%);
-    filter: blur(100px);
-    opacity: 0.4;
+    background: radial-gradient(circle, var(--color-primary-glow) 0%, transparent 60%);
+    filter: blur(120px);
+    opacity: 0.3;
     pointer-events: none;
     z-index: 0;
 }
 
 .heroInner {
     display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 80px;
-    align-items: center;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 60px;
+    align-items: flex-start;
     position: relative;
     z-index: 2;
 }
@@ -31,7 +27,8 @@
 .content {
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    justify-content: space-between;
+    height: 440px;
 }
 
 .badge {
@@ -69,39 +66,52 @@
 .subtitle {
     font-size: 18px;
     color: var(--color-text-dim);
-    line-height: 1.7;
+    line-height: 1.8;
     max-width: 580px;
     font-weight: var(--fw-regular);
     letter-spacing: 0.01em;
+    margin: 0;
 }
 
 .heroActions {
-    margin-top: 35px;
     display: flex;
     align-items: center;
     gap: 16px;
-    flex-wrap: wrap;
+    margin: 0;
+    width: 100%;
 }
 
 .btnExplore {
-    padding: 12px 24px;
-    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 32px;
+    height: 56px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    flex: 1;
+    max-width: 200px;
 }
 
 .btnCoffee {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 14px 28px;
-    background: rgba(245, 158, 11, 0.1);
-    border: 1px solid rgba(245, 158, 11, 0.3);
+    justify-content: center;
+    gap: 10px;
+    height: 56px;
+    padding: 0 24px;
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.2);
     border-radius: 14px;
     color: #f59e0b;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.1);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    flex: 2;
 }
 
 .btnCoffee:hover {
@@ -111,8 +121,9 @@
     transform: translateY(-2px);
 }
 
-.btnCoffee svg {
+.btnCoffee svg, .btnIcon {
     filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.4));
+    transition: transform 0.3s ease;
 }
 
 .stats {
@@ -170,39 +181,41 @@
 }
 
 .visual {
-    perspective: 1000px;
+    perspective: 1200px;
+    transform-style: preserve-3d;
 }
 
 .visualContainer {
     position: relative;
     width: 100%;
     display: flex;
-    flex-direction: column;
-    gap: 16px;
-    align-items: flex-end;
-    min-height: 520px; /* Fixed height to prevent layout shift during slider transitions */
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: 440px;
 }
 
 /* ── Main floating card ── */
 .floatingCard {
-    width: 100%;
-    max-width: 380px;
+    width: 360px;
+    height: 440px;
+    display: flex;
+    flex-direction: column;
+    z-index: 5;
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
     backdrop-filter: blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: var(--radius-xl);
-    padding: 20px;
-    box-shadow:
-        0 40px 80px -20px rgba(0, 0, 0, 0.6),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    z-index: 5;
+    padding: 24px;
+    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6);
 }
 
 .cardTopBar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
 .cardTag {
@@ -392,13 +405,13 @@
 
 /* ── Mini listing panel ── */
 .miniList {
-    width: 100%;
-    max-width: 380px;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
-    backdrop-filter: blur(16px);
+    width: 360px;
+    height: 440px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: var(--radius-lg);
-    padding: 14px 16px;
+    border-radius: var(--radius-xl);
+    padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -407,25 +420,33 @@
 .miniItem {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 8px 10px;
+    gap: 14px;
+    padding: 14px 18px;
     background: rgba(255, 255, 255, 0.02);
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    transition: all 0.3s ease;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.miniItem:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(4px);
 }
 
 .miniItem.active {
-    background: rgba(168, 85, 247, 0.1);
-    border-color: rgba(168, 85, 247, 0.3);
-    box-shadow: 0 0 15px rgba(168, 85, 247, 0.1);
+    background: rgba(168, 85, 247, 0.15);
+    border-color: rgba(168, 85, 247, 0.4);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transform: translateX(4px);
 }
 
 .miniDot {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     flex-shrink: 0;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
 }
 
 .miniInfo {
@@ -458,9 +479,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 10px;
+    padding-top: 16px;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
-    margin-top: 4px;
+    margin-top: auto;
 }
 
 .pageBtn {
@@ -495,6 +516,21 @@
     color: var(--color-text-dim);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+}
+
+@media (max-width: 1200px) {
+    .visualContainer {
+        flex-direction: column;
+        align-items: center;
+    }
+    .heroInner {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    .miniList {
+        width: 100%;
+        max-width: 380px;
+    }
 }
 
 @media (max-width: 1024px) {
@@ -543,20 +579,32 @@
 
     .heroActions {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
-        gap: 12px;
+        justify-content: center;
+        gap: 16px;
         width: 100%;
-        max-width: 100%;
-        padding: 0 20px;
-        margin: 0;
+        margin: 0 auto;
     }
 
     .btnExplore, .btnCoffee {
+        flex: 0 0 100px;
+        width: 100px;
+        height: 100px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         justify-content: center;
-        width: 100%;
-        padding: 16px;
-        font-size: 15px;
+        font-size: 11px;
+        padding: 0;
+        border-radius: 18px;
+        aspect-ratio: 1 / 1;
+    }
+
+    .btnIcon {
+        width: 24px !important;
+        height: 24px !important;
+        margin-bottom: 4px;
     }
 
     .stats {
@@ -599,7 +647,40 @@
     }
 
     .visualContainer {
-        height: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: auto;
+        height: auto;
+        width: 100%;
+        margin: 20px auto 0;
+    }
+
+    .floatingCard {
+        width: 100%;
+        max-width: none;
+        height: auto;
+        min-height: 420px;
+        padding: 24px;
+        margin: 0 auto;
+    }
+
+    .miniList {
         display: none;
+    }
+
+    .heroInner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 40px;
+    }
+
+    .content {
+        height: auto;
+        gap: 32px;
+        text-align: center;
+        align-items: center;
     }
 }

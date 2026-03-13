@@ -415,6 +415,7 @@ export default function App() {
 
             {toast.show && (
                 <Toast
+                    show={toast.show}
                     message={toast.message}
                     type={toast.type}
                     onClose={() => setToast(t => ({ ...t, show: false }))}

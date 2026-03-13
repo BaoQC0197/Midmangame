@@ -28,7 +28,7 @@ export default function MarketHero({ onOpenSellModal, onBuyRequest, accounts = [
     const [coffeeModalOpen, setCoffeeModalOpen] = useState(false);
     const [activeIndex, setActiveIndex] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
-    const ITEMS_PER_PAGE = 4;
+    const ITEMS_PER_PAGE = 3;
 
     const stats = [
         { icon: <ShieldCheck size={20} />, label: 'An toàn', sub: 'Giao dịch an toàn' },

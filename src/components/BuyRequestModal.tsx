@@ -165,6 +165,7 @@ export default function BuyRequestModal({ account, onClose, isLoggedIn }: BuyReq
                                             onChange={e => setPhone(e.target.value)}
                                             required
                                             autoFocus
+                                            autoComplete="off"
                                         />
                                     </div>
 
@@ -180,6 +181,7 @@ export default function BuyRequestModal({ account, onClose, isLoggedIn }: BuyReq
                                                 value={password}
                                                 onChange={e => setPassword(e.target.value)}
                                                 required
+                                                autoComplete="new-password"
                                             />
                                         </div>
                                     )}

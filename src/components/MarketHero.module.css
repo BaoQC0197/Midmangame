@@ -210,12 +210,13 @@
     align-items: center;
     gap: 5px;
     padding: 5px 12px;
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(185, 28, 28, 0.15));
-    border: 1px solid rgba(239, 68, 68, 0.4);
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 100px;
     font-size: 11px;
     font-weight: 700;
-    color: var(--color-accent);
+    color: white;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }

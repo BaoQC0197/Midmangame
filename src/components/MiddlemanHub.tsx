@@ -3,12 +3,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { 
     User, 
-    Ticket, LayoutDashboard, Package, X, PlusCircle, Users
+    Ticket, LayoutDashboard, Package, X, PlusCircle, Users, Trash2
 } from 'lucide-react';
+import { CATEGORY_LABELS, CATEGORY_STRUCTURE } from '../types/account';
+import { TICKET_STATUS_LABELS, TICKET_STATUS_COLORS } from '../types/ticket';
 import type { TradeAccount } from '../types/account';
 import type { TransactionTicket } from '../types/ticket';
 import { approveAccount, deleteAccount } from '../api/accounts';
-import { getTickets } from '../api/tickets';
+import { getTickets, updateTicketStatus } from '../api/tickets';
 import { getProfiles, updateSpinTurns, UserProfile } from '../api/profiles';
 import styles from './MiddlemanHub.module.css';
 
@@ -19,7 +21,7 @@ interface MiddlemanHubProps {
     showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
 }
 
-type Tab = 'dashboard' | 'sell_requests' | 'users';
+type Tab = 'dashboard' | 'sell_requests' | 'buy_requests' | 'users' | 'categories';
 
 export default function MiddlemanHub({ open, onClose, accounts, showToast }: MiddlemanHubProps) {
     const queryClient = useQueryClient();
@@ -86,7 +88,9 @@ export default function MiddlemanHub({ open, onClose, accounts, showToast }: Mid
                     <nav className={styles.navItems}>
                         <button className={`${styles.navItem} ${activeTab === 'dashboard' ? styles.active : ''}`} onClick={() => setActiveTab('dashboard')}><LayoutDashboard size={18} /><span>Tổng quan</span></button>
                         <button className={`${styles.navItem} ${activeTab === 'sell_requests' ? styles.active : ''}`} onClick={() => setActiveTab('sell_requests')}><PlusCircle size={18} /><span>Duyệt bán</span></button>
+                        <button className={`${styles.navItem} ${activeTab === 'buy_requests' ? styles.active : ''}`} onClick={() => setActiveTab('buy_requests')}><Ticket size={18} /><span>Duyệt mua</span></button>
                         <button className={`${styles.navItem} ${activeTab === 'users' ? styles.active : ''}`} onClick={() => setActiveTab('users')}><Users size={18} /><span>Người dùng</span></button>
+                        <button className={`${styles.navItem} ${activeTab === 'categories' ? styles.active : ''}`} onClick={() => setActiveTab('categories')}><Package size={18} /><span>Danh mục</span></button>
                     </nav>
 
                     <div className={styles.navFooter}>
@@ -98,7 +102,13 @@ export default function MiddlemanHub({ open, onClose, accounts, showToast }: Mid
 
                 <div className={styles.mainArea}>
                     <div className={styles.header}>
-                        <h2>{activeTab === 'dashboard' ? 'Tổng quan' : activeTab === 'sell_requests' ? 'Duyệt bài đăng' : 'Quản lý người dùng'}</h2>
+                        <h2>
+                            {activeTab === 'dashboard' && 'Tổng quan hệ thống'}
+                            {activeTab === 'sell_requests' && 'Yêu cầu đăng bán (Chờ duyệt)'}
+                            {activeTab === 'buy_requests' && 'Yêu cầu mua hàng (Tickets)'}
+                            {activeTab === 'users' && 'Quản lý người dùng'}
+                            {activeTab === 'categories' && 'Quản lý danh mục game'}
+                        </h2>
                     </div>
 
                     <div className={styles.content}>
@@ -159,6 +169,89 @@ export default function MiddlemanHub({ open, onClose, accounts, showToast }: Mid
                                             >
                                                 {processingId === acc.id ? '...' : 'Xóa'}
                                             </button>
+                                        </div>
+                                    </div>
+                                ))}
+                                {accounts.filter(a => a.status === 'pending').length === 0 && (
+                                    <div className={styles.emptyState}>Không có yêu cầu đăng bán nào đang chờ.</div>
+                                )}
+                            </div>
+                        )}
+
+                        {activeTab === 'buy_requests' && (
+                            <div className={styles.list}>
+                                {tickets.map(ticket => (
+                                    <div key={ticket.id} className={styles.item}>
+                                        <div className={styles.itemInfo}>
+                                            <div className={styles.ticketBadge}>#{ticket.id.slice(0, 8).toUpperCase()}</div>
+                                            <div>
+                                                <p className={styles.itemTitle}>Người mua: {ticket.buyer_phone || ticket.buyer_contact}</p>
+                                                <p className={styles.itemSub}>
+                                                    ID Acc: {ticket.account_id.slice(0, 8)}... • 
+                                                    Giá: {ticket.price.toLocaleString()}đ
+                                                </p>
+                                                <div className={styles.statusPill} style={{ 
+                                                    background: `${TICKET_STATUS_COLORS[ticket.status]}20`, 
+                                                    color: TICKET_STATUS_COLORS[ticket.status],
+                                                    border: `1px solid ${TICKET_STATUS_COLORS[ticket.status]}40`
+                                                }}>
+                                                    {TICKET_STATUS_LABELS[ticket.status]}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className={styles.itemActions}>
+                                            {ticket.status === 'pending_match' && (
+                                                <button 
+                                                    className={styles.actionBtn}
+                                                    onClick={async () => {
+                                                        try {
+                                                            await updateTicketStatus(ticket.id, 'matched');
+                                                            showToast('Đã xác nhận khớp lệnh!');
+                                                            loadTickets();
+                                                        } catch {
+                                                            showToast('Lỗi khi cập nhận trạng thái', 'error');
+                                                        }
+                                                    }}
+                                                >
+                                                    Ghép đôi
+                                                </button>
+                                            )}
+                                            <button 
+                                                className={styles.deleteBtn}
+                                                onClick={async () => {
+                                                    if (!confirm('Hủy yêu cầu mua này?')) return;
+                                                    try {
+                                                        await updateTicketStatus(ticket.id, 'cancelled');
+                                                        showToast('Đã hủy ticket');
+                                                        loadTickets();
+                                                    } catch {
+                                                        showToast('Lỗi khi hủy', 'error');
+                                                    }
+                                                }}
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                                {tickets.length === 0 && (
+                                    <div className={styles.emptyState}>Chưa có yêu cầu mua hàng nào.</div>
+                                )}
+                            </div>
+                        )}
+
+                        {activeTab === 'categories' && (
+                            <div className={styles.tabContent}>
+                                {CATEGORY_STRUCTURE.map(group => (
+                                    <div key={group.id} className={styles.categoryGroup}>
+                                        <h4 className={styles.groupTitle}>{group.label}</h4>
+                                        <div className={styles.categoryGrid}>
+                                            {group.items.map(key => (
+                                                <div key={key} className={styles.categoryItem}>
+                                                    <span>{CATEGORY_LABELS[key]}</span>
+                                                    <code style={{ fontSize: 10, opacity: 0.5 }}>{key}</code>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
                                 ))}

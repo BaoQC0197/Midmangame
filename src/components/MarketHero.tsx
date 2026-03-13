@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, Zap, TrendingUp, Sparkles, Star, Users, BadgeCheck, Coffee, Handshake } from 'lucide-react';
+import { ShieldCheck, Zap, TrendingUp, Sparkles, Star, BadgeCheck, Coffee, Handshake } from 'lucide-react';
 import styles from './MarketHero.module.css';
 import CoffeeDonateModal from './CoffeeDonateModal';
 import { TradeAccount, CATEGORY_LABELS, CategoryKey } from '../types/account';
@@ -27,6 +27,8 @@ interface ShowcaseItem {
 export default function MarketHero({ onOpenSellModal, onBuyRequest, accounts = [] }: MarketHeroProps) {
     const [coffeeModalOpen, setCoffeeModalOpen] = useState(false);
     const [activeIndex, setActiveIndex] = useState(0);
+    const [currentPage, setCurrentPage] = useState(0);
+    const ITEMS_PER_PAGE = 4;
 
     const stats = [
         { icon: <ShieldCheck size={20} />, label: 'An toàn', sub: 'Giao dịch an toàn' },
@@ -36,7 +38,7 @@ export default function MarketHero({ onOpenSellModal, onBuyRequest, accounts = [
 
     // Filter hot accounts (limit to 6 for the slider/carousel)
     const hotAccounts = useMemo(() => {
-        return accounts.filter(acc => acc.promotion === 'Hot' && !acc.is_sold).slice(0, 6);
+        return accounts.filter(acc => acc.promotion === 'Hot' && !acc.is_sold);
     }, [accounts]);
 
     // Fallback items if no hot accounts exist
@@ -248,37 +250,59 @@ export default function MarketHero({ onOpenSellModal, onBuyRequest, accounts = [
                         </AnimatePresence>
 
                         {/* Pagination / Dots indicator replacement */}
+                        {/* Pagination for Mini List */}
                         <div className={styles.miniList}>
-                            {displayItems.slice(0, 4).map((item, i) => (
-                                <motion.div
-                                    key={i}
-                                    className={`${styles.miniItem} ${activeIndex === i ? styles.active : ''}`}
-                                    onClick={() => setActiveIndex(i)}
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.6 + i * 0.1 }}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    <div className={styles.miniDot} style={{
-                                        background: i === activeIndex ? 'var(--color-primary)' : 'rgba(255,255,255,0.2)'
-                                    }} />
-                                    <div className={styles.miniInfo}>
-                                        <span className={styles.miniLabel}>
-                                            {'title' in item ? item.title : item.label}
+                            {displayItems.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE).map((item, i) => {
+                                const realIndex = currentPage * ITEMS_PER_PAGE + i;
+                                return (
+                                    <motion.div
+                                        key={realIndex}
+                                        className={`${styles.miniItem} ${activeIndex === realIndex ? styles.active : ''}`}
+                                        onClick={() => setActiveIndex(realIndex)}
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: 0.2 + i * 0.1 }}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        <div className={styles.miniDot} style={{
+                                            background: realIndex === activeIndex ? 'var(--color-primary)' : 'rgba(255,255,255,0.2)'
+                                        }} />
+                                        <div className={styles.miniInfo}>
+                                            <span className={styles.miniLabel}>
+                                                {'title' in item ? item.title : item.label}
+                                            </span>
+                                            <span className={styles.miniRank}>
+                                                {'game' in item ? CATEGORY_LABELS[item.game as CategoryKey] : item.rank}
+                                            </span>
+                                        </div>
+                                        <span className={styles.miniPrice}>
+                                            {typeof item.price === 'number' ? item.price.toLocaleString() + 'đ' : item.price}
                                         </span>
-                                        <span className={styles.miniRank}>
-                                            {'game' in item ? CATEGORY_LABELS[item.game as CategoryKey] : item.rank}
-                                        </span>
-                                    </div>
-                                    <span className={styles.miniPrice}>
-                                        {typeof item.price === 'number' ? item.price.toLocaleString() + 'đ' : item.price}
+                                    </motion.div>
+                                );
+                            })}
+                            
+                            {displayItems.length > ITEMS_PER_PAGE && (
+                                <div className={styles.miniPagination}>
+                                    <button 
+                                        onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+                                        disabled={currentPage === 0}
+                                        className={styles.pageBtn}
+                                    >
+                                        ←
+                                    </button>
+                                    <span className={styles.pageInfo}>
+                                        Trang {currentPage + 1} / {Math.ceil(displayItems.length / ITEMS_PER_PAGE)}
                                     </span>
-                                </motion.div>
-                            ))}
-                            <div className={styles.miniFooter}>
-                                <Users size={12} />
-                                <span>+{accounts.length} tài khoản đang niêm yết</span>
-                            </div>
+                                    <button 
+                                        onClick={() => setCurrentPage(p => Math.min(Math.ceil(displayItems.length / ITEMS_PER_PAGE) - 1, p + 1))}
+                                        disabled={currentPage >= Math.ceil(displayItems.length / ITEMS_PER_PAGE) - 1}
+                                        className={styles.pageBtn}
+                                    >
+                                        →
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </motion.div>

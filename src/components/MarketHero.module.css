@@ -453,14 +453,47 @@
     font-family: var(--font-heading);
 }
 
-.miniFooter {
+.miniPagination {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 11px;
-    color: var(--color-text-dim);
-    padding-top: 4px;
+    justify-content: space-between;
+    padding-top: 10px;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 4px;
+}
+
+.pageBtn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.pageBtn:hover:not(:disabled) {
+    background: rgba(168, 85, 247, 0.2);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.pageBtn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.pageInfo {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 @media (max-width: 1024px) {

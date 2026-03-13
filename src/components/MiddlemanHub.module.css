@@ -142,23 +142,22 @@
     gap: 20px;
 }
 
-.input,
-.select,
-.textarea {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-md);
+.searchInput {
+    width: 100%;
     padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
     color: white;
-    font-family: inherit;
-    outline: none;
-    transition: var(--transition-smooth);
+    font-size: 14px;
+    transition: all 0.3s ease;
 }
 
-.input:focus,
-.select:focus {
+.searchInput:focus {
+    outline: none;
     border-color: var(--color-primary);
     background: rgba(168, 85, 247, 0.05);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.1);
 }
 
 /* List Styles */

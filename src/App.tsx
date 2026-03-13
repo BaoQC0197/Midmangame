@@ -414,13 +414,12 @@ export default function App() {
 
             <WelcomePopup onOpenSellModal={() => setSellModalOpen(true)} />
 
-            {toast.show && (
-                <Toast
-                    message={toast.message}
-                    type={toast.type}
-                    onClose={() => setToast(t => ({ ...t, show: false }))}
-                />
-            )}
+            <Toast
+                show={toast.show}
+                message={toast.message}
+                type={toast.type}
+                onClose={() => setToast(t => ({ ...t, show: false }))}
+            />
 
             <footer className={styles.footer}>
                 <div className="container">

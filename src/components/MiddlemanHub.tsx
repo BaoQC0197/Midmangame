@@ -12,7 +12,8 @@ import type { TradeAccount } from '../types/account';
 import type { TransactionTicket } from '../types/ticket';
 import { approveAccount, rejectAccount } from '../api/accounts';
 import { getTickets, updateTicketStatus } from '../api/tickets';
-import { getProfiles, updateSpinTurns, UserProfile } from '../api/profiles';
+import { getProfiles, updateSpinTurns, UserProfile, getMidmanApplications, approveMidmanApplication, rejectMidmanApplication, MidmanApplication } from '../api/profiles';
+import { ShieldCheck } from 'lucide-react';
 import styles from './MiddlemanHub.module.css';
 
 interface MiddlemanHubProps {
@@ -22,13 +23,14 @@ interface MiddlemanHubProps {
     showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
 }
 
-type Tab = 'dashboard' | 'sell_requests' | 'buy_requests' | 'trading' | 'completed' | 'cancelled' | 'users' | 'categories';
+type Tab = 'dashboard' | 'sell_requests' | 'buy_requests' | 'trading' | 'completed' | 'cancelled' | 'users' | 'categories' | 'midman_apps';
 
 export default function MiddlemanHub({ open, onClose, accounts, showToast }: MiddlemanHubProps) {
     const queryClient = useQueryClient();
     const [activeTab, setActiveTab] = useState<Tab>('dashboard');
     const [tickets, setTickets] = useState<TransactionTicket[]>([]);
     const [profiles, setProfiles] = useState<UserProfile[]>([]);
+    const [midmanApps, setMidmanApps] = useState<MidmanApplication[]>([]);
     const [userSearch, setUserSearch] = useState('');
     const [processingId, setProcessingId] = useState<string | null>(null);
 
@@ -52,12 +54,22 @@ export default function MiddlemanHub({ open, onClose, accounts, showToast }: Mid
         }
     }, []);
 
+    const loadApps = useCallback(async () => {
+        try {
+            const data = await getMidmanApplications();
+            setMidmanApps(data);
+        } catch (error: any) {
+            console.error('Error loading apps:', error);
+        }
+    }, []);
+
     useEffect(() => {
         if (open) {
             loadTickets();
             loadProfiles();
+            loadApps();
         }
-    }, [open, loadTickets, loadProfiles]);
+    }, [open, loadTickets, loadProfiles, loadApps]);
 
     const handleUpdateSpinTurns = async (userId: string, turns: number) => {
         try {
@@ -91,6 +103,7 @@ export default function MiddlemanHub({ open, onClose, accounts, showToast }: Mid
                         <button className={`${styles.navItem} ${activeTab === 'sell_requests' ? styles.active : ''}`} onClick={() => setActiveTab('sell_requests')}><PlusCircle size={18} /><span>Duyệt bán</span></button>
                         <button className={`${styles.navItem} ${activeTab === 'buy_requests' ? styles.active : ''}`} onClick={() => setActiveTab('buy_requests')}><Clock size={18} /><span>Duyệt mua</span></button>
                         <button className={`${styles.navItem} ${activeTab === 'trading' ? styles.active : ''}`} onClick={() => setActiveTab('trading')}><RefreshCw size={18} /><span>Giao dịch</span></button>
+                        <button className={`${styles.navItem} ${activeTab === 'midman_apps' ? styles.active : ''}`} onClick={() => setActiveTab('midman_apps')}><ShieldCheck size={18} /><span>Duyệt Midman</span></button>
                         <button className={`${styles.navItem} ${activeTab === 'completed' ? styles.active : ''}`} onClick={() => setActiveTab('completed')}><CheckCircle size={18} /><span>Hoàn thành</span></button>
                         <button className={`${styles.navItem} ${activeTab === 'cancelled' ? styles.active : ''}`} onClick={() => setActiveTab('cancelled')}><Ban size={18} /><span>Đã hủy</span></button>
                         <button className={`${styles.navItem} ${activeTab === 'users' ? styles.active : ''}`} onClick={() => setActiveTab('users')}><Users size={18} /><span>Người dùng</span></button>
@@ -111,6 +124,7 @@ export default function MiddlemanHub({ open, onClose, accounts, showToast }: Mid
                             {activeTab === 'sell_requests' && 'Yêu cầu đăng bán (Chờ duyệt)'}
                             {activeTab === 'buy_requests' && 'Yêu cầu mua hàng (Tickets)'}
                             {activeTab === 'trading' && 'Đang trong quá trình giao dịch'}
+                            {activeTab === 'midman_apps' && 'Đơn ứng tuyển Midman'}
                             {activeTab === 'completed' && 'Giao dịch đã hoàn thành'}
                             {activeTab === 'cancelled' && 'Yêu cầu bị từ chối / Đã hủy'}
                             {activeTab === 'users' && 'Quản lý người dùng'}
@@ -126,6 +140,7 @@ export default function MiddlemanHub({ open, onClose, accounts, showToast }: Mid
                                 <StatsCard label="Đang giao dịch" value={tickets.filter(t => ['matched', 'trading'].includes(t.status)).length} icon={<RefreshCw />} color="#a855f7" />
                                 <StatsCard label="Đã hoàn thành" value={tickets.filter(t => t.status === 'completed').length} icon={<CheckCircle />} color="#10b981" />
                                 <StatsCard label="Đã hủy/Từ chối" value={accounts.filter(a => a.status === 'rejected').length + tickets.filter(t => t.status === 'cancelled').length} icon={<Ban />} color="#ef4444" />
+                                <StatsCard label="Midman Apps" value={midmanApps.filter(a => a.status === 'pending').length} icon={<ShieldCheck />} color="#10b981" />
                                 <StatsCard label="Người dùng" value={profiles.length} icon={<Users />} color="#6366f1" />
                             </div>
                         )}
@@ -185,6 +200,78 @@ export default function MiddlemanHub({ open, onClose, accounts, showToast }: Mid
                                 ))}
                                 {accounts.filter(a => a.status === 'pending').length === 0 && (
                                     <div className={styles.emptyState}>Không có yêu cầu đăng bán nào đang chờ.</div>
+                                )}
+                            </div>
+                        )}
+
+                        {activeTab === 'midman_apps' && (
+                            <div className={styles.list}>
+                                {midmanApps.filter(a => a.status === 'pending').map(app => (
+                                    <div key={app.id} className={styles.item}>
+                                        <div className={styles.itemInfo}>
+                                            <div className={styles.iconWrapper}><ShieldCheck size={18} /></div>
+                                            <div>
+                                                <p className={styles.itemTitle}>
+                                                    {app.full_name || 'Ứng viên mới'} 
+                                                    <span style={{ fontSize: 13, color: 'var(--color-text-dim)', marginLeft: 8, fontWeight: 'normal' }}>
+                                                        ({app.profiles?.email || app.user_id.slice(0, 8)})
+                                                    </span>
+                                                </p>
+                                                <p className={styles.itemSub} style={{ lineHeight: 1.6 }}>
+                                                    CCCD: <strong style={{color:'white'}}>{app.cccd}</strong> 
+                                                    {app.cccd_front_url && <span> [<a href={app.cccd_front_url} target="_blank" rel="noreferrer" style={{color: '#34d399'}}>Mặt Trước</a>]</span>}
+                                                    {app.cccd_back_url && <span> [<a href={app.cccd_back_url} target="_blank" rel="noreferrer" style={{color: '#34d399'}}>Mặt Sau</a>]</span>}
+                                                    <br/>
+                                                    Phí đề xuất: <strong style={{color:'var(--color-accent)'}}>{app.fee_rate || 'N/A'}</strong> • 
+                                                    Giờ HĐ: <strong style={{color:'white'}}>{app.working_hours || 'N/A'}</strong> <br/>
+                                                    FB: <a href={app.facebook_url} target="_blank" rel="noreferrer" style={{color: 'var(--color-primary)'}}>{app.facebook_url}</a>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className={styles.itemActions}>
+                                            <button 
+                                                disabled={processingId === app.id}
+                                                onClick={async () => {
+                                                    setProcessingId(app.id);
+                                                    try {
+                                                        await approveMidmanApplication(app.id, app.user_id);
+                                                        showToast('Đã cấp quyền Midman thành công!');
+                                                        loadApps();
+                                                        loadProfiles();
+                                                    } catch (err) {
+                                                        showToast('Lỗi khi duyệt', 'error');
+                                                    } finally {
+                                                        setProcessingId(null);
+                                                    }
+                                                }} 
+                                                className={styles.actionBtn}
+                                            >
+                                                {processingId === app.id ? '...' : 'Duyệt'}
+                                            </button>
+                                            <button 
+                                                disabled={processingId === app.id}
+                                                onClick={async () => {
+                                                    if (!confirm('Từ chối đơn ứng tuyển này?')) return;
+                                                    setProcessingId(app.id);
+                                                    try {
+                                                        await rejectMidmanApplication(app.id);
+                                                        showToast('Đã từ chối!');
+                                                        loadApps();
+                                                    } catch (err) {
+                                                        showToast('Lỗi khi từ chối', 'error');
+                                                    } finally {
+                                                        setProcessingId(null);
+                                                    }
+                                                }} 
+                                                className={styles.deleteBtn}
+                                            >
+                                                {processingId === app.id ? '...' : 'Từ chối'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                                {midmanApps.filter(a => a.status === 'pending').length === 0 && (
+                                    <div className={styles.emptyState}>Không có yêu cầu duyệt Midman nào mới.</div>
                                 )}
                             </div>
                         )}

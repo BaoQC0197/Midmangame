@@ -69,6 +69,7 @@ export interface CreateTicketPayload {
     buyer_phone: string;
     buyer_user_id?: string;
     note?: string;
+    midman_id?: string;
 }
 
 export const TICKET_STATUS_LABELS: Record<TicketStatus, string> = {

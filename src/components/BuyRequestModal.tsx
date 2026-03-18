@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Handshake, CheckCircle2, FileText, Info } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { createTicket } from '../api/tickets';
+import { getActiveMidmanList } from '../api/profiles';
 import type { TradeAccount } from '../types/account';
 import { CATEGORY_LABELS } from '../types/account';
+import MidmanProfileModal from './MidmanProfileModal';
 import styles from './BuyRequestModal.module.css';
 
 interface BuyRequestModalProps {
@@ -16,9 +18,22 @@ interface BuyRequestModalProps {
 export default function BuyRequestModal({ account, onClose, isLoggedIn }: BuyRequestModalProps) {
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [note, setNote] = useState('');
     const [loading, setLoading] = useState(false);
     const [ticketId, setTicketId] = useState<string | null>(null);
+    const [midmanList, setMidmanList] = useState<any[]>([]);
+    const [selectedMidmanId, setSelectedMidmanId] = useState('');
+    const [showMidmanProfileId, setShowMidmanProfileId] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (account) {
+            getActiveMidmanList().then(res => {
+                setMidmanList(res);
+                if (res.length > 0) setSelectedMidmanId(res[0].user_id);
+            });
+        }
+    }, [account]);
 
     if (!account) return null;
 
@@ -63,6 +78,7 @@ export default function BuyRequestModal({ account, onClose, isLoggedIn }: BuyReq
                 buyer_phone: rawPhone,
                 buyer_user_id: userId,
                 note: note.trim() || undefined,
+                midman_id: selectedMidmanId || undefined,
             });
 
             setTicketId(id);
@@ -170,19 +186,35 @@ export default function BuyRequestModal({ account, onClose, isLoggedIn }: BuyReq
                                     </div>
 
                                     {!isLoggedIn && (
-                                        <div>
-                                            <label className={styles.fieldLabel}>
-                                                Mật khẩu <span>(tối thiểu 6 ký tự)</span>
-                                            </label>
-                                            <input
-                                                className={styles.input}
-                                                type="password"
-                                                placeholder="••••••••"
-                                                value={password}
-                                                onChange={e => setPassword(e.target.value)}
-                                                required
-                                                autoComplete="new-password"
-                                            />
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                            <div>
+                                                <label className={styles.fieldLabel}>
+                                                    Mật khẩu <span>(tối thiểu 6 ký tự)</span>
+                                                </label>
+                                                <input
+                                                    className={styles.input}
+                                                    type="password"
+                                                    placeholder="••••••••"
+                                                    value={password}
+                                                    onChange={e => setPassword(e.target.value)}
+                                                    required
+                                                    autoComplete="new-password"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className={styles.fieldLabel}>
+                                                    Xác nhận mật khẩu
+                                                </label>
+                                                <input
+                                                    className={styles.input}
+                                                    type="password"
+                                                    placeholder="••••••••"
+                                                    value={confirmPassword}
+                                                    onChange={e => setConfirmPassword(e.target.value)}
+                                                    required
+                                                    autoComplete="new-password"
+                                                />
+                                            </div>
                                         </div>
                                     )}
                                     <div>
@@ -198,6 +230,36 @@ export default function BuyRequestModal({ account, onClose, isLoggedIn }: BuyReq
                                         />
                                     </div>
 
+                                    <div style={{ marginBottom: 16 }}>
+                                        <label className={styles.fieldLabel}>
+                                            Chọn Trung Gian (Midman) <span>(bắt buộc)</span>
+                                        </label>
+                                        <select
+                                            className={styles.input}
+                                            value={selectedMidmanId}
+                                            onChange={e => setSelectedMidmanId(e.target.value)}
+                                            required
+                                            style={{ cursor: 'pointer', appearance: 'none', backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '12px auto' }}
+                                        >
+                                            {midmanList.length === 0 && <option value="">Không có Midman nào đang hoạt động</option>}
+                                            {midmanList.map(m => (
+                                                <option key={m.id} value={m.user_id}>
+                                                    {m.full_name || 'Midman'} • ⭐ {m.rating}/5 ({m.reviewCount} đánh giá)
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        {selectedMidmanId && (
+                                            <button 
+                                                type="button" 
+                                                onClick={() => setShowMidmanProfileId(selectedMidmanId)}
+                                                style={{ marginTop: 8, fontSize: 13, color: 'var(--color-primary)', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, padding: 0 }}
+                                            >
+                                                <Info size={14} /> Xem thông tin & Đánh giá Midman này
+                                            </button>
+                                        )}
+                                    </div>
+
                                     <div className={styles.infoBox}>
                                         <Info size={14} style={{ flexShrink: 0, marginTop: 1 }} />
                                         <span>
@@ -209,7 +271,7 @@ export default function BuyRequestModal({ account, onClose, isLoggedIn }: BuyReq
                                     <button
                                         type="submit"
                                         className={`btn-premium ${styles.submitBtn}`}
-                                        disabled={loading || !phone.trim() || (!isLoggedIn && password.length < 6)}
+                                        disabled={loading || !phone.trim() || !selectedMidmanId || (!isLoggedIn && (password.length < 6 || password !== confirmPassword))}
                                     >
                                         {loading ? (
                                             <>
@@ -256,6 +318,13 @@ export default function BuyRequestModal({ account, onClose, isLoggedIn }: BuyReq
                     </AnimatePresence>
                 </motion.div>
             </motion.div>
+
+            {showMidmanProfileId && (
+                <MidmanProfileModal 
+                    midmanId={showMidmanProfileId}
+                    onClose={() => setShowMidmanProfileId(null)}
+                />
+            )}
         </AnimatePresence>
     );
 }

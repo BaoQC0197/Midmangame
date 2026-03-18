@@ -89,10 +89,10 @@ export async function createTicket(payload: CreateTicketPayload) {
         throw new Error('Sản phẩm này hiện đang có người đặt mua. Vui lòng chọn sản phẩm khác hoặc đợi Admin xử lý.');
     }
 
-    // 2. Lấy seller_id từ account để gắn vào ticket ngay từ đầu
+    // 2. Lấy seller_id và price từ account để gắn vào ticket và tính phí TỔNG ngay từ đầu
     const { data: accountData } = await supabase
         .from('trade_accounts')
-        .select('seller_id')
+        .select('seller_id, price')
         .eq('id', payload.account_id)
         .single();
 
@@ -104,8 +104,10 @@ export async function createTicket(payload: CreateTicketPayload) {
             buyer_contact: payload.buyer_phone,
             buyer_user_id: payload.buyer_user_id,
             seller_user_id: accountData?.seller_id,
+            midman_id: payload.midman_id,
             status: 'pending_match',
             note: payload.note,
+            fee: accountData?.price ? Math.max(accountData.price * 0.05, 30000) : 30000,
         }])
         .select()
         .single();
@@ -266,5 +268,90 @@ export async function getUserBuyRequests(userId: string): Promise<TransactionTic
         room_url: item.room_url,
         created_at: item.created_at,
         updated_at: item.updated_at,
+    } as any));
+}
+
+export async function getMidmanCompletedTickets(userId: string): Promise<TransactionTicket[]> {
+    const { data, error } = await supabase
+        .from('transaction_tickets')
+        .select(`
+            *,
+            trade_accounts (
+                name,
+                price,
+                game,
+                thumbnail
+            )
+        `)
+        .eq('midman_id', userId)
+        .eq('status', 'completed')
+        .order('completed_at', { ascending: false });
+
+    if (error) {
+        console.warn('Lỗi query midman tickets (có thể chưa chạy SQL thêm cột midman_id):', error);
+        return [];
+    }
+
+    return (data || []).map(item => ({
+        id: item.id,
+        account_id: item.account_id,
+        account_title: item.trade_accounts?.name,
+        account_price: item.trade_accounts?.price,
+        account_game: item.trade_accounts?.game,
+        account_thumbnail: item.trade_accounts?.thumbnail,
+        buyer_contact: item.buyer_phone || '',
+        buyer_phone: item.buyer_phone || '',
+        buyer_user_id: item.buyer_user_id,
+        seller_user_id: item.seller_user_id,
+        price: item.trade_accounts?.price || 0,
+        fee: item.fee || 0,
+        status: item.status as TicketStatus,
+        note: item.note,
+        room_url: item.room_url,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        completed_at: item.completed_at
+    } as any));
+}
+
+export async function getMidmanPendingRequests(userId: string): Promise<TransactionTicket[]> {
+    const { data, error } = await supabase
+        .from('transaction_tickets')
+        .select(`
+            *,
+            trade_accounts (
+                name,
+                price,
+                game,
+                thumbnail
+            )
+        `)
+        .eq('midman_id', userId)
+        .in('status', ['pending_match', 'matched', 'trading'])
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.warn('Lỗi query midman pending tickets:', error);
+        return [];
+    }
+
+    return (data || []).map(item => ({
+        id: item.id,
+        account_id: item.account_id,
+        account_title: item.trade_accounts?.name,
+        account_price: item.trade_accounts?.price,
+        account_game: item.trade_accounts?.game,
+        account_thumbnail: item.trade_accounts?.thumbnail,
+        buyer_contact: item.buyer_phone || '',
+        buyer_phone: item.buyer_phone || '',
+        buyer_user_id: item.buyer_user_id,
+        seller_user_id: item.seller_user_id,
+        price: item.trade_accounts?.price || 0,
+        fee: item.fee || 0,
+        status: item.status as TicketStatus,
+        note: item.note,
+        room_url: item.room_url,
+        created_at: item.created_at,
+        updated_at: item.updated_at
     } as any));
 }

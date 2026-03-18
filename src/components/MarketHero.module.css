@@ -85,44 +85,24 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 0 32px;
-    height: 56px;
-    border-radius: 14px;
-    font-size: 15px;
-    font-weight: 700;
+    gap: 12px;
+    padding: 0 40px;
+    height: 64px;
+    border-radius: 18px;
+    font-size: 18px;
+    font-weight: 800;
     cursor: pointer;
     flex: 1;
-    max-width: 200px;
+    max-width: 360px;
+    box-shadow: 0 10px 30px -10px rgba(168, 85, 247, 0.6);
 }
 
-.btnCoffee {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    height: 56px;
-    padding: 0 24px;
-    background: rgba(245, 158, 11, 0.08);
-    border: 1px solid rgba(245, 158, 11, 0.2);
-    border-radius: 14px;
-    color: #f59e0b;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    flex: 2;
+.btnExplore:hover {
+    box-shadow: 0 15px 40px -10px rgba(168, 85, 247, 0.8);
 }
 
-.btnCoffee:hover {
-    background: rgba(245, 158, 11, 0.2);
-    border-color: #f59e0b;
-    box-shadow: 0 15px 25px -5px rgba(245, 158, 11, 0.2);
-    transform: translateY(-2px);
-}
-
-.btnCoffee svg, .btnIcon {
-    filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.4));
+.btnExplore svg, .btnIcon {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
     transition: transform 0.3s ease;
 }
 
@@ -587,24 +567,25 @@
         margin: 0 auto;
     }
 
-    .btnExplore, .btnCoffee {
-        flex: 0 0 100px;
-        width: 100px;
-        height: 100px;
+    .btnExplore {
+        flex: none;
+        width: 100%;
+        max-width: 360px;
+        height: 64px;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
         justify-content: center;
-        font-size: 11px;
+        font-size: 18px;
         padding: 0;
-        border-radius: 18px;
-        aspect-ratio: 1 / 1;
+        border-radius: 16px;
+        aspect-ratio: auto;
     }
 
     .btnIcon {
         width: 24px !important;
         height: 24px !important;
-        margin-bottom: 4px;
+        margin-bottom: 0px;
     }
 
     .stats {

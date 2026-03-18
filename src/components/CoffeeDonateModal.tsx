@@ -11,18 +11,18 @@ export default function CoffeeDonateModal({ isOpen, onClose }: CoffeeDonateModal
     const benefits = [
         {
             icon: <Sparkles size={20} />,
-            title: 'Cờ Hotlist Độc Quyền',
-            desc: 'Tài khoản của bạn sẽ hiển thị huy hiệu "Hotlist" cực kỳ nổi bật trên sàn.'
+            title: 'Cơ hội nhận lượt quay hotlist',
+            desc: 'Tăng xu hướng xuất hiện cho người mua.'
         },
         {
             icon: <TrendingUp size={20} />,
             title: 'Ưu Tiên Hiển Thị',
-            desc: 'Đưa tài khoản lên đầu danh sách để thu hút người mua tiềm năng ngay lập tức.'
+            desc: 'Đưa tài khoản lên trang đầu để thu hút người mua tiềm năng ngay lập tức.'
         },
         {
             icon: <Clock size={20} />,
-            title: 'Duy Trì trong 7 Ngày',
-            desc: 'Hiệu ứng quảng bá sẽ kéo dài liên tục trong 1 tuần (168 giờ).'
+            title: 'Duy Trì trong 3/5/7 Ngày',
+            desc: 'Hiệu ứng quảng bá sẽ kéo dài liên tục tối đa trong 1 tuần'
         }
     ];
 
@@ -30,7 +30,7 @@ export default function CoffeeDonateModal({ isOpen, onClose }: CoffeeDonateModal
         <AnimatePresence>
             {isOpen && (
                 <div className={styles.modalOverlay} onClick={onClose}>
-                    <motion.div 
+                    <motion.div
                         className={styles.modalContent}
                         initial={{ opacity: 0, scale: 0.9, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -51,8 +51,8 @@ export default function CoffeeDonateModal({ isOpen, onClose }: CoffeeDonateModal
 
                         <div className={styles.benefits}>
                             {benefits.map((benefit, index) => (
-                                <motion.div 
-                                    key={index} 
+                                <motion.div
+                                    key={index}
                                     className={styles.benefitItem}
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}
@@ -70,7 +70,7 @@ export default function CoffeeDonateModal({ isOpen, onClose }: CoffeeDonateModal
                         </div>
 
                         <div className={styles.footer}>
-                            <motion.button 
+                            <motion.button
                                 className={`btn-premium ${styles.btnDonate}`}
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}

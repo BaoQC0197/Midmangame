@@ -1,8 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, Sparkles, Star, BadgeCheck, Coffee, Handshake, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ShieldCheck, Sparkles, Star, BadgeCheck, Handshake, ChevronLeft, ChevronRight, ThumbsUp } from 'lucide-react';
 import styles from './MarketHero.module.css';
-import CoffeeDonateModal from './CoffeeDonateModal';
 import { TradeAccount, CATEGORY_LABELS, CategoryKey } from '../types/account';
 
 interface MarketHeroProps {
@@ -25,7 +24,6 @@ interface ShowcaseItem {
 }
 
 export default function MarketHero({ onOpenSellModal, onBuyRequest, accounts = [] }: MarketHeroProps) {
-    const [coffeeModalOpen, setCoffeeModalOpen] = useState(false);
     const [activeIndex, setActiveIndex] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
     const ITEMS_PER_PAGE = 3;
@@ -87,18 +85,8 @@ export default function MarketHero({ onOpenSellModal, onBuyRequest, accounts = [
                             whileTap={{ scale: 0.95 }}
                             onClick={onOpenSellModal}
                         >
-                            <Sparkles size={20} className={styles.btnIcon} />
+                            <ThumbsUp size={18} className={styles.btnIcon} />
                             <span>Đăng ký bán</span>
-                        </motion.button>
-
-                        <motion.button
-                            className={styles.btnCoffee}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => setCoffeeModalOpen(true)}
-                        >
-                            <Coffee size={20} className={styles.btnIcon} />
-                            <span>Mời Coffee</span>
                         </motion.button>
                     </div>
 
@@ -266,11 +254,6 @@ export default function MarketHero({ onOpenSellModal, onBuyRequest, accounts = [
                     </div>
                 </motion.div>
             </div>
-
-            <CoffeeDonateModal
-                isOpen={coffeeModalOpen}
-                onClose={() => setCoffeeModalOpen(false)}
-            />
         </section>
     );
 }

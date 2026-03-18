@@ -6,11 +6,12 @@ import styles from './WelcomePopup.module.css';
 
 interface WelcomePopupProps {
     onOpenSellModal: () => void;
+    onOpenApplyMidman: () => void;
 }
 
 const STORAGE_KEY = 'gt_visited';
 
-export default function WelcomePopup({ onOpenSellModal }: WelcomePopupProps) {
+export default function WelcomePopup({ onOpenSellModal, onOpenApplyMidman }: WelcomePopupProps) {
     const [visible, setVisible] = useState(false);
 
     useEffect(() => {
@@ -43,6 +44,14 @@ export default function WelcomePopup({ onOpenSellModal }: WelcomePopupProps) {
         }, 350);
     };
 
+    const handleApplyMidman = () => {
+        localStorage.setItem(STORAGE_KEY, 'true');
+        setVisible(false);
+        setTimeout(() => {
+            onOpenApplyMidman();
+        }, 350);
+    };
+
     return (
         <AnimatePresence>
             {visible && (
@@ -68,24 +77,24 @@ export default function WelcomePopup({ onOpenSellModal }: WelcomePopupProps) {
 
                         {/* Title */}
                         <h2 className={`${styles.title} text-gradient`}>
-                            Chào mừng đến với<br />EasyTrade! ✨
+                            Chào mừng đến với EasyTrade!
                         </h2>
 
                         {/* Tâm thư */}
                         <div className={styles.letter}>
                             <p>
                                 Kính gửi anh/chị, khách hàng của EasyTrade.<br /><br />
-                                EasyTrade được xây dựng để trở thành <strong>cầu nối an toàn tuyệt đối</strong> giữa
+                                EasyTrade được xây dựng để trở thành <strong>cầu nối an toàn</strong> giữa
                                 người mua và người bán các loại tài khoản điện tử. Chúng tôi cam kết mọi giao dịch đều
-                                được bảo đảm bởi hệ thống chuyên nghiệp — <strong>không lo lừa đảo,
-                                không lo hớ giá</strong>.
+                                được bảo đảm bởi hệ thống chuyên nghiệp — <strong>không lo lừa đảo tiền,
+                                    không lo mất tài khoản</strong>.
                             </p>
                         </div>
 
                         {/* Divider element */}
                         <div className={styles.question}>
                             <Shield size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 8, color: 'var(--color-primary)' }} />
-                            Bạn đến đây với tư cách nào?
+                            Bạn đến đây với mục đích gì?
                         </div>
 
                         {/* CTA Buttons */}
@@ -114,6 +123,19 @@ export default function WelcomePopup({ onOpenSellModal }: WelcomePopupProps) {
                                 </div>
                                 <span className={styles.btnLabel}>Tôi đăng bán acc</span>
                                 <span className={styles.btnSub}>Ký gửi qua hệ thống trung gian</span>
+                            </motion.button>
+
+                            <motion.button
+                                className={styles.btnMidman}
+                                onClick={handleApplyMidman}
+                                whileHover={{ scale: 1.03 }}
+                                whileTap={{ scale: 0.97 }}
+                            >
+                                <div className={styles.btnIcon}>
+                                    <Shield size={20} />
+                                </div>
+                                <span className={styles.btnLabel}>Ứng tuyển làm Midman</span>
+                                <span className={styles.btnSub}>Trở thành đối tác giao dịch trung gian chuyên nghiệp</span>
                             </motion.button>
                         </div>
 

@@ -46,6 +46,7 @@ export default function SellAccountModal({ open, onClose, onSubmit, isSubmitting
         description: '',
         title: '',
         password: '',
+        confirmPassword: '',
         feePayer: 'seller' as 'seller' | 'buyer' | 'split'
     });
 
@@ -63,6 +64,7 @@ export default function SellAccountModal({ open, onClose, onSubmit, isSubmitting
                 description: '',
                 title: '',
                 password: '',
+                confirmPassword: '',
                 feePayer: 'seller' as 'seller' | 'buyer' | 'split'
             });
         }
@@ -110,7 +112,7 @@ export default function SellAccountModal({ open, onClose, onSubmit, isSubmitting
         if (currentStep === 0) return !!formData.game;
         if (currentStep === 1) {
             const isPhoneValid = !!formData.phone && formData.phone.length >= 9;
-            const isPasswordValid = isLoggedIn || (formData.password?.length >= 6);
+            const isPasswordValid = isLoggedIn || (formData.password?.length >= 6 && formData.password === formData.confirmPassword);
             return !!formData.server && isPhoneValid && isPasswordValid;
         }
         if (currentStep === 2) return formData.images.length > 0;
@@ -243,18 +245,32 @@ export default function SellAccountModal({ open, onClose, onSubmit, isSubmitting
                                         <span className={styles.hintText}>* Thông tin này giúp người mua đánh giá độ an toàn của tài khoản.</span>
                                     </div>
                                     {!isLoggedIn && (
-                                        <div className={styles.field}>
-                                            <label>Mật khẩu cho tài khoản mới <span>(tối thiểu 6 ký tự)</span></label>
-                                            <input
-                                                type="password"
-                                                className={styles.input}
-                                                placeholder="••••••••"
-                                                value={formData.password}
-                                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                                required
-                                                autoComplete="new-password"
-                                            />
-                                            <span className={styles.hintText}>Dùng để đăng nhập và quản lý yêu cầu của bạn sau này.</span>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                            <div className={styles.field}>
+                                                <label>Mật khẩu tạo mới <span>(tối thiểu 6 ký tự)</span></label>
+                                                <input
+                                                    type="password"
+                                                    className={styles.input}
+                                                    placeholder="••••••••"
+                                                    value={formData.password}
+                                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                                    required
+                                                    autoComplete="new-password"
+                                                />
+                                                <span className={styles.hintText}>Dùng để đăng nhập quản lý.</span>
+                                            </div>
+                                            <div className={styles.field}>
+                                                <label>Xác nhận mật khẩu</label>
+                                                <input
+                                                    type="password"
+                                                    className={styles.input}
+                                                    placeholder="••••••••"
+                                                    value={formData.confirmPassword}
+                                                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                                                    required
+                                                    autoComplete="new-password"
+                                                />
+                                            </div>
                                         </div>
                                     )}
                                 </div>

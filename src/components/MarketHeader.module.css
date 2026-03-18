@@ -575,3 +575,44 @@
     background: rgba(239, 68, 68, 0.2);
     border-color: #ef4444;
 }
+
+/* Nút Header Đặc Biệt (Midman / Coffee) */
+.headerBtnMidman, .headerBtnCoffee {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    border: none;
+    font-family: inherit;
+    text-decoration: none;
+}
+
+.headerBtnMidman {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.2) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #10b981;
+}
+.headerBtnMidman:hover {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.28) 0%, rgba(5, 150, 105, 0.35) 100%);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+    transform: translateY(-2px);
+    color: #34d399;
+}
+
+.headerBtnCoffee {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #f59e0b;
+}
+.headerBtnCoffee:hover {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: #f59e0b;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+    transform: translateY(-2px);
+    color: #fbbf24;
+}

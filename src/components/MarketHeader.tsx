@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, LogOut, Settings, Menu, X, ShieldCheck, AlertCircle, ShoppingBag } from 'lucide-react';
+import { User, LogOut, Settings, Menu, X, ShieldCheck, AlertCircle, ShoppingBag, Coffee } from 'lucide-react';
 import Logo from './Logo';
+import CoffeeDonateModal from './CoffeeDonateModal';
 import styles from './MarketHeader.module.css';
 
 interface MarketHeaderProps {
@@ -13,15 +14,18 @@ interface MarketHeaderProps {
     currentUserPhone?: string | null;
     activeTicket?: any | null;
     onUserHubOpen: () => void;
+    onUserProfileOpen: () => void;
+    onOpenApplyMidman: () => void;
 }
 
-export default function MarketHeader({ isAdmin, isLoggedIn, currentUserPhone, activeTicket, onLogin, onLogout, onAdminPanelOpen, onUserHubOpen }: MarketHeaderProps) {
+export default function MarketHeader({ isAdmin, isLoggedIn, currentUserPhone, activeTicket, onLogin, onLogout, onAdminPanelOpen, onUserHubOpen, onUserProfileOpen, onOpenApplyMidman }: MarketHeaderProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [adminOpen, setAdminOpen] = useState(false);
     const [termsOpen, setTermsOpen] = useState(false);
+    const [coffeeModalOpen, setCoffeeModalOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
@@ -97,6 +101,14 @@ export default function MarketHeader({ isAdmin, isLoggedIn, currentUserPhone, ac
                                     {link.label}
                                 </a>
                             ))}
+                            <button className={styles.headerBtnMidman} onClick={onOpenApplyMidman}>
+                                <ShieldCheck size={18} />
+                                Ứng tuyển Midman
+                            </button>
+                            <button className={styles.headerBtnCoffee} onClick={() => setCoffeeModalOpen(true)}>
+                                <Coffee size={18} />
+                                Mời Coffee
+                            </button>
                         </nav>
 
                         <div className={styles.headerActions}>
@@ -112,6 +124,9 @@ export default function MarketHeader({ isAdmin, isLoggedIn, currentUserPhone, ac
                                             <Settings size={20} />
                                         </button>
                                     )}
+                                    <button className={styles.btnAction} onClick={onUserProfileOpen} title="Hồ sơ cá nhân">
+                                        <User size={20} />
+                                    </button>
                                     <button className={styles.btnAction} onClick={onUserHubOpen} title="Trung tâm của tôi">
                                         <ShoppingBag size={20} />
                                     </button>
@@ -284,6 +299,18 @@ export default function MarketHeader({ isAdmin, isLoggedIn, currentUserPhone, ac
                                     <button 
                                         className={styles.mobileLinkBtn} 
                                         onClick={() => {
+                                            onUserProfileOpen();
+                                            setMenuOpen(false);
+                                        }}
+                                    >
+                                        <User size={20} />
+                                        <span>Hồ sơ cá nhân</span>
+                                    </button>
+                                )}
+                                {isLoggedIn && (
+                                    <button 
+                                        className={styles.mobileLinkBtn} 
+                                        onClick={() => {
                                             onUserHubOpen();
                                             setMenuOpen(false);
                                         }}
@@ -308,6 +335,14 @@ export default function MarketHeader({ isAdmin, isLoggedIn, currentUserPhone, ac
                                         {link.label}
                                     </a>
                                 ))}
+                                <button className={styles.mobileLinkBtn} onClick={() => { onOpenApplyMidman(); setMenuOpen(false); }}>
+                                    <ShieldCheck size={20} />
+                                    <span>Ứng tuyển Midman</span>
+                                </button>
+                                <button className={styles.mobileLinkBtn} onClick={() => { setCoffeeModalOpen(true); setMenuOpen(false); }}>
+                                    <Coffee size={20} />
+                                    <span>Mời Coffee</span>
+                                </button>
                             </div>
                         </motion.nav>
                     </>
@@ -348,6 +383,11 @@ export default function MarketHeader({ isAdmin, isLoggedIn, currentUserPhone, ac
                     </div>
                 )}
             </AnimatePresence>
+
+            <CoffeeDonateModal 
+                isOpen={coffeeModalOpen} 
+                onClose={() => setCoffeeModalOpen(false)} 
+            />
         </>
     );
 }

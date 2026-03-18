@@ -212,6 +212,38 @@
     line-height: 1.4;
 }
 
+.btnMidman {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 16px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.2) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    border-radius: 18px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    font-family: var(--font-body);
+    text-align: center;
+}
+
+.btnMidman:hover {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.28) 0%, rgba(5, 150, 105, 0.35) 100%);
+    border-color: #10b981;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px -8px rgba(16, 185, 129, 0.4);
+}
+
+.btnMidman .btnIcon {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    width: 40px;
+    height: 40px;
+}
+
 /* ── Footer note ── */
 .footerNote {
     position: relative;

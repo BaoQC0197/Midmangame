@@ -21,8 +21,12 @@ import TradeRoomBanner from './components/TradeRoomBanner';
 import TradeRoomView from './components/TradeRoomView';
 import Toast, { type ToastType } from './components/Toast';
 import UserHub from './components/UserHub';
+import ApplyMidmanModal from './components/ApplyMidmanModal';
+import MidmanPanel from './components/MidmanPanel';
 import Logo from './components/Logo';
+import UserProfileModal from './components/UserProfileModal';
 import styles from './App.module.css';
+import { getProfile } from './api/profiles';
 
 // Types
 import { CATEGORY_STRUCTURE, CategoryKey } from './types/account';
@@ -48,6 +52,10 @@ export default function App() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
     const [userHubOpen, setUserHubOpen] = useState(false);
+    const [userProfileOpen, setUserProfileOpen] = useState(false);
+    const [applyMidmanOpen, setApplyMidmanOpen] = useState(false);
+    const [midmanPanelOpen, setMidmanPanelOpen] = useState(false);
+    const [userProfile, setUserProfile] = useState<any>(null);
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' as ToastType });
 
     // --- DATA FETCHING ---
@@ -63,13 +71,27 @@ export default function App() {
     // Auth Effect
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
-            setUser(session?.user ?? null);
-            if (session?.user?.email === ADMIN_EMAIL) setIsAdmin(true);
+            const loggedInUser = session?.user ?? null;
+            setUser(loggedInUser);
+            if (loggedInUser?.email === ADMIN_EMAIL) setIsAdmin(true);
+            
+            if (loggedInUser) {
+                getProfile(loggedInUser.id).then(prof => setUserProfile(prof));
+            } else {
+                setUserProfile(null);
+            }
         });
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null);
-            setIsAdmin(session?.user?.email === ADMIN_EMAIL);
+            const loggedInUser = session?.user ?? null;
+            setUser(loggedInUser);
+            setIsAdmin(loggedInUser?.email === ADMIN_EMAIL);
+
+            if (loggedInUser) {
+                getProfile(loggedInUser.id).then(prof => setUserProfile(prof));
+            } else {
+                setUserProfile(null);
+            }
         });
 
         return () => subscription.unsubscribe();
@@ -266,7 +288,20 @@ export default function App() {
                 onAdminPanelOpen={() => setAdminPanelOpen(true)}
                 activeTicket={activeTradeTicket}
                 onUserHubOpen={() => setUserHubOpen(true)}
+                onUserProfileOpen={() => setUserProfileOpen(true)}
+                onOpenApplyMidman={() => setApplyMidmanOpen(true)}
             />
+            {userProfile?.role === 'midman' && (
+                <div style={{ position: 'fixed', bottom: 20, left: 20, zIndex: 1000 }}>
+                    <button 
+                        className="btn-premium" 
+                        onClick={() => setMidmanPanelOpen(true)}
+                        style={{ background: 'linear-gradient(135deg, #a855f7 0%, #7e22ce 100%)', boxShadow: '0 4px 15px rgba(168, 85, 247, 0.4)', borderRadius: 20 }}
+                    >
+                        Midman Panel
+                    </button>
+                </div>
+            )}
 
             <MarketHero
                 onOpenSellModal={() => setSellModalOpen(true)}
@@ -409,10 +444,37 @@ export default function App() {
                 />
             )}
 
+            {user && (
+                <UserProfileModal
+                    open={userProfileOpen}
+                    onClose={() => setUserProfileOpen(false)}
+                    userId={user.id}
+                    showToast={showToast}
+                />
+            )}
+
+            <ApplyMidmanModal
+                open={applyMidmanOpen}
+                onClose={() => setApplyMidmanOpen(false)}
+                userId={user?.id}
+                showToast={showToast}
+            />
+
+            {userProfile?.role === 'midman' && (
+                <MidmanPanel
+                    open={midmanPanelOpen}
+                    onClose={() => setMidmanPanelOpen(false)}
+                    showToast={showToast}
+                />
+            )}
+
             {/* Modal Tham gia nhanh qua Link (Xử lý /trade/[ID]) */}
             <QuickJoinModal />
 
-            <WelcomePopup onOpenSellModal={() => setSellModalOpen(true)} />
+            <WelcomePopup 
+                onOpenSellModal={() => setSellModalOpen(true)} 
+                onOpenApplyMidman={() => setApplyMidmanOpen(true)} 
+            />
 
             <Toast
                 show={toast.show}

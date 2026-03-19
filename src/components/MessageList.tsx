@@ -40,9 +40,11 @@ export default function MessageList({ messages, currentUserId }: MessageListProp
                     >
                         {!isSelf && (
                             <div className={styles.senderInfo}>
-                                <span className={styles.senderName}>{msg.sender_name || 'User'}</span>
+                                {!(msg.sender_role === 'midman' && (msg.sender_name === 'Khách hàng' || msg.sender_name === 'User' || !msg.sender_name)) && (
+                                    <span className={styles.senderName}>{msg.sender_name || 'User'}</span>
+                                )}
                                 <span className={`${styles.roleBadge} ${styles[`role${msg.sender_role.charAt(0).toUpperCase() + msg.sender_role.slice(1)}`]}`}>
-                                    {msg.sender_role === 'midman' ? 'Trung gian' : msg.sender_role === 'seller' ? 'Người bán' : 'Người mua'}
+                                    {msg.sender_role === 'midman' ? 'TRUNG GIAN' : msg.sender_role === 'seller' ? 'Người bán' : 'Người mua'}
                                 </span>
                             </div>
                         )}

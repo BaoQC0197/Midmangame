@@ -25,6 +25,20 @@ export default function TradeRoomView({ ticket, user, userProfile, onClose }: Tr
 
     // Đăng ký realtime cho riêng ticket này để cập nhật tiến độ tức thì
     useEffect(() => {
+        // Fetch dữ liệu mới nhất một lần khi mount để đảm bảo không bị stale
+        const fetchLatest = async () => {
+            const { data, error } = await supabase
+                .from('transaction_tickets')
+                .select('*')
+                .eq('id', ticket.id)
+                .single();
+            if (data && !error) {
+                setCurrentTicket(data as TransactionTicket);
+            }
+        };
+
+        fetchLatest();
+
         const channel = supabase
             .channel(`ticket_room_${ticket.id}`)
             .on(
@@ -40,9 +54,7 @@ export default function TradeRoomView({ ticket, user, userProfile, onClose }: Tr
                     setCurrentTicket(payload.new as TransactionTicket);
                 }
             )
-            .subscribe((status) => {
-                console.log('Realtime subscription status:', status);
-            });
+            .subscribe();
 
         return () => {
             supabase.removeChannel(channel);

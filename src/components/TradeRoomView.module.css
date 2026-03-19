@@ -8,7 +8,7 @@
     overflow: hidden;
     color: #fff;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    height: 100vh;
+    height: 100dvh;
 }
 
 .header {
@@ -23,16 +23,18 @@
     flex-shrink: 0;
 }
 
+/* This is the heart of the fixed layout */
 .roomContent {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 20px;
-    gap: 20px;
+    padding: 24px;
+    gap: 24px;
     max-width: 1400px;
     width: 100%;
     margin: 0 auto;
-    overflow: hidden;
+    overflow: hidden; /* No outer scroll */
+    min-height: 0;
 }
 
 .titleArea {
@@ -41,23 +43,32 @@
 }
 
 .roomTitle {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 800;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
 }
 
 .roomSub {
-    color: var(--color-text-dim);
-    font-size: 13px;
+    color: #94a3b8;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.gridContent {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 30px;
+    width: 100%;
+    flex: 1;
+    min-height: 0; /* Important for flex children scrolling */
 }
 
 .mainWorkArea {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+    gap: 30px;
+    flex: 1;
+    min-height: 0;
 }
 
 .machineWrapper {
@@ -66,34 +77,27 @@
 
 .chatSection {
     flex: 1;
-    min-height: 0; /* Important for flex children scrolling */
+    min-height: 0;
     display: flex;
     flex-direction: column;
-}
-
-.gridContent {
-    display: grid;
-    grid-template-columns: 1fr 340px;
-    gap: 24px;
-    width: 100%;
-    flex: 1;
-    min-height: 0;
-}
-
-@media (max-width: 1100px) {
-    .gridContent {
-        grid-template-columns: 1fr;
-        overflow-y: auto;
-    }
-    .roomWrapper {
-        overflow-y: auto;
-    }
+    overflow: hidden; /* Let inner ChatRoom handle scroll */
 }
 
 .infoSidebar {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 24px;
+    overflow-y: auto; /* Sidebar allows internal scroll if content is too long */
+    padding-right: 4px;
+}
+
+/* Custom scrollbar for sidebar */
+.infoSidebar::-webkit-scrollbar {
+    width: 4px;
+}
+.infoSidebar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
 }
 
 .card {
@@ -101,22 +105,24 @@
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 16px;
     padding: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    flex-shrink: 0;
 }
 
 .cardTitle {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 700;
-    margin-bottom: 15px;
+    margin-bottom: 16px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    color: var(--color-accent);
+    gap: 12px;
+    color: #a855f7;
 }
 
 .checklist {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
 }
 
 .checkItem {
@@ -124,7 +130,7 @@
     align-items: center;
     gap: 12px;
     font-size: 14px;
-    color: var(--color-text-dim);
+    color: #94a3b8;
     transition: all 0.2s ease;
 }
 
@@ -138,28 +144,24 @@
     transform: translateX(4px);
 }
 
-.checkItem.interactive:hover .checkIcon {
-    border-color: var(--color-primary);
-    background: rgba(168, 85, 247, 0.1);
-}
-
 .checkItem.done {
     color: #fff;
 }
 
 .checkIcon {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     border: 2px solid #334155;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .checkItem.done .checkIcon {
-    background: var(--color-accent);
-    border-color: var(--color-accent);
+    background: #a855f7;
+    border-color: #a855f7;
     color: #000;
 }
 
@@ -177,27 +179,94 @@
     gap: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
-    text-decoration: none;
-}
-
-.joinBtn:hover {
-    background: #dc2626;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
 }
 
 .backBtn {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #fff;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 13px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 14px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    transition: all 0.2s;
 }
+
 .backBtn:hover {
     background: rgba(255, 255, 255, 0.1);
+}
+
+/* --- Responsive --- */
+
+@media (max-width: 1100px) {
+    .roomContent {
+        padding: 6px 10px;
+        gap: 6px;
+    }
+
+    .gridContent {
+        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .mainWorkArea {
+        gap: 8px;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .infoSidebar {
+        order: -1;
+        flex-direction: row;
+        overflow-x: auto;
+        gap: 8px;
+        padding-bottom: 4px;
+        flex-shrink: 0;
+    }
+
+    .card {
+        padding: 8px 12px;
+        min-width: 200px;
+        border-radius: 10px;
+    }
+
+    .cardTitle {
+        font-size: 11px;
+        margin-bottom: 6px;
+    }
+
+    .roomTitle {
+        font-size: 16px;
+        margin-bottom: 2px;
+    }
+
+    .roomSub {
+        font-size: 10px;
+    }
+
+    .checkItem {
+        font-size: 12px;
+        gap: 8px;
+    }
+
+    .checkIcon {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+@media (max-width: 640px) {
+    .header {
+        padding: 6px 10px;
+    }
+    
+    .backBtn {
+        padding: 4px 10px;
+        font-size: 11px;
+    }
 }

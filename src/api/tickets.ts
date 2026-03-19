@@ -194,7 +194,7 @@ export async function getMyActiveTicket(userId: string): Promise<TransactionTick
         .from('transaction_tickets')
         .select(`*, trade_accounts(name, price, game, seller_id, seller_phone)`)
         .eq('status', 'trading')
-        .or(`buyer_user_id.eq.${userId},seller_user_id.eq.${userId}`)
+        .or(`buyer_user_id.eq.${userId},seller_user_id.eq.${userId},midman_id.eq.${userId}`)
         .order('trading_at', { ascending: false })
         .limit(1)
         .maybeSingle();

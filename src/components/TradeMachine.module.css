@@ -316,3 +316,82 @@
     letter-spacing: 3px;
     font-weight: 500;
 }
+
+@media (max-width: 1024px) {
+    .machineContainer {
+        padding: 8px;
+        min-height: 220px;
+    }
+    .lcdStatus {
+        font-size: 14px;
+    }
+    .lcdScreen {
+        min-height: 50px;
+        padding: 8px;
+        margin-bottom: 10px;
+    }
+    .lcdTitle {
+        font-size: 8px;
+        letter-spacing: 1px;
+        margin-bottom: 2px;
+    }
+    .slotsArea {
+        gap: 8px;
+        padding-bottom: 5px;
+    }
+    .slot {
+        width: 80px;
+        height: 110px;
+    }
+    .cylinder {
+        width: 65px;
+        height: 80px;
+        bottom: 12px;
+    }
+    .ball {
+        width: 36px;
+        height: 36px;
+        bottom: 30px;
+    }
+    .platform {
+        width: 75px;
+        height: 8px;
+    }
+    .lightRing {
+        width: 60px;
+        height: 60px;
+    }
+    .label {
+        font-size: 7px;
+        margin-top: 4px;
+    }
+}
+
+@media (max-width: 640px) {
+    .machineContainer {
+        padding: 6px;
+        min-height: 200px;
+    }
+    .lcdStatus {
+        font-size: 13px;
+    }
+    .lcdScreen {
+        padding: 6px;
+        margin-bottom: 8px;
+        min-height: 44px;
+    }
+    .slot {
+        width: 70px;
+        height: 100px;
+    }
+    .ball {
+        width: 30px;
+        height: 30px;
+        bottom: 25px;
+    }
+    .ballButton {
+        width: 10px;
+        height: 10px;
+        border-width: 2px;
+    }
+}

@@ -144,3 +144,21 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+@media (max-width: 640px) {
+    .messageRow {
+        max-width: 90%;
+    }
+    .messageList {
+        padding: 12px;
+        gap: 8px;
+    }
+    .inputArea {
+        padding: 12px;
+        gap: 8px;
+    }
+    .messageBubble {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+}

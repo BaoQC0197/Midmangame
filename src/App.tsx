@@ -121,7 +121,7 @@ export default function App() {
                     (payload: any) => {
                         // Nếu ticket này liên quan đến user và status mới là trading hoặc vừa kết thúc
                         const t = payload.new;
-                        if (t.buyer_user_id === user.id || t.seller_user_id === user.id) {
+                        if (t.buyer_user_id === user.id || t.seller_user_id === user.id || t.midman_id === user.id) {
                             loadActive();
                         }
                     }

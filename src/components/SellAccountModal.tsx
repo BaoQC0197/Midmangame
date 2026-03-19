@@ -9,9 +9,10 @@ import {
     ChevronRight,
     ChevronLeft,
     CheckCircle2,
-    Upload
+    Upload,
+    Search
 } from 'lucide-react';
-import { CATEGORY_LABELS, CATEGORY_STRUCTURE, CategoryKey } from '../types/account';
+import { getCategories, Category } from '../api/categories';
 import styles from './SellAccountModal.module.css';
 
 interface SellAccountModalProps {
@@ -35,9 +36,11 @@ const BIND_STATUSES = ['Trắng thông tin (Chưa liên kết)', 'Có thể gỡ
 
 export default function SellAccountModal({ open, onClose, onSubmit, isSubmitting, currentUserPhone, isLoggedIn }: SellAccountModalProps) {
     const [currentStep, setCurrentStep] = useState(0);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [categories, setCategories] = useState<Category[]>([]);
     const [formData, setFormData] = useState({
         phone: currentUserPhone || '',
-        game: '' as CategoryKey | '',
+        game: '' as string,
         server: 'Asia',
         accountType: ACCOUNT_TYPES[0],
         bindStatus: BIND_STATUSES[0],
@@ -51,11 +54,24 @@ export default function SellAccountModal({ open, onClose, onSubmit, isSubmitting
     });
 
     useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const data = await getCategories();
+                setCategories(data);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+        fetchCategories();
+    }, []);
+
+    useEffect(() => {
         if (open) {
             setCurrentStep(0);
+            setSearchTerm('');
             setFormData({
                 phone: currentUserPhone || '',
-                game: '' as CategoryKey | '',
+                game: '' as string,
                 server: 'Asia',
                 accountType: ACCOUNT_TYPES[0],
                 bindStatus: BIND_STATUSES[0],
@@ -169,26 +185,77 @@ export default function SellAccountModal({ open, onClose, onSubmit, isSubmitting
                             {/* STEP 1: CHỌN DANH MỤC */}
                             {currentStep === 0 && (
                                 <div className={styles.hierarchicalSelection}>
-                                    {CATEGORY_STRUCTURE.map(group => (
-                                        <div key={group.id} className={styles.categoryGroup}>
-                                            <h3 className={styles.groupTitle}>{group.label}</h3>
-                                            <div className={styles.gridSelection}>
-                                                {group.items.map(key => (
-                                                    <div
-                                                        key={key}
-                                                        className={`${styles.selectionCard} ${formData.game === key ? styles.selected : ''}`}
-                                                        onClick={() => setFormData({ ...formData, game: key as CategoryKey })}
-                                                    >
-                                                        <div className={styles.radioCircle}>
-                                                            {formData.game === key && <div className={styles.radioInner} />}
+                                    <div className={styles.searchBox}>
+                                        <Search size={18} className={styles.searchIcon} />
+                                        <input
+                                            type="text"
+                                            placeholder="Tìm kiếm game hoặc dịch vụ cần ký gửi..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            className={styles.searchInput}
+                                            autoFocus
+                                        />
+                                        {searchTerm && (
+                                            <button 
+                                                className={styles.clearSearch}
+                                                onClick={() => setSearchTerm('')}
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    {/* Grouped and Filtered Categories */}
+                                    {Array.from(new Set(categories.map(c => c.group_label))).map(groupLabel => {
+                                        const filteredItems = categories.filter(cat => 
+                                            cat.group_label === groupLabel &&
+                                            cat.name.toLowerCase().includes(searchTerm.toLowerCase())
+                                        );
+
+                                        if (filteredItems.length === 0) return null;
+
+                                        return (
+                                            <div key={groupLabel} className={styles.categoryGroup}>
+                                                <h3 className={styles.groupTitle}>{groupLabel}</h3>
+                                                <div className={styles.gridSelection}>
+                                                    {filteredItems.map(cat => (
+                                                        <div
+                                                            key={cat.id}
+                                                            className={`${styles.selectionCard} ${formData.game === cat.id ? styles.selected : ''}`}
+                                                            onClick={() => setFormData({ ...formData, game: cat.id })}
+                                                        >
+                                                            <div className={styles.radioCircle}>
+                                                                {formData.game === cat.id && <div className={styles.radioInner} />}
+                                                            </div>
+                                                            <div className={styles.gameIconWrapper}>
+                                                                <img 
+                                                                    src={cat.icon_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${cat.id}`} 
+                                                                    alt={cat.name}
+                                                                    className={styles.gameIcon} 
+                                                                />
+                                                            </div>
+                                                            <span className={styles.gameName}>{cat.name}</span>
                                                         </div>
-                                                        <Gamepad2 size={24} className={styles.cardIcon} />
-                                                        <span>{CATEGORY_LABELS[key]}</span>
-                                                    </div>
-                                                ))}
+                                                    ))}
+                                                </div>
                                             </div>
+                                        );
+                                    })}
+
+                                    {categories.length > 0 && categories.filter(cat => 
+                                        cat.name.toLowerCase().includes(searchTerm.toLowerCase())
+                                    ).length === 0 && (
+                                        <div className={styles.noResults}>
+                                            <p>Không tìm thấy danh mục nào phù hợp với "{searchTerm}"</p>
                                         </div>
-                                    ))}
+                                    )}
+
+                                    {categories.length === 0 && (
+                                        <div className={styles.loadingItems}>
+                                            <div className="spinner-small" />
+                                            <span>Đang tải danh mục...</span>
+                                        </div>
+                                    )}
                                 </div>
                             )}
 

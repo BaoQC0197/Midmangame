@@ -54,16 +54,19 @@ export const CATEGORY_STRUCTURE = [
     {
         id: 'game',
         label: 'Game',
+        icon: '/src/assets/categories/game.png',
         items: ['genshin', 'honkai_star_rail', 'zenless_zone_zero', 'wuthering_waves'] as CategoryKey[]
     },
     {
         id: 'social',
         label: 'Mạng xã hội',
+        icon: '/src/assets/categories/social.png',
         items: ['facebook', 'tiktok', 'youtube', 'instagram'] as CategoryKey[]
     },
     {
         id: 'entertainment',
-        label: 'Giải trí & Học tập',
+        label: 'Dịch vụ',
+        icon: '/src/assets/categories/service.png',
         items: ['netflix', 'spotify', 'coursera', 'premium_acc'] as CategoryKey[]
     }
 ];

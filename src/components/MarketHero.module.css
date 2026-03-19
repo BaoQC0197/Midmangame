@@ -1,7 +1,7 @@
 /* MarketHero.module.css */
 .hero {
     position: relative;
-    padding: 120px 0 120px;
+    padding: 120px 0 20px;
     overflow: hidden;
     background: var(--color-bg);
 }

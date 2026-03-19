@@ -155,6 +155,71 @@
 }
 
 /* Grid Selection */
+.searchBox {
+    position: sticky;
+    top: -32px; /* Pull into padding area */
+    z-index: 10;
+    margin-bottom: 24px;
+    background: var(--color-surface-1);
+    padding: 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.searchIcon {
+    position: absolute;
+    left: 12px;
+    color: var(--color-text-dim);
+    pointer-events: none;
+}
+
+.searchInput {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 10px 40px;
+    color: white;
+    font-size: 14px;
+    outline: none;
+    transition: var(--transition-smooth);
+}
+
+.searchInput:focus {
+    border-color: var(--color-primary);
+    background: rgba(168, 85, 247, 0.05);
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.1);
+}
+
+.clearSearch {
+    position: absolute;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-dim);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.clearSearch:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.noResults {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--color-text-dim);
+}
+
 .gridSelection {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -171,6 +236,7 @@
     gap: 16px;
     cursor: pointer;
     transition: var(--transition-smooth);
+    width: 100%;
 }
 
 .selectionCard:hover {
@@ -205,8 +271,37 @@
     background: var(--color-primary);
 }
 
-.cardIcon {
-    color: var(--color-secondary);
+.gameIconWrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.gameIcon {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gameName {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.loadingItems {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 60px 0;
+    color: var(--color-text-dim);
 }
 
 /* Forms */

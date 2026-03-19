@@ -27,18 +27,20 @@ CREATE POLICY "Allow authenticated delete" ON public.categories FOR DELETE USING
 -- Bật Realtime cho bảng categories
 ALTER PUBLICATION supabase_realtime ADD TABLE public.categories;
 
--- Insert initial data
-INSERT INTO public.categories (id, name, group_id, group_label, sort_order) VALUES
-('genshin', 'Genshin Impact', 'game', 'Game', 1),
-('honkai_star_rail', 'Honkai: Star Rail', 'game', 'Game', 2),
-('zenless_zone_zero', 'Zenless Zone Zero', 'game', 'Game', 3),
-('wuthering_waves', 'Wuthering Waves', 'game', 'Game', 4),
-('facebook', 'Facebook', 'social', 'Mạng xã hội', 5),
-('tiktok', 'Tiktok', 'social', 'Mạng xã hội', 6),
-('youtube', 'Youtube', 'social', 'Mạng xã hội', 7),
-('instagram', 'Instagram', 'social', 'Mạng xã hội', 8),
-('netflix', 'Netflix', 'entertainment', 'Giải trí & Học tập', 9),
-('spotify', 'Spotify', 'entertainment', 'Giải trí & Học tập', 10),
-('coursera', 'Coursera', 'entertainment', 'Giải trí & Học tập', 11),
-('premium_acc', 'Tài khoản Premium khác', 'entertainment', 'Giải trí & Học tập', 12)
-ON CONFLICT (id) DO NOTHING;
+-- Insert initial data with icon_url
+INSERT INTO public.categories (id, name, group_id, group_label, icon_url, sort_order) VALUES
+('genshin', 'Genshin Impact', 'game', 'Game', '/src/assets/categories/genshin.png', 1),
+('honkai_star_rail', 'Honkai: Star Rail', 'game', 'Game', '/src/assets/categories/honkai.png', 2),
+('zenless_zone_zero', 'Zenless Zone Zero', 'game', 'Game', '/src/assets/categories/game.png', 3),
+('wuthering_waves', 'Wuthering Waves', 'game', 'Game', '/src/assets/categories/game.png', 4),
+('facebook', 'Facebook', 'social', 'Mạng xã hội', '/src/assets/categories/social.png', 5),
+('tiktok', 'Tiktok', 'social', 'Mạng xã hội', '/src/assets/categories/social.png', 6),
+('youtube', 'Youtube', 'social', 'Mạng xã hội', '/src/assets/categories/social.png', 7),
+('instagram', 'Instagram', 'social', 'Mạng xã hội', '/src/assets/categories/social.png', 8),
+('netflix', 'Netflix', 'entertainment', 'Dịch vụ', '/src/assets/categories/service.png', 9),
+('spotify', 'Spotify', 'entertainment', 'Dịch vụ', '/src/assets/categories/service.png', 10),
+('coursera', 'Coursera', 'entertainment', 'Dịch vụ', '/src/assets/categories/service.png', 11),
+('premium_acc', 'Tài khoản Premium khác', 'entertainment', 'Dịch vụ', '/src/assets/categories/service.png', 12)
+ON CONFLICT (id) DO UPDATE SET 
+    icon_url = EXCLUDED.icon_url,
+    group_label = EXCLUDED.group_label;

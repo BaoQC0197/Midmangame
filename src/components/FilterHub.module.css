@@ -1,6 +1,6 @@
 /* FilterHub.module.css */
 .filterHub {
-    margin: 40px 0;
+    margin: 10px 0 40px;
     padding: 24px;
     background: var(--color-surface-1);
     border-radius: 20px;
@@ -15,7 +15,150 @@
     display: flex;
     align-items: center;
     gap: 20px;
+    flex-wrap: nowrap;
+}
+
+.categoryTabs {
+    display: flex;
+    gap: 12px;
     flex-wrap: wrap;
+    flex: 1;
+    position: relative;
+}
+
+.tabWrapper {
+    position: relative;
+}
+
+.categoryTab {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    color: var(--color-text-dim);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.categoryTab:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.categoryTab.active {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.1));
+    border-color: var(--color-primary);
+    color: var(--color-primary-light);
+    box-shadow: 0 8px 20px rgba(168, 85, 247, 0.2);
+}
+
+.tabIcon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.tabIcon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.3));
+}
+
+.categoryDropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    min-width: 280px;
+    background: #0f0c1a; /* Solid dark background */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 10px;
+    z-index: 1000;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(168, 85, 247, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 400px; /* Scrollable if many games */
+    overflow-y: auto;
+}
+
+/* Custom Scrollbar for Dropdown */
+.categoryDropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.categoryDropdown::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.categoryDropdown::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.categoryDropdown::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.dropdownItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    text-align: left;
+}
+
+.dropdownItem:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(4px);
+}
+
+.dropdownItem.active {
+    background: rgba(168, 85, 247, 0.1);
+    border-color: var(--color-primary);
+    color: var(--color-primary-light);
+}
+
+.dropdownIcon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.dropdownIcon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dropdownLabel {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff; /* Explicitly white for readability */
 }
 
 .filterLabel {
@@ -27,11 +170,26 @@
     letter-spacing: 0.05em;
 }
 
+.spacer {
+    flex: 1;
+}
+
+.typeWrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.typeGroup {
+    display: flex;
+    gap: 8px;
+}
+
 .filterGroups {
     display: flex;
     align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
+    gap: 20px;
+    flex-wrap: nowrap;
     flex: 1;
 }
 
@@ -45,9 +203,9 @@
     display: flex;
     align-items: center;
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
-    padding: 2px 12px;
+    padding: 0 12px;
+    height: 44px;
     transition: var(--transition-smooth);
 }
 
@@ -66,7 +224,8 @@
     background: transparent;
     border: none;
     color: white;
-    padding: 10px 8px;
+    padding: 0 8px;
+    height: 100%;
     font-size: 14px;
     outline: none;
     font-family: inherit;
@@ -170,11 +329,61 @@
     color: var(--color-primary);
 }
 
-.noResults {
-    padding: 15px;
-    text-align: center;
+.searchResults {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.searchResultItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
     color: var(--color-text-dim);
-    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+}
+
+.searchResultItem:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+.resultIcon {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+}
+
+.resultInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.resultLabel {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.resultCategory {
+    font-size: 11px;
+    color: var(--color-text-dim);
+    opacity: 0.7;
 }
 
 .dividerVertical {
@@ -202,7 +411,8 @@
     background: #1a1a2e; /* Fix white background issue */
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: white;
-    padding: 10px 16px;
+    padding: 0 16px;
+    height: 44px;
     border-radius: 12px;
     outline: none;
     cursor: pointer;
@@ -229,7 +439,8 @@
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
-    padding: 5px 12px;
+    padding: 0 12px;
+    height: 44px;
     color: var(--color-text-dim);
 }
 
@@ -238,6 +449,8 @@
     border: none;
     color: white;
     width: 100px;
+    height: 100%;
+    padding: 0 8px;
     font-size: 14px;
     outline: none;
 }

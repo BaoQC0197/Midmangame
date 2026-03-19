@@ -156,6 +156,10 @@ export default function MiddlemanHub({ open, onClose, accounts, showToast, onOpe
         return acc;
     }, {} as Record<string, { label: string, items: Category[] }>);
 
+    const getGameName = (id: string) => {
+        return categories.find(c => c.id === id)?.name || id;
+    };
+
     const handleUpdateSpinTurns = async (userId: string, turns: number) => {
         try {
             await updateSpinTurns(userId, turns);
@@ -233,9 +237,9 @@ export default function MiddlemanHub({ open, onClose, accounts, showToast, onOpe
                                     <div key={acc.id} className={styles.item}>
                                         <div className={styles.itemInfo}>
                                             <img src={acc.thumbnail} alt="" className={styles.itemThumb} />
-                                            <div>
+                                             <div>
                                                 <p className={styles.itemTitle}>{acc.title}</p>
-                                                <p className={styles.itemSub}>{acc.game} • {acc.server}</p>
+                                                <p className={styles.itemSub}>{getGameName(acc.game)} • {acc.server}</p>
                                                 <p className={styles.itemPrice}>{acc.price.toLocaleString()}đ</p>
                                             </div>
                                         </div>
@@ -465,9 +469,9 @@ export default function MiddlemanHub({ open, onClose, accounts, showToast, onOpe
                                     <div key={acc.id} className={styles.item} style={{ opacity: 0.7 }}>
                                         <div className={styles.itemInfo}>
                                             <img src={acc.thumbnail} alt="" className={styles.itemThumb} />
-                                            <div>
+                                             <div>
                                                 <p className={styles.itemTitle}>{acc.title} (Bị từ chối bán)</p>
-                                                <p className={styles.itemSub}>{acc.game} • {acc.price.toLocaleString()}đ</p>
+                                                <p className={styles.itemSub}>{getGameName(acc.game)} • {acc.price.toLocaleString()}đ</p>
                                             </div>
                                         </div>
                                     </div>
@@ -527,14 +531,20 @@ export default function MiddlemanHub({ open, onClose, accounts, showToast, onOpe
                                                             <button 
                                                                 className={styles.iconBtn} 
                                                                 style={{ background: 'transparent', border: 'none' }}
-                                                                onClick={() => setEditingCategory(cat)}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setEditingCategory(cat);
+                                                                }}
                                                             >
                                                                 <Edit size={14} />
                                                             </button>
                                                             <button 
                                                                 className={styles.iconBtn} 
                                                                 style={{ background: 'transparent', border: 'none', color: '#ef4444' }}
-                                                                onClick={() => handleDeleteCategory(cat.id)}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleDeleteCategory(cat.id);
+                                                                }}
                                                             >
                                                                 <Trash2 size={14} />
                                                             </button>

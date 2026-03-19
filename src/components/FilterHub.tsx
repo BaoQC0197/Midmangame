@@ -1,10 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, CheckCircle2, ChevronDown, Search, X, Banknote, ChevronRight } from 'lucide-react';
+import { Mail, CheckCircle2, ChevronDown, Search, X, Banknote } from 'lucide-react';
 import styles from './FilterHub.module.css';
-import { CATEGORY_LABELS, CATEGORY_STRUCTURE, CategoryKey } from '../types/account';
+import { Category } from '../api/categories';
 
 interface FilterHubProps {
+    categories: Category[];
     selectedGame: string;
     onSelectedGameChange: (val: string) => void;
     searchQuery: string;
@@ -22,6 +23,7 @@ interface FilterHubProps {
 }
 
 export default function FilterHub({
+    categories,
     selectedGame, onSelectedGameChange,
     searchQuery, onSearchChange,
     sortBy, onSortChange,
@@ -31,8 +33,35 @@ export default function FilterHub({
     maxPrice, onMaxPriceChange
 }: FilterHubProps) {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [hoveredGroupId, setHoveredGroupId] = useState<string | null>(null);
+    const [activeGroupId, setActiveGroupId] = useState<string | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+
+    // Group categories by group_id
+    const groupedCategories = useMemo(() => {
+        const groups: Record<string, { label: string; icon: string; items: Category[] }> = {};
+        categories.forEach(cat => {
+            if (!groups[cat.group_id]) {
+                groups[cat.group_id] = {
+                    label: cat.group_label,
+                    icon: cat.group_id === 'game' ? '/src/assets/categories/game.png' : 
+                          cat.group_id === 'social' ? '/src/assets/categories/social.png' : 
+                          '/src/assets/categories/service.png',
+                    items: []
+                };
+            }
+            groups[cat.group_id].items.push(cat);
+        });
+        return groups;
+    }, [categories]);
+
+    // Derive Searchable Labels
+    const categoryLabels = useMemo(() => {
+        const labels: Record<string, string> = {};
+        categories.forEach(cat => {
+            labels[cat.id] = cat.name;
+        });
+        return labels;
+    }, [categories]);
 
     const feeOptions = [
         { label: 'Tất cả', value: 'All' },
@@ -47,47 +76,128 @@ export default function FilterHub({
         { label: 'Giao Email', value: 'Email' },
     ];
 
-
-    // Clicks outside to close
+    // Clicks outside to close search dropdown or category dropdown
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
                 setMenuOpen(false);
+                setActiveGroupId(null);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleGroupClick = (groupId: string) => {
+    const handleTabClick = (groupId: string) => {
         if (groupId === 'All') {
             onSelectedGameChange('All');
             onSearchChange('');
-            setMenuOpen(false);
+            setActiveGroupId(null);
         } else {
-            // If Level 1 is clicked, we filter by that group (this needs support in App.tsx)
-            onSelectedGameChange(groupId);
-            onSearchChange('');
-            setMenuOpen(false);
+            // Toggle active group for expansion
+            if (activeGroupId === groupId) {
+                setActiveGroupId(null);
+            } else {
+                setActiveGroupId(groupId);
+                onSelectedGameChange(groupId);
+                onSearchChange('');
+            }
         }
     };
 
-    const handleSubCategoryClick = (key: CategoryKey) => {
-        onSelectedGameChange(key);
-        onSearchChange(CATEGORY_LABELS[key]);
-        setMenuOpen(false);
+    const handleItemClick = (categoryId: string, categoryName: string) => {
+        onSelectedGameChange(categoryId);
+        onSearchChange(categoryName);
+        // Maybe close expansion after selection? Or keep it.
     };
 
-    const currentGroup = CATEGORY_STRUCTURE.find(g => g.id === hoveredGroupId);
+    const getIcon = (cat: Category) => {
+        return cat.icon_url || groupedCategories[cat.group_id]?.icon || '/src/assets/categories/game.png';
+    };
+
+    // Filter subcategories for search results
+    const filteredSearchItems = searchQuery.length > 0 
+        ? Object.entries(categoryLabels).filter(([_, label]) => 
+            label.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+        : [];
 
     return (
-        <div className={styles.filterHub}>
-            {/* Hàng 1: Game & Search & Sắp xếp */}
+        <div className={styles.filterHub} ref={containerRef}>
+            {/* Hàng 0: Danh mục (Tab view with Dropdowns) */}
             <div className={styles.filterRow}>
-                <div className={styles.filterLabel}>Tìm Tài Khoản:</div>
+                <div className={styles.filterLabel}>Danh mục:</div>
+                <div className={styles.categoryTabs}>
+                    <button
+                        className={`${styles.categoryTab} ${selectedGame === 'All' ? styles.active : ''}`}
+                        onClick={() => handleTabClick('All')}
+                    >
+                        <div className={styles.tabIcon}>
+                            <ChevronDown size={14} />
+                        </div>
+                        <span>Tất cả</span>
+                    </button>
+
+                    {Object.entries(groupedCategories).map(([groupId, group]) => (
+                        <div key={groupId} className={styles.tabWrapper}>
+                            <button
+                                className={`${styles.categoryTab} ${activeGroupId === groupId || selectedGame === groupId || categories.find(c => c.id === selectedGame)?.group_id === groupId ? styles.active : ''}`}
+                                onClick={() => handleTabClick(groupId)}
+                            >
+                                <div className={styles.tabIcon}>
+                                    <img src={group.icon} alt={group.label} />
+                                </div>
+                                <span>{group.label}</span>
+                                <ChevronDown 
+                                    size={12} 
+                                    style={{ 
+                                        marginLeft: 4, 
+                                        opacity: 0.5, 
+                                        transform: activeGroupId === groupId ? 'rotate(180deg)' : 'none',
+                                        transition: 'transform 0.2s ease'
+                                    }} 
+                                />
+                            </button>
+
+                            <AnimatePresence>
+                                {activeGroupId === groupId && (
+                                    <motion.div
+                                        className={styles.categoryDropdown}
+                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        transition={{ duration: 0.2, ease: 'easeOut' }}
+                                    >
+                                        {group.items.map(item => (
+                                            <button
+                                                key={item.id}
+                                                className={`${styles.dropdownItem} ${selectedGame === item.id ? styles.active : ''}`}
+                                                onClick={() => {
+                                                    handleItemClick(item.id, item.name);
+                                                    setActiveGroupId(null); // Close dropdown after selection
+                                                }}
+                                            >
+                                                <div className={styles.dropdownIcon}>
+                                                    <img src={getIcon(item)} alt={item.name} />
+                                                </div>
+                                                <span className={styles.dropdownLabel}>{item.name}</span>
+                                            </button>
+                                        ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className={styles.divider} />
+
+            {/* Hàng 1: Tìm Tài Khoản & Giá & Sắp xếp */}
+            <div className={styles.filterRow}>
+                <div className={styles.filterLabel}>Tìm & Giá:</div>
                 <div className={styles.filterGroups}>
-                    {/* Game Searchable Selector */}
-                    <div className={styles.gameSelector} ref={containerRef}>
+                    <div className={styles.gameSelector}>
                         <div className={styles.searchWrapper}>
                             <Search size={16} className={styles.searchIconSide} />
                             <input
@@ -115,50 +225,44 @@ export default function FilterHub({
                         </div>
 
                         <AnimatePresence>
-                            {menuOpen && (
+                            {menuOpen && searchQuery.length > 0 && (
                                 <motion.div
                                     className={styles.gameDropdown}
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: 10 }}
-                                    onMouseLeave={() => setHoveredGroupId(null)}
                                 >
-                                    {/* Level 1: Main Groups */}
-                                    <div className={styles.level1Menu}>
-                                        <button
-                                            className={`${styles.gameOption} ${selectedGame === 'All' ? styles.active : ''}`}
-                                            onMouseEnter={() => setHoveredGroupId(null)}
-                                            onClick={() => handleGroupClick('All')}
-                                        >
-                                            Tất cả Danh mục
-                                        </button>
-                                        {CATEGORY_STRUCTURE.map(group => (
-                                            <button
-                                                key={group.id}
-                                                className={`${styles.gameOption} ${selectedGame === group.id ? styles.active : ''} ${hoveredGroupId === group.id ? styles.hovered : ''}`}
-                                                onMouseEnter={() => setHoveredGroupId(group.id)}
-                                                onClick={() => handleGroupClick(group.id)}
-                                            >
-                                                <span>{group.label}</span>
-                                                <ChevronRight size={14} opacity={0.5} />
-                                            </button>
-                                        ))}
+                                    <div className={styles.searchResults}>
+                                        {filteredSearchItems.length > 0 ? (
+                                            filteredSearchItems.map(([key, label]) => {
+                                                const cat = categories.find(c => c.id === key);
+                                                return (
+                                                    <button
+                                                        key={key}
+                                                        className={styles.searchResultItem}
+                                                        onClick={() => {
+                                                            handleItemClick(key, label);
+                                                            setMenuOpen(false);
+                                                        }}
+                                                    >
+                                                        <div className={styles.resultIcon}>
+                                                            <img src={cat ? getIcon(cat) : '/src/assets/categories/game.png'} alt="" style={{ width: '100%', height: '100%', borderRadius: 6, objectFit: 'cover' }} />
+                                                        </div>
+                                                        <div className={styles.resultInfo}>
+                                                            <div className={styles.resultLabel}>{label}</div>
+                                                            <div className={styles.resultCategory}>
+                                                                {cat?.group_label}
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                );
+                                            })
+                                        ) : searchQuery.length > 0 && (
+                                            <div className={styles.noResults}>
+                                                Không tìm thấy kết quả
+                                            </div>
+                                        )}
                                     </div>
-
-                                    {/* Level 2: Subcategories (shown for hovered group) */}
-                                    {hoveredGroupId && currentGroup && (
-                                        <div className={styles.level2Menu}>
-                                            {currentGroup.items.map((key) => (
-                                                <button
-                                                    key={key}
-                                                    className={`${styles.gameOption} ${selectedGame === key ? styles.active : ''}`}
-                                                    onClick={() => handleSubCategoryClick(key)}
-                                                >
-                                                    {CATEGORY_LABELS[key]}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
                                 </motion.div>
                             )}
                         </AnimatePresence>
@@ -166,45 +270,8 @@ export default function FilterHub({
 
                     <div className={styles.dividerVertical} />
 
-                    <div className={styles.sortWrapper}>
-                        <div className={styles.filterLabelSmall}>Sắp xếp:</div>
-                        <select
-                            className={styles.sortSelect}
-                            value={sortBy}
-                            onChange={(e) => onSortChange(e.target.value)}
-                        >
-                            <option value="newest">Bài đăng mới nhất</option>
-                            <option value="price_asc">Giá giảm dần</option>
-                            <option value="price_desc">Giá tăng dần</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div className={styles.divider} />
-
-            {/* Hàng 2: Phí trung gian & Khoảng giá */}
-            <div className={styles.filterRow}>
-                <div className={styles.filterLabel}>Phí trung gian:</div>
-                <div className={styles.filterGroups}>
-                    <div className={styles.feeWrapper}>
-                        <div className={styles.feeGroup}>
-                            {feeOptions.map(opt => (
-                                <button
-                                    key={opt.value}
-                                    className={`${styles.filterChip} ${feePayer === opt.value ? styles.active : ''}`}
-                                    onClick={() => onFeePayerChange(opt.value)}
-                                >
-                                    {opt.label}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className={styles.dividerVertical} />
-
                     <div className={styles.priceInputs}>
-                        <div className={styles.filterLabelSmall}>Khoảng giá:</div>
+                        <div className={styles.filterLabelSmall}>Giá:</div>
                         <div className={styles.priceInputWrapper}>
                             <Banknote size={14} />
                             <input
@@ -225,25 +292,61 @@ export default function FilterHub({
                             />
                         </div>
                     </div>
+
+                    <div className={styles.dividerVertical} />
+
+                    <div className={styles.sortWrapper}>
+                        <div className={styles.filterLabelSmall}>Sắp xếp:</div>
+                        <select
+                            className={styles.sortSelect}
+                            value={sortBy}
+                            onChange={(e) => onSortChange(e.target.value)}
+                        >
+                            <option value="price_asc">Giá tăng dần</option>
+                            <option value="price_desc">Giá giảm dần</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
             <div className={styles.divider} />
 
-            {/* Hàng 3: Loại tài khoản */}
+            {/* Hàng 2: Loại & Phí */}
             <div className={styles.filterRow}>
-                <div className={styles.filterLabel}>Loại tài khoản:</div>
+                <div className={styles.filterLabel}>Phí & Loại:</div>
                 <div className={styles.filterGroups}>
-                    {typeOptions.map(opt => (
-                        <button
-                            key={opt.value}
-                            className={`${styles.filterChip} ${accType === opt.value ? styles.active : ''}`}
-                            onClick={() => onAccTypeChange(opt.value)}
-                        >
-                            {opt.value === 'Email' ? <Mail size={14} /> : <CheckCircle2 size={14} />}
-                            {opt.label}
-                        </button>
-                    ))}
+                    <div className={styles.typeWrapper}>
+                        <div className={styles.filterLabelSmall}>Loại:</div>
+                        <div className={styles.typeGroup}>
+                            {typeOptions.map(opt => (
+                                <button
+                                    key={opt.value}
+                                    className={`${styles.filterChip} ${accType === opt.value ? styles.active : ''}`}
+                                    onClick={() => onAccTypeChange(opt.value)}
+                                >
+                                    {opt.value === 'Email' ? <Mail size={14} /> : <CheckCircle2 size={14} />}
+                                    {opt.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className={styles.dividerVertical} />
+
+                    <div className={styles.feeWrapper}>
+                        <div className={styles.filterLabelSmall}>Phí:</div>
+                        <div className={styles.feeGroup}>
+                            {feeOptions.map(opt => (
+                                <button
+                                    key={opt.value}
+                                    className={`${styles.filterChip} ${feePayer === opt.value ? styles.active : ''}`}
+                                    onClick={() => onFeePayerChange(opt.value)}
+                                >
+                                    {opt.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

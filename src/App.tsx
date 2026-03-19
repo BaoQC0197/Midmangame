@@ -5,6 +5,7 @@ import { ShieldCheck, Zap, TrendingUp } from 'lucide-react';
 
 import { getAccounts, addAccount } from './api/accounts';
 import { uploadImages } from './api/storage';
+import { getCategories } from './api/categories';
 import { supabase, ADMIN_EMAIL } from './lib/supabase';
 
 // UI Components
@@ -30,7 +31,7 @@ import styles from './App.module.css';
 import { getProfile } from './api/profiles';
 
 // Types
-import { CATEGORY_STRUCTURE, CategoryKey } from './types/account';
+
 
 export default function App() {
     const queryClient = useQueryClient();
@@ -40,7 +41,7 @@ export default function App() {
     const [sellModalOpen, setSellModalOpen] = useState(false);
     const [isSubmittingTicket, setIsSubmittingTicket] = useState(false);
     const [selectedGame, setSelectedGame] = useState<string>('All');
-    const [sortBy, setSortBy] = useState<string>('newest');
+    const [sortBy, setSortBy] = useState<string>('price_asc');
     const [feePayerFilter, setFeePayerFilter] = useState<string>('All');
     const [accTypeFilter, setAccTypeFilter] = useState<string>('All');
     const [minPrice, setMinPrice] = useState<string>('');
@@ -60,9 +61,14 @@ export default function App() {
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' as ToastType });
 
     // --- DATA FETCHING ---
-    const { data: accounts = [], isLoading } = useQuery({
+    const { data: accounts = [], isLoading: isLoadingAccounts } = useQuery({
         queryKey: ['accounts'],
         queryFn: getAccounts,
+    });
+
+    const { data: categories = [] } = useQuery({
+        queryKey: ['categories'],
+        queryFn: getCategories,
     });
 
     const showToast = (message: string, type: ToastType = 'success') => {
@@ -225,15 +231,22 @@ export default function App() {
         return ['All', ...uniqueGames];
     }, [accounts]); */
 
+    const categoryMap = useMemo(() => {
+        const map: Record<string, string> = {};
+        categories.forEach(c => { map[c.id] = c.name; });
+        return map;
+    }, [categories]);
+
     const filteredAccounts = useMemo(() => {
         let base = accounts.filter(acc => {
+            const gameName = categoryMap[acc.game] || acc.game; // Fallback to ID if not found
             const matchesSearch = !searchQuery ||
                 acc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                acc.game.toLowerCase().includes(searchQuery.toLowerCase());
+                gameName.toLowerCase().includes(searchQuery.toLowerCase());
 
             const matchesGame = selectedGame === 'All' ||
                 acc.game === selectedGame ||
-                (CATEGORY_STRUCTURE.find(g => g.id === selectedGame)?.items.includes(acc.game as CategoryKey));
+                categories.filter(c => c.group_id === selectedGame).some(c => c.id === acc.game);
 
             // Fee Payer Filter
             const matchesFee = feePayerFilter === 'All' || acc.fee_payer === feePayerFilter;
@@ -313,6 +326,7 @@ export default function App() {
 
             <main id="product-list" className="container">
                 <FilterHub
+                    categories={categories}
                     selectedGame={selectedGame}
                     onSelectedGameChange={setSelectedGame}
                     searchQuery={searchQuery}
@@ -329,7 +343,7 @@ export default function App() {
                     onMaxPriceChange={setMaxPrice}
                 />
 
-                {isLoading ? (
+                {isLoadingAccounts ? (
                     <div className={styles.loadingState}>
                         <div className="spinner" />
                         <p>Đang quét dữ liệu sàn giao dịch...</p>

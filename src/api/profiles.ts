@@ -11,6 +11,7 @@ export interface UserProfile {
     facebook_url?: string;
     rating?: number;
     is_active_midman?: boolean;
+    full_name?: string;
 }
 
 export interface MidmanApplication {
@@ -171,6 +172,7 @@ export async function approveMidmanApplication(appId: string, userId: string) {
             .update({ 
                 role: 'midman',
                 is_active_midman: true,
+                full_name: appData.full_name, // Sync full_name here!
                 cccd: appData.cccd,
                 facebook_url: appData.facebook_url
             })

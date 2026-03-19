@@ -4,10 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import {
     getTicketMessages,
-    sendMessage,
+    sendTicketMessage,
     subscribeToTicketMessages,
     type ChatMessage,
 } from '../api/chat';
+import { MessageRole } from '../types/chat';
 import { updateTicketStatus } from '../api/tickets';
 import styles from './TicketChatRoom.module.css';
 
@@ -58,20 +59,43 @@ export default function TicketChatRoom({ ticket, onClose, onTicketUpdate }: Tick
 
     // Xác định userId hiện tại và role trong phiên này
     useEffect(() => {
-        supabase.auth.getUser().then(({ data: { user } }) => {
+        supabase.auth.getUser().then(async ({ data: { user } }) => {
             if (!user) return;
             setCurrentUserId(user.id);
 
-            let role: ChatMessage['sender_role'] = 'buyer';
-            if (user.id === ticket.midman_id) role = 'midman';
-            else if (user.id === ticket.seller_user_id) role = 'seller';
+            // 1. Fetch profile
+            const { data: profile } = await supabase.from('profiles').select('full_name, role').eq('id', user.id).maybeSingle();
+
+            // 2. Determine Role
+            let role: MessageRole = 'system';
+            
+            // Nếu là Admin thì luôn là Midman
+            if (user.email === 'admin@easytrade.com' || profile?.role === 'admin') {
+                role = 'midman';
+            } 
+            // Nếu là Midman được gắn cho ticket này hoặc có role hệ thống là midman
+            else if (user.id === ticket.midman_id || profile?.role === 'midman') {
+                role = 'midman';
+            }
+            // Nếu là Buyer của ticket
+            else if (user.id === ticket.buyer_user_id) {
+                role = 'buyer';
+            }
+            // Nếu là Seller của ticket
+            else if (user.id === ticket.seller_user_id) {
+                role = 'seller';
+            }
+
             setCurrentRole(role);
 
-            // Lấy tên hiển thị
-            supabase.from('profiles').select('full_name').eq('id', user.id).single()
-                .then(({ data }) => {
-                    setCurrentName(data?.full_name || ROLE_LABELS[role] || 'Người dùng');
-                });
+            // 3. Determine Name
+            let name = profile?.full_name;
+            if (!name && (profile?.role === 'midman' || profile?.role === 'admin')) {
+                const { data: app } = await supabase.from('midman_applications').select('full_name').eq('user_id', user.id).eq('status', 'approved').maybeSingle();
+                if (app?.full_name) name = app.full_name;
+            }
+
+            setCurrentName(name || ROLE_LABELS[role] || 'Người dùng');
         });
     }, [ticket]);
 
@@ -106,11 +130,11 @@ export default function TicketChatRoom({ ticket, onClose, onTicketUpdate }: Tick
         if (!input.trim() || sending) return;
         setSending(true);
         try {
-            await sendMessage({
-                ticketId: ticket.id,
-                senderId: currentUserId,
-                senderRole: currentRole,
-                senderName: currentName,
+            await sendTicketMessage({
+                ticket_id: ticket.id,
+                sender_id: currentUserId || '',
+                sender_role: currentRole,
+                sender_name: currentName,
                 message: input.trim(),
             });
             setInput('');
@@ -131,11 +155,11 @@ export default function TicketChatRoom({ ticket, onClose, onTicketUpdate }: Tick
     const handleComplete = async () => {
         if (!confirm('Xác nhận hoàn thành giao dịch? Midman sẽ nhận 60% hoa hồng.')) return;
         // Gửi thông báo hệ thống vào phòng chat
-        await sendMessage({
-            ticketId: ticket.id,
-            senderId: null,
-            senderRole: 'system',
-            senderName: 'Hệ thống EasyTrade',
+        await sendTicketMessage({
+            ticket_id: ticket.id,
+            sender_id: '',
+            sender_role: 'system',
+            sender_name: 'Hệ thống EasyTrade',
             message: '✅ Giao dịch đã được Midman xác nhận hoàn thành. Cảm ơn các bên đã tin tưởng EasyTrade!',
         });
         await updateTicketStatus(ticket.id, 'completed');
@@ -145,11 +169,11 @@ export default function TicketChatRoom({ ticket, onClose, onTicketUpdate }: Tick
 
     const handleCancel = async () => {
         if (!confirm('Bạn chắc chắn muốn hủy giao dịch này?')) return;
-        await sendMessage({
-            ticketId: ticket.id,
-            senderId: null,
-            senderRole: 'system',
-            senderName: 'Hệ thống EasyTrade',
+        await sendTicketMessage({
+            ticket_id: ticket.id,
+            sender_id: '',
+            sender_role: 'system',
+            sender_name: 'Hệ thống EasyTrade',
             message: '❌ Giao dịch đã bị hủy bởi Midman.',
         });
         await updateTicketStatus(ticket.id, 'cancelled');

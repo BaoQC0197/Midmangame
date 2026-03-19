@@ -5,21 +5,20 @@ import {
 import { TICKET_STATUS_LABELS, TICKET_STATUS_COLORS } from '../types/ticket';
 import type { TransactionTicket } from '../types/ticket';
 import { getTickets, updateTicketStatus } from '../api/tickets';
-import TicketChatRoom from './TicketChatRoom';
 import styles from './MiddlemanHub.module.css';
 
 interface MidmanPanelProps {
     open: boolean;
     onClose: () => void;
     showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
+    onOpenTradeRoom?: (ticket: TransactionTicket) => void;
 }
 
 type Tab = 'dashboard' | 'buy_requests' | 'trading';
 
-export default function MidmanPanel({ open, onClose, showToast }: MidmanPanelProps) {
+export default function MidmanPanel({ open, onClose, showToast, onOpenTradeRoom }: MidmanPanelProps) {
     const [activeTab, setActiveTab] = useState<Tab>('dashboard');
     const [tickets, setTickets] = useState<TransactionTicket[]>([]);
-    const [selectedChatTicket, setSelectedChatTicket] = useState<TransactionTicket | null>(null);
 
     const loadTickets = useCallback(async () => {
         try {
@@ -147,7 +146,7 @@ export default function MidmanPanel({ open, onClose, showToast }: MidmanPanelPro
                                             <button 
                                                 className={styles.actionBtn} 
                                                 style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)' }}
-                                                onClick={() => setSelectedChatTicket(ticket)}
+                                                onClick={() => onOpenTradeRoom?.(ticket)}
                                             >
                                                 Vào Chat 3 Bên
                                             </button>
@@ -176,14 +175,6 @@ export default function MidmanPanel({ open, onClose, showToast }: MidmanPanelPro
                     </div>
                 </div>
             </div>
-
-            {selectedChatTicket && (
-                <TicketChatRoom 
-                    ticket={selectedChatTicket} 
-                    onClose={() => setSelectedChatTicket(null)}
-                    onTicketUpdate={loadTickets}
-                />
-            )}
         </>
     );
 }

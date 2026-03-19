@@ -45,6 +45,7 @@ export interface TransactionTicket {
     seller_contact?: string;
     seller_phone?: string;
     seller_user_id?: string;
+    midman_id?: string;
     // Giao dịch
     price: number;
     fee: number;

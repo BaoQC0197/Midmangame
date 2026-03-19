@@ -1,4 +1,4 @@
-import { Video, ExternalLink } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import type { TransactionTicket } from '../types/ticket';
 import styles from './TradeRoomBanner.module.css';
 
@@ -7,7 +7,8 @@ interface TradeRoomBannerProps {
 }
 
 export default function TradeRoomBanner({ ticket }: TradeRoomBannerProps) {
-    if (!ticket.room_url) return null;
+    // Luôn hiển thị nếu có ticket, vì Jitsi room_url có thể không còn cần thiết
+    if (!ticket) return null;
 
     return (
         <div className={styles.banner}>
@@ -26,18 +27,13 @@ export default function TradeRoomBanner({ ticket }: TradeRoomBannerProps) {
                             Mã: #{ticket.id.slice(0, 8).toUpperCase()}
                         </div>
                     </div>
-                    <a
-                        href={ticket.room_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={styles.joinBtn}
-                    >
-                        <Video size={15} />
-                        Tham gia phòng
-                        <ExternalLink size={12} />
-                    </a>
+                    <div className={styles.joinBtn}>
+                        <MessageSquare size={15} />
+                        Vào phòng chat
+                    </div>
                 </div>
             </div>
         </div>
     );
 }
+

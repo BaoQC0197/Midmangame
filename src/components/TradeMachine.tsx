@@ -8,17 +8,23 @@ interface TradeMachineProps {
 }
 
 export default function TradeMachine({ checklist, statusLabel = 'Giao dịch đang diễn ra' }: TradeMachineProps) {
-    const sExported = !!checklist?.seller_exported;
-    const sVerified = !!checklist?.seller_verified;
-    const bExported = !!checklist?.buyer_exported;
-    const bVerified = !!checklist?.buyer_verified;
+    // Map checklist items to ball presence
+    const sExported = !!checklist?.seller_delivered;
+    const sVerified = !!checklist?.identity_verified;
+    const bExported = !!checklist?.buyer_paid;
+    const bVerified = !!checklist?.buyer_confirmed;
+    
+    // Final state
+    const isCompleted = !!checklist?.seller_received_payment;
 
     return (
         <div className={styles.machineContainer}>
             {/* LCD Header */}
             <div className={styles.lcdScreen}>
                 <div className={styles.lcdTitle}>Global Trade Machine GTI-300</div>
-                <div className={styles.lcdStatus}>{statusLabel}</div>
+                <div className={`${styles.lcdStatus} ${isCompleted ? styles.completed : ''}`}>
+                    {isCompleted ? 'GIAO DỊCH HOÀN TẤT' : statusLabel}
+                </div>
             </div>
 
             {/* Trading Slots Area */}
@@ -75,8 +81,8 @@ export default function TradeMachine({ checklist, statusLabel = 'Giao dịch đa
             </div>
             
             {/* Base Deco */}
-            <div style={{ textAlign: 'center', marginTop: 10, fontSize: 10, opacity: 0.3, letterSpacing: 4 }}>
-                SECURE EXCHANGE PROTOCOL v2.4
+            <div className={styles.footerDeco}>
+                SECURE EXCHANGE PROTOCOL v2.4 • POKEBALL TRADING SYSTEM
             </div>
         </div>
     );

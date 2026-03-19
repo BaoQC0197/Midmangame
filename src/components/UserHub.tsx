@@ -3,18 +3,19 @@ import styles from './UserHub.module.css';
 import { getUserAccounts } from '../api/accounts';
 import { getUserBuyRequests, getMidmanCompletedTickets, getMidmanPendingRequests, updateTicketStatus } from '../api/tickets';
 import { getProfile } from '../api/profiles';
-import TicketChatRoom from './TicketChatRoom';
 import SpinWheel from './SpinWheel';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { TransactionTicket } from '../types/ticket';
 
 interface UserHubProps {
     open: boolean;
     onClose: () => void;
     userId: string;
+    onOpenTradeRoom?: (ticket: TransactionTicket) => void;
 }
 
-export default function UserHub({ open, onClose, userId }: UserHubProps) {
+export default function UserHub({ open, onClose, userId, onOpenTradeRoom }: UserHubProps) {
     const [activeTab, setActiveTab] = useState<'listings' | 'buys' | 'midman_history' | 'midman_pending'>('listings');
     const [accounts, setAccounts] = useState<any[]>([]);
     const [buyRequests, setBuyRequests] = useState<any[]>([]);
@@ -22,7 +23,6 @@ export default function UserHub({ open, onClose, userId }: UserHubProps) {
     const [midmanPending, setMidmanPending] = useState<any[]>([]);
     const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [selectedChatTicket, setSelectedChatTicket] = useState<any | null>(null);
     
     // Spin state
     const [selectedAccountForSpin, setSelectedAccountForSpin] = useState<any>(null);
@@ -202,27 +202,27 @@ export default function UserHub({ open, onClose, userId }: UserHubProps) {
                                                         </button>
                                                     )}
                                                     {ticket.status === 'trading' && (
-                                                        <>
-                                                            <button 
-                                                                className="btn-action"
-                                                                style={{ padding: '8px', fontSize: 12, background: 'rgba(52, 211, 153, 0.1)', color: 'var(--color-success)' }}
-                                                                onClick={() => setSelectedChatTicket(ticket)}
-                                                            >
-                                                                Vào Chat 3 Bên
-                                                            </button>
-                                                            <button 
-                                                                className="btn-premium"
-                                                                style={{ padding: '8px', fontSize: 12, background: 'var(--color-success)', color: 'black' }}
-                                                                onClick={async () => {
-                                                                    if (confirm('Xác nhận hoàn thành giao dịch này? Bạn sẽ nhận 60% Hoa hồng vào Lịch sử.')) {
-                                                                        await updateTicketStatus(ticket.id, 'completed');
-                                                                        refreshData();
-                                                                    }
-                                                                }}
-                                                            >
-                                                                Chốt Thành Công
-                                                            </button>
-                                                        </>
+                                                        <button 
+                                                            className="btn-action"
+                                                            style={{ padding: '8px', fontSize: 12, background: 'rgba(52, 211, 153, 0.1)', color: 'var(--color-success)' }}
+                                                            onClick={() => onOpenTradeRoom?.(ticket)}
+                                                        >
+                                                            Vào Chat 3 Bên
+                                                        </button>
+                                                    )}
+                                                    {ticket.status === 'trading' && (
+                                                        <button 
+                                                            className="btn-premium"
+                                                            style={{ padding: '8px', fontSize: 12, background: 'var(--color-success)', color: 'black' }}
+                                                            onClick={async () => {
+                                                                if (confirm('Xác nhận hoàn thành giao dịch này? Bạn sẽ nhận 60% Hoa hồng vào Lịch sử.')) {
+                                                                    await updateTicketStatus(ticket.id, 'completed');
+                                                                    refreshData();
+                                                                }
+                                                            }}
+                                                        >
+                                                            Chốt Thành Công
+                                                        </button>
                                                     )}
                                                     <button 
                                                         style={{ padding: '8px', fontSize: 12, border: 'none', background: 'transparent', color: 'var(--color-danger)', cursor: 'pointer' }}
@@ -332,7 +332,7 @@ export default function UserHub({ open, onClose, userId }: UserHubProps) {
                                                     <button 
                                                         className="btn-action" 
                                                         style={{ padding: '8px 12px', fontSize: 12, border: 'none', background: 'var(--color-primary)', color: 'white', borderRadius: 8, cursor: 'pointer' }}
-                                                        onClick={() => setSelectedChatTicket(ticket)}
+                                                        onClick={() => onOpenTradeRoom?.(ticket)}
                                                     >
                                                         VÀO PHÒNG CHAT
                                                     </button>
@@ -363,14 +363,6 @@ export default function UserHub({ open, onClose, userId }: UserHubProps) {
                     />
                 )}
             </AnimatePresence>
-
-            {selectedChatTicket && (
-                <TicketChatRoom 
-                    ticket={selectedChatTicket}
-                    onClose={() => setSelectedChatTicket(null)}
-                    onTicketUpdate={refreshData}
-                />
-            )}
         </>
     );
 }

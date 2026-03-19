@@ -12,12 +12,12 @@ import MarketHeader from './components/MarketHeader';
 import MarketHero from './components/MarketHero';
 import MarketAccountCard from './components/MarketAccountCard';
 import FilterHub from './components/FilterHub';
-import MiddlemanHub from './components/MiddlemanHub';
 import SellAccountModal from './components/SellAccountModal';
 import WelcomePopup from './components/WelcomePopup';
 import BuyRequestModal from './components/BuyRequestModal';
 import AccountDetailModal from './components/AccountDetailModal';
 import TradeRoomBanner from './components/TradeRoomBanner';
+import type { TransactionTicket } from './types/ticket';
 import TradeRoomView from './components/TradeRoomView';
 import Toast, { type ToastType } from './components/Toast';
 import UserHub from './components/UserHub';
@@ -290,6 +290,7 @@ export default function App() {
                 onUserHubOpen={() => setUserHubOpen(true)}
                 onUserProfileOpen={() => setUserProfileOpen(true)}
                 onOpenApplyMidman={() => setApplyMidmanOpen(true)}
+                onOpenTradeRoom={() => setShowTradeRoom(true)}
             />
             {userProfile?.role === 'midman' && (
                 <div style={{ position: 'fixed', bottom: 20, left: 20, zIndex: 1000 }}>
@@ -364,6 +365,8 @@ export default function App() {
                     {showTradeRoom && activeTradeTicket && (
                         <TradeRoomView
                             ticket={activeTradeTicket}
+                            user={user}
+                            userProfile={userProfile}
                             onClose={() => setShowTradeRoom(false)}
                         />
                     )}
@@ -404,11 +407,15 @@ export default function App() {
             </main>
 
             {isAdmin && (
-                <MiddlemanHub
+                <MidmanPanel
                     open={adminPanelOpen}
                     onClose={() => setAdminPanelOpen(false)}
-                    accounts={accounts}
                     showToast={showToast}
+                    onOpenTradeRoom={(t: TransactionTicket) => {
+                        setActiveTradeTicket(t);
+                        setShowTradeRoom(true);
+                        setAdminPanelOpen(false);
+                    }}
                 />
             )}
 
@@ -441,6 +448,11 @@ export default function App() {
                     open={userHubOpen}
                     onClose={() => setUserHubOpen(false)}
                     userId={user.id}
+                    onOpenTradeRoom={(t: TransactionTicket) => {
+                        setActiveTradeTicket(t);
+                        setShowTradeRoom(true);
+                        setUserHubOpen(false);
+                    }}
                 />
             )}
 
@@ -590,16 +602,18 @@ function QuickJoinModal() {
                             Bạn đang được mời tham gia phòng giao dịch trung gian cho tài khoản:
                             <br /><b style={{ color: 'white' }}>{ticket.trade_accounts?.name}</b>
                         </p>
-                        <a
-                            href={ticket.room_url}
-                            target="_blank"
-                            rel="noreferrer"
+                        <button
                             className="btn-premium"
                             style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: 8, alignItems: 'center' }}
-                            onClick={() => setShow(false)}
+                            onClick={() => {
+                                setShow(false);
+                                window.history.pushState({}, '', '/');
+                                // Force reload or just let the banner handle it if they are logged in.
+                                window.location.reload(); 
+                            }}
                         >
-                            Vào phòng ngay
-                        </a>
+                            Vào phòng chat ngay
+                        </button>
                     </>
                 ) : (
                     <p style={{ color: '#ef4444' }}>Phòng giao dịch này không tồn tại hoặc đã kết thúc.</p>

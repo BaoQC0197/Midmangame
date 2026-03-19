@@ -375,10 +375,17 @@ export default function MiddlemanHub({ open, onClose, accounts, showToast }: Mid
                                             <button 
                                                 className={styles.actionBtn} 
                                                 style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)' }}
-                                                onClick={() => ticket.room_url && window.open(ticket.room_url, '_blank')}
+                                                onClick={() => {
+                                                    // For Admin, we still might want to provide the Jitsi link if it exists,
+                                                    // but the primary interaction should be internal.
+                                                    // Since this is the Admin panel, they can just use the internal room banner.
+                                                    // I'll leave this as is if they still want Jitsi, OR change label.
+                                                    if (ticket.room_url) window.open(ticket.room_url, '_blank')
+                                                }}
                                             >
-                                                Vào Room
+                                                Jitsi Room
                                             </button>
+
                                             <button 
                                                 className={styles.deleteBtn}
                                                 onClick={async () => {

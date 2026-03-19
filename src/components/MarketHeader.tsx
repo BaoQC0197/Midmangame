@@ -16,9 +16,10 @@ interface MarketHeaderProps {
     onUserHubOpen: () => void;
     onUserProfileOpen: () => void;
     onOpenApplyMidman: () => void;
+    onOpenTradeRoom?: () => void;
 }
 
-export default function MarketHeader({ isAdmin, isLoggedIn, currentUserPhone, activeTicket, onLogin, onLogout, onAdminPanelOpen, onUserHubOpen, onUserProfileOpen, onOpenApplyMidman }: MarketHeaderProps) {
+export default function MarketHeader({ isAdmin, isLoggedIn, currentUserPhone, activeTicket, onLogin, onLogout, onAdminPanelOpen, onUserHubOpen, onUserProfileOpen, onOpenApplyMidman, onOpenTradeRoom }: MarketHeaderProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -131,17 +132,16 @@ export default function MarketHeader({ isAdmin, isLoggedIn, currentUserPhone, ac
                                         <ShoppingBag size={20} />
                                     </button>
                                     {activeTicket && (
-                                        <motion.a
-                                            href={activeTicket.room_url}
-                                            target="_blank"
-                                            rel="noreferrer"
+                                        <motion.button
+                                            onClick={onOpenTradeRoom}
                                             className={styles.liveSessionBtn}
+                                            style={{ border: 'none', cursor: 'pointer' }}
                                             animate={{ opacity: [1, 0.5, 1], scale: [1, 1.05, 1] }}
                                             transition={{ duration: 1.5, repeat: Infinity }}
                                         >
                                             <div className={styles.liveDot} />
                                             <span>Phòng GD</span>
-                                        </motion.a>
+                                        </motion.button>
                                     )}
                                     <button className={styles.btnAction} onClick={() => setShowLogoutConfirm(true)} title="Đăng xuất">
                                         <LogOut size={20} />
@@ -222,8 +222,8 @@ export default function MarketHeader({ isAdmin, isLoggedIn, currentUserPhone, ac
                                         <div className={styles.step}>
                                             <div className={styles.stepNum}>3</div>
                                             <div className={styles.stepInfo}>
-                                                <strong>Giao dịch trực tiếp (Video Call)</strong>
-                                                <p>Ba bên tham gia phòng Jitsi. Admin giám sát quá trình đổi thông tin tài khoản.</p>
+                                                <strong>Giao dịch trực tiếp (Chat 3 bên)</strong>
+                                                <p>Ba bên tham gia phòng chat nội bộ. Admin giám sát quá trình đổi thông tin tài khoản.</p>
                                             </div>
                                         </div>
                                         <div className={styles.step}>

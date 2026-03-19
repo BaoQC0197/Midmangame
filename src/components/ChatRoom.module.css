@@ -1,0 +1,146 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.messageList {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.messageRow {
+    display: flex;
+    flex-direction: column;
+    max-width: 80%;
+}
+
+.messageRowSelf {
+    align-self: flex-end;
+}
+
+.messageRowOther {
+    align-self: flex-start;
+}
+
+.senderInfo {
+    font-size: 11px;
+    color: var(--color-text-dim);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.roleBadge {
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 9px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.roleBuyer { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+.roleSeller { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+.roleMidman { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+.roleSystem { background: rgba(107, 114, 128, 0.2); color: #9ca3af; width: 100%; text-align: center; justify-content: center; }
+
+.messageBubble {
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.5;
+    word-break: break-word;
+    position: relative;
+}
+
+.bubbleSelf {
+    background: var(--color-primary);
+    color: white;
+    border-bottom-right-radius: 2px;
+}
+
+.bubbleOther {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--color-text);
+    border-bottom-left-radius: 2px;
+}
+
+.bubbleSystem {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--color-text-dim);
+    font-style: italic;
+    font-size: 12px;
+    text-align: center;
+    max-width: 100%;
+    align-self: center;
+}
+
+.timestamp {
+    font-size: 9px;
+    opacity: 0.5;
+    margin-top: 4px;
+    align-self: flex-end;
+}
+
+/* Input Area */
+.inputArea {
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 10px 16px;
+    color: white;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.input:focus {
+    border-color: var(--color-primary);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.sendBtn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.sendBtn:hover {
+    transform: scale(1.05);
+    background: var(--color-primary-dark);
+}
+
+.sendBtn:active {
+    transform: scale(0.95);
+}
+
+.sendBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

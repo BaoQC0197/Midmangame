@@ -273,3 +273,20 @@ export async function getMidmanProfileAndReviews(midmanId: string) {
         return null;
     }
 }
+
+export async function checkPhoneExists(phone: string): Promise<boolean> {
+    if (!phone) return false;
+    const email = `${phone}@easytrade.com`;
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', email)
+        .maybeSingle();
+    
+    if (error) {
+        console.error('Error checking phone exists:', error);
+        return false;
+    }
+    return !!data;
+}
+

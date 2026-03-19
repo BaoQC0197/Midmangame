@@ -13,6 +13,8 @@ import {
     Search
 } from 'lucide-react';
 import { getCategories, Category } from '../api/categories';
+import { formatVND, parseVND, formatPhone } from '../lib/utils';
+import { checkPhoneExists } from '../api/profiles';
 import styles from './SellAccountModal.module.css';
 
 interface SellAccountModalProps {
@@ -38,6 +40,8 @@ export default function SellAccountModal({ open, onClose, onSubmit, isSubmitting
     const [currentStep, setCurrentStep] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
     const [categories, setCategories] = useState<Category[]>([]);
+    const [phoneError, setPhoneError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
     const [formData, setFormData] = useState({
         phone: currentUserPhone || '',
         game: '' as string,
@@ -69,6 +73,8 @@ export default function SellAccountModal({ open, onClose, onSubmit, isSubmitting
         if (open) {
             setCurrentStep(0);
             setSearchTerm('');
+            setPhoneError('');
+            setPasswordError('');
             setFormData({
                 phone: currentUserPhone || '',
                 game: '' as string,
@@ -85,6 +91,38 @@ export default function SellAccountModal({ open, onClose, onSubmit, isSubmitting
             });
         }
     }, [open, currentUserPhone]);
+
+    // Real-time Phone Check
+    useEffect(() => {
+        if (isLoggedIn || formData.phone.length < 10) {
+            setPhoneError('');
+            return;
+        }
+        
+        const timer = setTimeout(async () => {
+            const exists = await checkPhoneExists(formData.phone);
+            if (exists) {
+                setPhoneError('Số điện thoại này đã được đăng ký trong hệ thống.');
+            } else {
+                setPhoneError('');
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [formData.phone, isLoggedIn]);
+
+    // Real-time Password Check
+    useEffect(() => {
+        if (isLoggedIn) return;
+        
+        if (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword) {
+            setPasswordError('Mật khẩu xác nhận không khớp.');
+        } else if (formData.password && formData.password.length > 0 && formData.password.length < 6) {
+            setPasswordError('Mật khẩu phải có ít nhất 6 ký tự.');
+        } else {
+            setPasswordError('');
+        }
+    }, [formData.password, formData.confirmPassword, isLoggedIn]);
 
     if (!open) return null;
 
@@ -127,8 +165,8 @@ export default function SellAccountModal({ open, onClose, onSubmit, isSubmitting
     const canProceed = () => {
         if (currentStep === 0) return !!formData.game;
         if (currentStep === 1) {
-            const isPhoneValid = !!formData.phone && formData.phone.length >= 9;
-            const isPasswordValid = isLoggedIn || (formData.password?.length >= 6 && formData.password === formData.confirmPassword);
+            const isPhoneValid = !!formData.phone && formData.phone.length >= 10 && !phoneError;
+            const isPasswordValid = isLoggedIn || (formData.password?.length >= 6 && formData.password === formData.confirmPassword && !passwordError);
             return !!formData.server && isPhoneValid && isPasswordValid;
         }
         if (currentStep === 2) return formData.images.length > 0;
@@ -266,13 +304,14 @@ export default function SellAccountModal({ open, onClose, onSubmit, isSubmitting
                                         <label>Số điện thoại liên hệ (Zalo/Gọi)</label>
                                         <input
                                             type="tel"
-                                            className={styles.input}
+                                            className={`${styles.input} ${phoneError ? styles.inputError : ''}`}
                                             placeholder="0912345678"
                                             value={formData.phone}
-                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                            onChange={(e) => setFormData({ ...formData, phone: formatPhone(e.target.value) })}
                                             disabled={isLoggedIn}
                                             autoComplete="off"
                                         />
+                                        {phoneError && <p className={styles.errorText}>{phoneError}</p>}
                                         {isLoggedIn && (
                                             <span className={styles.hintText}>Đang sử dụng số điện thoại gắn với tài khoản của bạn.</span>
                                         )}
@@ -312,33 +351,36 @@ export default function SellAccountModal({ open, onClose, onSubmit, isSubmitting
                                         <span className={styles.hintText}>* Thông tin này giúp người mua đánh giá độ an toàn của tài khoản.</span>
                                     </div>
                                     {!isLoggedIn && (
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                                            <div className={styles.field}>
-                                                <label>Mật khẩu tạo mới <span>(tối thiểu 6 ký tự)</span></label>
-                                                <input
-                                                    type="password"
-                                                    className={styles.input}
-                                                    placeholder="••••••••"
-                                                    value={formData.password}
-                                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                                    required
-                                                    autoComplete="new-password"
-                                                />
-                                                <span className={styles.hintText}>Dùng để đăng nhập quản lý.</span>
+                                        <>
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                                <div className={styles.field}>
+                                                    <label>Mật khẩu tạo mới <span>(tối thiểu 6 ký tự)</span></label>
+                                                    <input
+                                                        type="password"
+                                                        className={`${styles.input} ${passwordError && (formData.password.length < 6 || formData.password !== formData.confirmPassword) ? styles.inputError : ''}`}
+                                                        placeholder="••••••••"
+                                                        value={formData.password}
+                                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                                        required
+                                                        autoComplete="new-password"
+                                                    />
+                                                    <span className={styles.hintText}>Dùng để đăng nhập quản lý.</span>
+                                                </div>
+                                                <div className={styles.field}>
+                                                    <label>Xác nhận mật khẩu</label>
+                                                    <input
+                                                        type="password"
+                                                        className={`${styles.input} ${passwordError && formData.password !== formData.confirmPassword ? styles.inputError : ''}`}
+                                                        placeholder="••••••••"
+                                                        value={formData.confirmPassword}
+                                                        onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                                                        required
+                                                        autoComplete="new-password"
+                                                    />
+                                                </div>
                                             </div>
-                                            <div className={styles.field}>
-                                                <label>Xác nhận mật khẩu</label>
-                                                <input
-                                                    type="password"
-                                                    className={styles.input}
-                                                    placeholder="••••••••"
-                                                    value={formData.confirmPassword}
-                                                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                                                    required
-                                                    autoComplete="new-password"
-                                                />
-                                            </div>
-                                        </div>
+                                            {passwordError && <p className={styles.errorText} style={{ marginTop: -10, marginBottom: 10 }}>{passwordError}</p>}
+                                        </>
                                     )}
                                 </div>
                             )}
@@ -404,11 +446,11 @@ export default function SellAccountModal({ open, onClose, onSubmit, isSubmitting
                                     <div className={styles.field}>
                                         <label>Giá mong muốn nhận (VNĐ)</label>
                                         <input
-                                            type="number"
+                                            type="text"
                                             className={`${styles.input} ${styles.priceInput}`}
-                                            placeholder="500000"
-                                            value={formData.price}
-                                            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                                            placeholder="500.000"
+                                            value={formatVND(formData.price)}
+                                            onChange={(e) => setFormData({ ...formData, price: parseVND(e.target.value) })}
                                         />
                                         <span className={styles.hintText}>Phí trung gian 5% sẽ được tính sát giá lúc giao dịch thanh toán.</span>
                                     </div>

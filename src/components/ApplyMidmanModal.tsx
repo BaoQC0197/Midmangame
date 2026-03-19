@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShieldCheck, Link as LinkIcon, AlertCircle, User, Briefcase, Percent, Image as ImageIcon, HelpCircle, Phone, Lock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { applyForMidman } from '../api/profiles';
+import { applyForMidman, checkPhoneExists } from '../api/profiles';
 import { uploadImages } from '../api/storage';
+import { formatPhone } from '../lib/utils';
 import styles from './SellAccountModal.module.css';
 
 interface ApplyMidmanModalProps {
@@ -27,13 +28,60 @@ export default function ApplyMidmanModal({ open, onClose, userId, showToast }: A
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [phoneError, setPhoneError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Reset errors when modal opens
+    useEffect(() => {
+        if (open) {
+            setPhoneError('');
+            setPasswordError('');
+        }
+    }, [open]);
+
+    // Real-time Phone Check
+    useEffect(() => {
+        if (userId || phone.length < 10) {
+            setPhoneError('');
+            return;
+        }
+        
+        const timer = setTimeout(async () => {
+            const exists = await checkPhoneExists(phone);
+            if (exists) {
+                setPhoneError('Số điện thoại này đã được đăng ký trong hệ thống.');
+            } else {
+                setPhoneError('');
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [phone, userId]);
+
+    // Real-time Password Check
+    useEffect(() => {
+        if (userId) return;
+        
+        if (password && confirmPassword && password !== confirmPassword) {
+            setPasswordError('Mật khẩu xác nhận không khớp.');
+        } else if (password && password.length > 0 && password.length < 6) {
+            setPasswordError('Mật khẩu phải có ít nhất 6 ký tự.');
+        } else {
+            setPasswordError('');
+        }
+    }, [password, confirmPassword, userId]);
 
 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (phoneError || passwordError) {
+            showToast('Vui lòng sửa các lỗi trước khi gửi đơn.', 'error');
+            return;
+        }
 
         // Không nhất thiết cần userId từ prop, sẽ tạo auth nếu chưa có
         if (!userId && (!phone || !password)) {
@@ -127,17 +175,16 @@ export default function ApplyMidmanModal({ open, onClose, userId, showToast }: A
                         exit={{ opacity: 0 }}
                         onClick={onClose}
                     />
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        transition={{ duration: 0.2 }}
-                        className={styles.modal}
-                        style={{ zIndex: 1101, maxWidth: 650, maxHeight: '95vh', overflowY: 'auto' }}
-                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            transition={{ duration: 0.2 }}
+                            className={`${styles.modal} ${styles.applyModal}`}
+                        >
                         <div className={styles.header}>
                             <div>
-                                <h2 style={{ display: 'flex', alignItems: 'center', gap: 10, margin: 0 }}>
+                                <h2 className={styles.modalTitle}>
                                     <ShieldCheck size={24} style={{ color: 'var(--color-primary)' }} />
                                     Ứng tuyển Midman
                                 </h2>
@@ -155,11 +202,11 @@ export default function ApplyMidmanModal({ open, onClose, userId, showToast }: A
 
                                 {!userId && (
                                     <>
-                                        <div style={{ padding: 16, background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: 12, marginBottom: 16 }}>
-                                            <p style={{ fontSize: 13, color: '#93c5fd', marginBottom: 12, lineHeight: 1.5 }}>
+                                        <div className={styles.authPrompt}>
+                                            <p className={styles.authText}>
                                                 Bạn chưa đăng nhập. Vui lòng nhập thông tin dưới đây để tạo tài khoản hoặc đăng nhập trực tiếp (nếu số điện thoại đã tồn tại).
                                             </p>
-                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                                            <div className={styles.grid2Col}>
                                                 <div className={styles.field} style={{ gridColumn: '1 / -1' }}>
                                                     <label>
                                                         <Phone size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
@@ -168,12 +215,13 @@ export default function ApplyMidmanModal({ open, onClose, userId, showToast }: A
                                                     <input
                                                         type="tel"
                                                         required={!userId}
-                                                        className={styles.input}
+                                                        className={`${styles.input} ${phoneError ? styles.inputError : ''}`}
                                                         placeholder="SĐT dùng làm User"
                                                         value={phone}
-                                                        onChange={e => setPhone(e.target.value)}
+                                                        onChange={e => setPhone(formatPhone(e.target.value))}
                                                         autoComplete="off"
                                                     />
+                                                    {phoneError && <p className={styles.errorText}>{phoneError}</p>}
                                                 </div>
                                                 <div className={styles.field}>
                                                     <label>
@@ -183,7 +231,7 @@ export default function ApplyMidmanModal({ open, onClose, userId, showToast }: A
                                                     <input
                                                         type="password"
                                                         required={!userId}
-                                                        className={styles.input}
+                                                        className={`${styles.input} ${passwordError && (password.length < 6 || password !== confirmPassword) ? styles.inputError : ''}`}
                                                         placeholder="Tối thiểu 6 ký tự"
                                                         value={password}
                                                         onChange={e => setPassword(e.target.value)}
@@ -198,7 +246,7 @@ export default function ApplyMidmanModal({ open, onClose, userId, showToast }: A
                                                     <input
                                                         type="password"
                                                         required={!userId}
-                                                        className={styles.input}
+                                                        className={`${styles.input} ${passwordError && password !== confirmPassword ? styles.inputError : ''}`}
                                                         placeholder="••••••••"
                                                         value={confirmPassword}
                                                         onChange={e => setConfirmPassword(e.target.value)}
@@ -206,11 +254,12 @@ export default function ApplyMidmanModal({ open, onClose, userId, showToast }: A
                                                     />
                                                 </div>
                                             </div>
+                                            {passwordError && <p className={styles.errorText} style={{ marginTop: -10, marginBottom: 10 }}>{passwordError}</p>}
                                         </div>
                                     </>
                                 )}
 
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                                <div className={styles.grid2Col}>
                                     <div className={styles.field}>
                                         <label>
                                             <User size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
@@ -237,12 +286,12 @@ export default function ApplyMidmanModal({ open, onClose, userId, showToast }: A
                                             className={styles.input}
                                             placeholder="Cấp theo định dạng quốc gia"
                                             value={cdcd}
-                                            onChange={e => setCccd(e.target.value)}
+                                            onChange={e => setCccd(formatPhone(e.target.value))}
                                         />
                                     </div>
                                 </div>
 
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                                <div className={styles.grid2Col}>
                                     <div className={styles.field}>
                                         <label style={{ display: 'flex', alignItems: 'center' }}>
                                             <Percent size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
@@ -320,7 +369,7 @@ export default function ApplyMidmanModal({ open, onClose, userId, showToast }: A
 
                                 <div className={styles.field}>
                                     <label>Hình Căn Cước Công Dân Để Đối Chiếu (Dung lượng nhỏ hơn 5MB)</label>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                                    <div className={styles.grid2Col}>
                                         <div className={styles.uploadArea}>
                                             <input
                                                 type="file"

@@ -335,11 +335,11 @@ export default function MarketHeader({ isAdmin, isLoggedIn, currentUserPhone, ac
                                         {link.label}
                                     </a>
                                 ))}
-                                <button className={styles.mobileLinkBtn} onClick={() => { onOpenApplyMidman(); setMenuOpen(false); }}>
+                                <button className={`${styles.mobileLinkBtn} ${styles.mobileLinkBtnMidman}`} onClick={() => { onOpenApplyMidman(); setMenuOpen(false); }}>
                                     <ShieldCheck size={20} />
                                     <span>Ứng tuyển Midman</span>
                                 </button>
-                                <button className={styles.mobileLinkBtn} onClick={() => { setCoffeeModalOpen(true); setMenuOpen(false); }}>
+                                <button className={`${styles.mobileLinkBtn} ${styles.mobileLinkBtnCoffee}`} onClick={() => { setCoffeeModalOpen(true); setMenuOpen(false); }}>
                                     <Coffee size={20} />
                                     <span>Mời Coffee</span>
                                 </button>

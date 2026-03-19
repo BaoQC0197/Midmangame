@@ -3,10 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Handshake, CheckCircle2, FileText, Info } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { createTicket } from '../api/tickets';
-import { getActiveMidmanList } from '../api/profiles';
+import { getActiveMidmanList, checkPhoneExists } from '../api/profiles';
 import type { TradeAccount } from '../types/account';
 import { CATEGORY_LABELS } from '../types/account';
 import MidmanProfileModal from './MidmanProfileModal';
+import { formatPhone } from '../lib/utils';
 import styles from './BuyRequestModal.module.css';
 
 interface BuyRequestModalProps {
@@ -19,12 +20,46 @@ export default function BuyRequestModal({ account, onClose, isLoggedIn }: BuyReq
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [phoneError, setPhoneError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
     const [note, setNote] = useState('');
     const [loading, setLoading] = useState(false);
     const [ticketId, setTicketId] = useState<string | null>(null);
     const [midmanList, setMidmanList] = useState<any[]>([]);
     const [selectedMidmanId, setSelectedMidmanId] = useState('');
     const [showMidmanProfileId, setShowMidmanProfileId] = useState<string | null>(null);
+
+    // Real-time Phone Check
+    useEffect(() => {
+        if (isLoggedIn || phone.length < 10) {
+            setPhoneError('');
+            return;
+        }
+        
+        const timer = setTimeout(async () => {
+            const exists = await checkPhoneExists(phone);
+            if (exists) {
+                setPhoneError('Số điện thoại này đã được đăng ký trong hệ thống.');
+            } else {
+                setPhoneError('');
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [phone, isLoggedIn]);
+
+    // Real-time Password Check
+    useEffect(() => {
+        if (isLoggedIn) return;
+        
+        if (password && confirmPassword && password !== confirmPassword) {
+            setPasswordError('Mật khẩu xác nhận không khớp.');
+        } else if (password && password.length > 0 && password.length < 6) {
+            setPasswordError('Mật khẩu phải có ít nhất 6 ký tự.');
+        } else {
+            setPasswordError('');
+        }
+    }, [password, confirmPassword, isLoggedIn]);
 
     useEffect(() => {
         if (account) {
@@ -174,48 +209,52 @@ export default function BuyRequestModal({ account, onClose, isLoggedIn }: BuyReq
                                             Số điện thoại <span>(bắt buộc)</span>
                                         </label>
                                         <input
-                                            className={styles.input}
+                                            className={`${styles.input} ${phoneError ? styles.inputError : ''}`}
                                             type="tel"
                                             placeholder="VD: 0901234567"
                                             value={phone}
-                                            onChange={e => setPhone(e.target.value)}
+                                            onChange={e => setPhone(formatPhone(e.target.value))}
                                             required
                                             autoFocus
                                             autoComplete="off"
                                         />
+                                        {phoneError && <p className={styles.errorText}>{phoneError}</p>}
                                     </div>
 
                                     {!isLoggedIn && (
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                                            <div>
-                                                <label className={styles.fieldLabel}>
-                                                    Mật khẩu <span>(tối thiểu 6 ký tự)</span>
-                                                </label>
-                                                <input
-                                                    className={styles.input}
-                                                    type="password"
-                                                    placeholder="••••••••"
-                                                    value={password}
-                                                    onChange={e => setPassword(e.target.value)}
-                                                    required
-                                                    autoComplete="new-password"
-                                                />
+                                        <>
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                                <div>
+                                                    <label className={styles.fieldLabel}>
+                                                        Mật khẩu <span>(tối thiểu 6 ký tự)</span>
+                                                    </label>
+                                                    <input
+                                                        className={`${styles.input} ${passwordError && (password.length < 6 || password !== confirmPassword) ? styles.inputError : ''}`}
+                                                        type="password"
+                                                        placeholder="••••••••"
+                                                        value={password}
+                                                        onChange={e => setPassword(e.target.value)}
+                                                        required
+                                                        autoComplete="new-password"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className={styles.fieldLabel}>
+                                                        Xác nhận mật khẩu
+                                                    </label>
+                                                    <input
+                                                        className={`${styles.input} ${passwordError && password !== confirmPassword ? styles.inputError : ''}`}
+                                                        type="password"
+                                                        placeholder="••••••••"
+                                                        value={confirmPassword}
+                                                        onChange={e => setConfirmPassword(e.target.value)}
+                                                        required
+                                                        autoComplete="new-password"
+                                                    />
+                                                </div>
                                             </div>
-                                            <div>
-                                                <label className={styles.fieldLabel}>
-                                                    Xác nhận mật khẩu
-                                                </label>
-                                                <input
-                                                    className={styles.input}
-                                                    type="password"
-                                                    placeholder="••••••••"
-                                                    value={confirmPassword}
-                                                    onChange={e => setConfirmPassword(e.target.value)}
-                                                    required
-                                                    autoComplete="new-password"
-                                                />
-                                            </div>
-                                        </div>
+                                            {passwordError && <p className={styles.errorText} style={{ marginTop: -8 }}>{passwordError}</p>}
+                                        </>
                                     )}
                                     <div>
                                         <label className={styles.fieldLabel}>
@@ -271,7 +310,7 @@ export default function BuyRequestModal({ account, onClose, isLoggedIn }: BuyReq
                                     <button
                                         type="submit"
                                         className={`btn-premium ${styles.submitBtn}`}
-                                        disabled={loading || !phone.trim() || !selectedMidmanId || (!isLoggedIn && (password.length < 6 || password !== confirmPassword))}
+                                        disabled={loading || !phone.trim() || !!phoneError || !selectedMidmanId || (!isLoggedIn && (password.length < 6 || password !== confirmPassword || !!passwordError))}
                                     >
                                         {loading ? (
                                             <>

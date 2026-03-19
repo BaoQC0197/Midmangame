@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, ShieldCheck, Mail, Facebook, Save } from 'lucide-react';
 import { getProfile, updateProfileInfo, UserProfile } from '../api/profiles';
+import { formatPhone } from '../lib/utils';
 import styles from './SellAccountModal.module.css'; // Dùng chung CSS Modal
 
 interface UserProfileModalProps {
@@ -120,7 +121,7 @@ export default function UserProfileModal({ open, onClose, userId, showToast }: U
                                         className={styles.input}
                                         placeholder="Nhập số CCCD thật của bạn"
                                         value={cccd}
-                                        onChange={e => setCccd(e.target.value)}
+                                        onChange={e => setCccd(formatPhone(e.target.value))}
                                         disabled={saving}
                                     />
                                 </div>

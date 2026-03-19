@@ -278,6 +278,19 @@
     .title { font-size: 20px; }
 }
 
+.inputError {
+    border-color: #ef4444 !important;
+    background: rgba(239, 68, 68, 0.05) !important;
+}
+
+.errorText {
+    color: #ef4444;
+    font-size: 12px;
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+
 /* Buyer Fee Notice Styles */
 .buyerFeeNotice {
     margin-top: 16px;

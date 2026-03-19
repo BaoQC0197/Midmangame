@@ -27,7 +27,12 @@
     display: flex;
     flex-direction: column;
     max-height: 90vh;
-    overflow: hidden;
+    overflow-y: auto;
+}
+
+.applyModal {
+    max-width: 650px;
+    z-index: 1101;
 }
 
 .header {
@@ -39,7 +44,7 @@
     background: rgba(255, 255, 255, 0.02);
 }
 
-.header h2 {
+.header h2, .modalTitle {
     font-size: 24px;
     font-weight: 800;
     margin-bottom: 8px;
@@ -47,6 +52,9 @@
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .header p {
@@ -221,6 +229,12 @@
 }
 
 .gridSelection {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.grid2Col {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
@@ -608,7 +622,7 @@
 }
 
 @media (max-width: 640px) {
-    .gridSelection {
+    .gridSelection, .grid2Col {
         grid-template-columns: 1fr;
     }
 
@@ -619,3 +633,15 @@
         padding: 20px;
     }
 }
+
+.inputError {
+    border-color: #ef4444 !important;
+    background: rgba(239, 68, 68, 0.05) !important;
+}
+
+.errorText {
+    color: #ef4444;
+    font-size: 12px;
+    margin-top: 4px;
+    font-weight: 600;
+}

@@ -18,12 +18,35 @@
     flex-wrap: nowrap;
 }
 
+@media (max-width: 768px) {
+    .filterRow {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+}
+
 .categoryTabs {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
     flex: 1;
     position: relative;
+}
+
+@media (max-width: 768px) {
+    .categoryTabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        gap: 8px;
+    }
+    
+    .categoryTab {
+        width: 100%;
+        justify-content: center;
+        padding: 12px;
+    }
 }
 
 .tabWrapper {
@@ -170,6 +193,16 @@
     letter-spacing: 0.05em;
 }
 
+@media (max-width: 768px) {
+    .filterLabel {
+        min-width: 0;
+        width: 100%;
+        font-size: 12px;
+        opacity: 0.6;
+        margin-bottom: -4px;
+    }
+}
+
 .spacer {
     flex: 1;
 }
@@ -183,6 +216,7 @@
 .typeGroup {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap; /* Added wrapping for narrow screens */
 }
 
 .filterGroups {
@@ -191,6 +225,14 @@
     gap: 20px;
     flex-wrap: nowrap;
     flex: 1;
+}
+
+@media (max-width: 768px) {
+    .filterGroups {
+        flex-direction: column;
+        width: 100%;
+        gap: 16px;
+    }
 }
 
 .gameSelector {
@@ -392,10 +434,28 @@
     background: var(--color-border);
 }
 
+@media (max-width: 768px) {
+    .dividerVertical {
+        display: none;
+    }
+}
+
 .sortWrapper {
     display: flex;
     align-items: center;
     gap: 12px;
+}
+
+@media (max-width: 768px) {
+    .sortWrapper {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .sortSelect {
+        flex: 1;
+        max-width: 200px;
+    }
 }
 
 .filterLabelSmall {
@@ -405,6 +465,13 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .filterLabelSmall {
+        font-size: 11px;
+        opacity: 0.6;
+    }
 }
 
 .sortSelect {
@@ -430,6 +497,13 @@
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+@media (max-width: 768px) {
+    .priceInputs {
+        width: 100%;
+        flex-wrap: wrap;
+    }
 }
 
 .priceInputWrapper {
@@ -475,6 +549,7 @@
 .feeGroup {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap; /* Added wrapping */
 }
 
 .filterChip {

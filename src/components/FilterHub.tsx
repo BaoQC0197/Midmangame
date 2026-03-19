@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, CheckCircle2, ChevronDown, Search, X, Banknote } from 'lucide-react';
 import styles from './FilterHub.module.css';
 import { Category } from '../api/categories';
+import { formatVND, parseVND } from '../lib/utils';
 
 interface FilterHubProps {
     categories: Category[];
@@ -275,20 +276,20 @@ export default function FilterHub({
                         <div className={styles.priceInputWrapper}>
                             <Banknote size={14} />
                             <input
-                                type="number"
+                                type="text"
                                 placeholder="Từ"
-                                value={minPrice}
-                                onChange={(e) => onMinPriceChange(e.target.value)}
+                                value={formatVND(minPrice)}
+                                onChange={(e) => onMinPriceChange(parseVND(e.target.value))}
                             />
                         </div>
                         <span className={styles.priceTo}>-</span>
                         <div className={styles.priceInputWrapper}>
                             <Banknote size={14} />
                             <input
-                                type="number"
+                                type="text"
                                 placeholder="đến"
-                                value={maxPrice}
-                                onChange={(e) => onMaxPriceChange(e.target.value)}
+                                value={formatVND(maxPrice)}
+                                onChange={(e) => onMaxPriceChange(parseVND(e.target.value))}
                             />
                         </div>
                     </div>

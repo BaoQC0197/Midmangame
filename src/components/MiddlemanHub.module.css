@@ -24,6 +24,19 @@
     animation: zoomIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.modalContent {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.8);
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes zoomIn {
     from {
         opacity: 0;
@@ -87,6 +100,27 @@
 .navFooter {
     padding: 20px;
     border-top: 1px solid var(--color-border);
+}
+
+.closeBtn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.closeBtn:hover {
+    background: #ef4444;
+    color: white;
 }
 
 .header {

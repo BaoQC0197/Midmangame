@@ -23,6 +23,7 @@ import Toast, { type ToastType } from './components/Toast';
 import UserHub from './components/UserHub';
 import ApplyMidmanModal from './components/ApplyMidmanModal';
 import MidmanPanel from './components/MidmanPanel';
+import MiddlemanHub from './components/MiddlemanHub';
 import Logo from './components/Logo';
 import UserProfileModal from './components/UserProfileModal';
 import styles from './App.module.css';
@@ -407,9 +408,10 @@ export default function App() {
             </main>
 
             {isAdmin && (
-                <MidmanPanel
+                <MiddlemanHub
                     open={adminPanelOpen}
                     onClose={() => setAdminPanelOpen(false)}
+                    accounts={accounts}
                     showToast={showToast}
                     onOpenTradeRoom={(t: TransactionTicket) => {
                         setActiveTradeTicket(t);

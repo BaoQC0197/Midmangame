@@ -27,8 +27,66 @@
 .content {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    height: 440px;
+    justify-content: flex-start;
+    gap: 20px;
+    height: auto;
+}
+
+.bannerContainer {
+    position: relative;
+    width: 100%;
+    height: 360px;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #000;
+}
+
+.bannerImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+    transition: transform 0.8s ease;
+}
+
+.bannerContainer:hover .bannerImage {
+    transform: scale(1.05);
+}
+
+.bannerOverlay {
+    position: absolute;
+    inset: 0;
+    padding: 05px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    text-align: center;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.2) 50%, transparent 100%);
+}
+
+.bannerTitle {
+    font-size: clamp(18px, 2.2vw, 24px);
+    line-height: 1.4;
+    font-weight: 700;
+    margin: 0;
+    color: #fff;
+    font-family: var(--font-body);
+}
+
+.bannerTitle span {
+    color: var(--color-accent);
+}
+
+.bannerSubtitle {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 4px 0 0;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    font-family: var(--font-body);
 }
 
 .badge {
@@ -86,22 +144,39 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    padding: 0 40px;
-    height: 64px;
-    border-radius: 18px;
-    font-size: 18px;
-    font-weight: 800;
+    padding: 0 40px !important;
+    height: 60px !important;
+    border-radius: 18px !important;
+    font-size: 16px !important;
+    font-weight: 700;
     cursor: pointer;
-    flex: 1;
-    max-width: 360px;
-    box-shadow: 0 10px 30px -10px rgba(168, 85, 247, 0.6);
+    width: 100% !important;
+    max-width: none !important;
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%) !important;
+    color: white !important;
+    border: none !important;
+    box-shadow: 0 10px 40px -10px rgba(124, 58, 237, 0.6);
+    transition: all 0.3s ease !important;
+    font-family: var(--font-body) !important;
+    text-transform: none !important;
+    letter-spacing: 0.02em !important;
+}
+
+.btnExplore:hover {
+    box-shadow: 0 15px 50px -10px rgba(124, 58, 237, 0.8);
+    filter: brightness(1.1);
+}
+
+.btnExplore:hover .btnIcon {
+    transform: translateX(6px);
 }
 
 .btnExplore:hover {
     box-shadow: 0 15px 40px -10px rgba(168, 85, 247, 0.8);
 }
 
-.btnExplore svg, .btnIcon {
+.btnExplore svg,
+.btnIcon {
     filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
     transition: transform 0.3s ease;
 }
@@ -503,10 +578,12 @@
         flex-direction: column;
         align-items: center;
     }
+
     .heroInner {
         grid-template-columns: 1fr;
         gap: 40px;
     }
+
     .miniList {
         width: 100%;
         max-width: 380px;
@@ -663,5 +740,20 @@
         gap: 32px;
         text-align: center;
         align-items: center;
+    }
+
+    .bannerContainer {
+        height: 240px;
+    }
+
+    .bannerOverlay {
+        padding: 20px;
+        align-items: center;
+        text-align: center;
+        background: rgba(0, 0, 0, 0.6);
+    }
+
+    .bannerTitle {
+        font-size: 28px;
     }
 }

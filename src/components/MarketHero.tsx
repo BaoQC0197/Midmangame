@@ -1,8 +1,9 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, Sparkles, Star, BadgeCheck, Handshake, ChevronLeft, ChevronRight, ThumbsUp } from 'lucide-react';
+import { ShieldCheck, Sparkles, Star, BadgeCheck, Handshake, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './MarketHero.module.css';
 import { TradeAccount, CATEGORY_LABELS, CategoryKey } from '../types/account';
+import heroBanner from '../assets/hero_banner_sharp.png';
 
 interface MarketHeroProps {
     onOpenSellModal: () => void;
@@ -67,26 +68,28 @@ export default function MarketHero({ onOpenSellModal, onBuyRequest, accounts = [
                     transition={{ duration: 0.8, ease: "easeOut" }}
                     className={styles.content}
                 >
+                    <div className={styles.bannerContainer}>
+                        <img src={heroBanner} alt="Hero Banner" className={styles.bannerImage} />
+                        <div className={styles.bannerOverlay}>
+                            <h1 className={styles.bannerTitle}>
+                                Sàn ký gửi, tìm mua tài khoản game<br />
 
-                    <h1 className={`${styles.title} text-gradient`}>
-                        <span className="text-gold">Trung Gian</span> <br />
-                        Tài Khoản
-                    </h1>
-
-                    <p className={styles.subtitle}>
-                        Nơi trung gian tin cậy cho mọi loại tài khoản số.<br />
-                        An toàn, nhanh chóng và bảo mật tuyệt đối.
-                    </p>
+                            </h1>
+                            <p className={styles.bannerSubtitle}>
+                                UY TÍN • BẢO MẬT • NHANH CHÓNG
+                            </p>
+                        </div>
+                    </div>
 
                     <div className={styles.heroActions}>
                         <motion.button
                             className={`btn-premium ${styles.btnExplore}`}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
                             onClick={onOpenSellModal}
                         >
-                            <ThumbsUp size={18} className={styles.btnIcon} />
-                            <span>Đăng ký bán</span>
+                            <span>KÝ GỬI ACCOUNT TẠI ĐÂY</span>
+                            <ChevronRight size={20} className={styles.btnIcon} />
                         </motion.button>
                     </div>
 
@@ -99,104 +102,102 @@ export default function MarketHero({ onOpenSellModal, onBuyRequest, accounts = [
                     className={styles.visual}
                 >
                     <div className={styles.visualContainer}>
-                        {/* Slider Card */}
-                        <AnimatePresence mode="wait">
-                            <motion.div
-                                key={activeIndex}
-                                initial={{ opacity: 0, x: 40, scale: 0.95, filter: "blur(8px)" }}
-                                animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)" }}
-                                exit={{ opacity: 0, x: -40, scale: 1.05, filter: "blur(8px)" }}
-                                transition={{ 
-                                    duration: 1.2,
-                                    ease: [0.22, 1, 0.36, 1] 
-                                }}
-                                className={styles.floatingCard}
-                            >
-                                <div className={styles.cardTopBar}>
-                                    <div className={styles.cardTag}>
-                                        <Sparkles size={10} />
-                                        <span>Hot Account</span>
-                                    </div>
-                                    <div className={styles.cardVerified}>
-                                        <BadgeCheck size={14} />
-                                        <span>Verified</span>
-                                    </div>
-                                </div>
-
-                                <div className={styles.cardGameBanner}>
-                                    <div className={styles.bannerGlow} />
-                                    <div className={styles.bannerContent}>
-                                        <div className={styles.bannerAvatar}>
-                                            {currentItem && 'thumbnail' in currentItem && currentItem.thumbnail ? (
-                                                <img src={currentItem.thumbnail} alt="" className={styles.hotThumb} />
-                                            ) : (
-                                                <Star size={20} style={{ color: '#f59e0b' }} />
-                                            )}
+                        {/* Slider Card - STATIC FRAME */}
+                        <div className={styles.floatingCard}>
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={activeIndex}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.4 }}
+                                    className={styles.cardContentWrapper}
+                                >
+                                    <div className={styles.cardTopBar}>
+                                        <div className={styles.cardTag}>
+                                            <Sparkles size={10} />
+                                            <span>Hot Account</span>
                                         </div>
-                                        <div>
-                                            <div className={styles.bannerTitle}>
-                                                {currentItem && ('title' in currentItem ? currentItem.title : currentItem.label)}
+                                        <div className={styles.cardVerified}>
+                                            <BadgeCheck size={14} />
+                                            <span>Verified</span>
+                                        </div>
+                                    </div>
+
+                                    <div className={styles.cardGameBanner}>
+                                        <div className={styles.bannerGlow} />
+                                        <div className={styles.bannerContent}>
+                                            <div className={styles.bannerAvatar}>
+                                                {currentItem && 'thumbnail' in currentItem && currentItem.thumbnail ? (
+                                                    <img src={currentItem.thumbnail} alt="" className={styles.hotThumb} />
+                                                ) : (
+                                                    <Star size={20} style={{ color: '#f59e0b' }} />
+                                                )}
                                             </div>
-                                            <div className={styles.bannerGame}>
-                                                {currentItem && ('game' in currentItem ? CATEGORY_LABELS[currentItem.game as CategoryKey] : (currentItem.category || 'Genshin Impact'))}
+                                            <div>
+                                                <div className={styles.bannerTitle}>
+                                                    {currentItem && ('title' in currentItem ? currentItem.title : currentItem.label)}
+                                                </div>
+                                                <div className={styles.bannerGame}>
+                                                    {currentItem && ('game' in currentItem ? CATEGORY_LABELS[currentItem.game as CategoryKey] : (currentItem.category || 'Genshin Impact'))}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div className={styles.cardStats}>
-                                    <div className={styles.cardStatItem}>
-                                        <span className={styles.cardStatLabel}>
-                                            {currentItem && 'server' in currentItem ? 'Khu vực' : 'Nhân vật 5★'}
-                                        </span>
-                                        <span className={styles.cardStatVal}>
-                                            {currentItem && 'server' in currentItem ? (currentItem.server || 'Global') : '24'}
-                                        </span>
-                                    </div>
-                                    <div className={styles.cardStatItem}>
-                                        <span className={styles.cardStatLabel}>
-                                            {currentItem && 'account_type' in currentItem ? 'Xếp hạng' : 'Vũ khí 5★'}
-                                        </span>
-                                        <span className={styles.cardStatVal}>
-                                            {currentItem && 'account_type' in currentItem ? (currentItem.account_type || 'VIP') : '18'}
-                                        </span>
-                                    </div>
-                                    <div className={styles.cardStatItem}>
-                                        <span className={styles.cardStatLabel}>Tình trạng</span>
-                                        <span className={styles.cardStatVal}>Sẵn sàng</span>
-                                    </div>
-                                </div>
-
-                                <div className={styles.cardFooter}>
-                                    <div className={styles.priceArea}>
-                                        <span className={styles.priceLabel}>Giá account</span>
-                                        <span className={styles.priceVal}>
-                                            {currentItem && typeof currentItem.price === 'number'
-                                                ? currentItem.price.toLocaleString() + 'đ'
-                                                : currentItem.price}
-                                        </span>
-                                    </div>
-
-                                    {currentItem && 'id' in currentItem ? (
-                                        <motion.button
-                                            className={styles.btnBuyAction}
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            onClick={() => onBuyRequest(currentItem as TradeAccount)}
-                                        >
-                                            <Handshake size={16} />
-                                            <span>Mua ngay</span>
-                                        </motion.button>
-                                    ) : (
-                                        <div className={styles.cardShield}>
-                                            <ShieldCheck size={16} style={{ color: 'var(--color-secondary)' }} />
+                                    <div className={styles.cardStats}>
+                                        <div className={styles.cardStatItem}>
+                                            <span className={styles.cardStatLabel}>
+                                                {currentItem && 'server' in currentItem ? 'Khu vực' : 'Nhân vật 5★'}
+                                            </span>
+                                            <span className={styles.cardStatVal}>
+                                                {currentItem && 'server' in currentItem ? (currentItem.server || 'Global') : '24'}
+                                            </span>
                                         </div>
-                                    )}
-                                </div>
-                            </motion.div>
-                        </AnimatePresence>
+                                        <div className={styles.cardStatItem}>
+                                            <span className={styles.cardStatLabel}>
+                                                {currentItem && 'account_type' in currentItem ? 'Xếp hạng' : 'Vũ khí 5★'}
+                                            </span>
+                                            <span className={styles.cardStatVal}>
+                                                {currentItem && 'account_type' in currentItem ? (currentItem.account_type || 'VIP') : '18'}
+                                            </span>
+                                        </div>
+                                        <div className={styles.cardStatItem}>
+                                            <span className={styles.cardStatLabel}>Tình trạng</span>
+                                            <span className={styles.cardStatVal}>Sẵn sàng</span>
+                                        </div>
+                                    </div>
 
-                        {/* Pagination / Dots indicator replacement */}
+                                    <div className={styles.cardFooter}>
+                                        <div className={styles.priceArea}>
+                                            <span className={styles.priceLabel}>Giá account</span>
+                                            <span className={styles.priceVal}>
+                                                {currentItem && typeof currentItem.price === 'number'
+                                                    ? currentItem.price.toLocaleString() + 'đ'
+                                                    : currentItem.price}
+                                            </span>
+                                        </div>
+
+                                        {currentItem && 'id' in currentItem ? (
+                                            <motion.button
+                                                className={styles.btnBuyAction}
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                                onClick={() => onBuyRequest(currentItem as TradeAccount)}
+                                            >
+                                                <Handshake size={16} />
+                                                <span>Mua ngay</span>
+                                            </motion.button>
+                                        ) : (
+                                            <div className={styles.cardShield}>
+                                                <ShieldCheck size={16} style={{ color: 'var(--color-secondary)' }} />
+                                            </div>
+                                        )}
+                                    </div>
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
+
                         {/* Pagination for Mini List */}
                         <div className={styles.miniList}>
                             {displayItems.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE).map((item, i) => {
